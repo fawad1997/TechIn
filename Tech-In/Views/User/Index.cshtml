@@ -1,0 +1,773 @@
+﻿@model ProfileViewModal
+@{
+    ViewData["Title"] = "Profile";
+}
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<!-- Blog -->
+<div id="blog" class="section sm-padding">
+
+    <!-- Container -->
+    <div class="container">
+
+        <!-- Row -->
+        <div class="row">
+            <div class="col-md-9">
+                <div>
+                    <img src="~/images/s.png" class="img-responsive profile-cover" />
+                </div>
+                <!--Cover Div-->
+                <div class="profile-pic-align">
+                    <img src="~/images/noimg.svg" class="img-responsive img-rounded profile-pic" />
+                </div>
+                <!--/Profile Picture-->
+                <!--Edit-->
+                <div class="right-icon-div">
+                    <div class="round-icon-back">
+                        <i class="fa fa-pencil"></i>
+                    </div>
+                </div>
+                <!--/Edit-->
+                <div class="center">
+                    <h1 class="profile-name">@Model.UserPersonalVM.FullName</h1>
+                    <i class="fa fa-briefcase"></i>
+
+                    @*<h2 class="profile-name profile-less inline"> Student at Capital University of Science & Technology</h2>*@
+                    <hr class="col-xs-12">
+                    <br />
+                    <p>
+                        @Model.UserPersonalVM.Summary
+                    </p>
+                </div>
+                <!--/Name Education ends here-->
+
+                <div>
+
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#wall" aria-controls="home" role="tab" data-toggle="tab">Timeline</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#about" aria-controls="profile" role="tab" data-toggle="tab">About</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Questions</a>
+                        </li>
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="wall">
+                            <div class="row">
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-2 col-md-1">
+                                            <img src="~/images/noimg.svg" class="post-img img-circle" />
+                                        </div>
+                                        <div class="col-xs-10 col-md-11">
+                                            <h6 class="inline small-h">@Model.UserPersonalVM.FullName</h6>
+                                            <br />
+                                            <!--Edit-->
+                                            <div class="right-post-icon-div">
+                                                <div class="round-icon-back">
+                                                    <i class="fa fa-ellipsis-h"></i>
+                                                </div>
+                                            </div>
+                                            <!--/Edit-->
+                                            <p class="inline twelve-font">Student at Capital University of Science & Technology</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <hr />
+                                            <p class="black">
+                                                I am sorry if you are seeing it. Please Ignore this message as this module is pending yet and will be done in next semester. have a nice day
+                                            </p>
+                                            <p>7 Likes</p>
+                                            <hr />
+                                            <button class="transparent-btn">
+                                                <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+                                                Like
+                                            </button>
+                                            <button class="transparent-btn">
+                                                <i class="fa fa-comment-o" aria-hidden="true"></i>
+                                                Comment
+                                            </button>
+                                            <button class="transparent-btn">
+                                                <i class="fa fa-share" aria-hidden="true"></i>
+                                                Share
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-2 col-md-1">
+                                            <img src="~/images/noimg.svg" class="post-img img-circle" />
+                                        </div>
+                                        <div class="col-xs-10 col-md-11">
+                                            <h6 class="inline small-h">@Model.UserPersonalVM.FullName</h6>
+                                            <br />
+                                            <!--Edit-->
+                                            <div class="right-post-icon-div">
+                                                <div class="round-icon-back">
+                                                    <i class="fa fa-ellipsis-h"></i>
+                                                </div>
+                                            </div>
+                                            <!--/Edit-->
+                                            <p class="inline twelve-font">Student at Capital University of Science & Technology</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <hr />
+                                            <p class="black">
+                                                I am sorry if you are seeing it. Please Ignore this message as this module is pending yet and will be done in next semester. have a nice day
+                                            </p>
+                                            <p>7 Likes</p>
+                                            <hr />
+                                            <button class="transparent-btn">
+                                                <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+                                                Like
+                                            </button>
+                                            <button class="transparent-btn">
+                                                <i class="fa fa-comment-o" aria-hidden="true"></i>
+                                                Comment
+                                            </button>
+                                            <button class="transparent-btn">
+                                                <i class="fa fa-share" aria-hidden="true"></i>
+                                                Share
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--/Wall Div-->
+                        <div role="tabpanel" class="tab-pane" id="about">
+                            <div class="row">
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h6 class="inline small-h">Personal Information</h6>
+                                            <br />
+                                            <!--Edit-->
+                                            <div class="right-post-icon-div" onclick="EditPersonalD(@Model.UserPersonalVM.UserPersonalDetailID)">
+                                                <div class="round-icon-back">
+                                                    <i class="fa fa-pencil"></i>
+                                                </div>
+                                            </div>
+                                            <!--/Edit-->
+                                            <hr />
+                                        </div>
+                                        <div class="row">
+                                            <div class="container">
+                                                <div class="col-xs-5 col-md-push-2 col-sm-push-1">
+                                                    <strong>First Name :</strong>
+                                                    <br />
+                                                    <strong>Last Name : </strong>
+                                                    <br />
+                                                    @if (@Model.UserPersonalVM.PhoneNo != null)
+                                            {
+                                                <strong>Phone no : </strong>
+                                                <br />
+
+                                    }
+                                                    <strong>Email : </strong>
+                                                    <br />
+                                                    <strong>Date of Birth : </strong>
+                                                    <br />
+                                                    <strong>Gender : </strong>
+                                                    <br />
+                                                    <strong>Country : </strong>
+                                                    <br />
+                                                    <strong>City : </strong>
+                                                    <br />
+                                                </div>
+                                                <div class="col-xs-7">
+                                                    <p class="black zero-margin">@Model.UserPersonalVM.FirstName</p>
+                                                    <p class="black zero-margin">@Model.UserPersonalVM.LastName</p>
+                                                    <p class="black zero-margin">@Model.UserPersonalVM.PhoneNo</p>
+                                                    <p class="black zero-margin">@Model.UserPersonalVM.Email</p>
+                                                    <p class="black zero-margin">@Model.UserPersonalVM.DOB.ToString("dd MMM yyyy")</p>
+                                                    <p class="black zero-margin">@Model.UserPersonalVM.Gender</p>
+                                                    <p class="black zero-margin">@Model.UserPersonalVM.CountryName</p>
+                                                    <p class="black zero-margin">@Model.UserPersonalVM.CityName</p>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!--Experience-->
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h6 class="inline small-h">
+                                                Experience
+                                                <small>(2 Months)</small>
+                                            </h6>
+                                            <br />
+                                            <!--Add-->
+                                            <div class="right-post-icon-div" onclick="AddEditExp(0)">
+                                                <div class="round-icon-back">
+                                                    <i class="fa fa-plus"></i>
+                                                </div>
+                                            </div>
+                                            <!--/Add-->
+                                            <hr />
+                                        </div>
+                                        <input type="hidden" id="hiddenExpId" />
+                                        @if (ViewBag.UserExperienceList != null && ViewBag.UserExperienceList.Count != 0)
+                                {
+                                    foreach (var item in ViewBag.UserExperienceList)
+                                    {
+                                        <div class="row" id="row_exp_@item.UserExperienceId">
+                                            <div class="col-xs-3 col-md-2">
+                                                <img src="~/images/noimg.svg" alt="" class="img-thumbnail margin-left20" />
+                                            </div>
+                                            <div class="col-xs-9 col-md-10">
+                                                <strong class="small-h">@item.Title</strong>
+                                                <!--Delete-->
+                                                <div onclick="confirmDelExp(@item.UserExperienceId)" class="delete-exp-round">
+                                                    <div class="round-icon-back-del" data-toggle="modal" data-target="#addExperienceModal">
+                                                        <i class="fa fa-trash-o"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Delete-->
+                                                <!--Edit-->
+                                                <div onclick="AddEditExp(@item.UserExperienceId)" class="edit-exp-round">
+                                                    <div class="round-icon-back" data-toggle="modal" data-target="#addExperienceModal">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Edit-->
+                                                <p class="xsmall-h">
+                                                    @item.CompanyName, @item.CityName, @item.CountryName
+                                                    <i class="fa fa-map-marker" aria-hidden="true"></i>
+                                                </p>
+                                                <p class="black">@item.Description</p>
+                                                <p>
+                                                    @item.StartDate.ToString("dd MMM yyyy") -
+                                                    @if (item.CurrentWorkCheck)
+                                            {<span>Current</span> }
+                                    else
+                                    {
+
+                                        @item.EndDate.ToString("dd MMM yyyy")
+                            }
+                                                    &bull;
+                                                    @*<small>1 Month</small>*@
+                                                </p>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <hr class="margin-both-lr" />
+                                            </div>
+                                        </div>
+
+                            }
+                        }
+                        else
+                        {
+                            <div class="row">
+                                <p class="xsmall-h"><center>No Experience</center></p>
+                            </div>
+
+
+                }
+                                    </div>
+                                </div>
+                                <!--/Experience-->
+                                <!--Education-->
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h6 class="inline small-h">Education</h6>
+                                            <br />
+                                            <!--Add-->
+                                            <div class="right-post-icon-div" onclick="viewEduModal(0)">
+                                                <div class="round-icon-back">
+                                                    <i class="fa fa-plus"></i>
+                                                </div>
+                                            </div>
+                                            <!--/Add-->
+                                            <hr />
+                                        </div>
+                                        <input type="hidden" id="hiddenEduId" />
+                                        @if (ViewBag.UserEducationList != null && ViewBag.UserEducationList.Count != 0)
+                                {
+                                    foreach (var item in ViewBag.UserEducationList)
+                                    {
+                                        <div class="row" id="row_exp_@item.UserEducationID">
+                                            <div class="col-xs-12 margin-both-lr">
+                                                <strong class="small-h">@item.Title</strong>
+                                                <!--Delete-->
+                                                <div onclick="confirmDelEdu(@item.UserEducationID)" class="delete-exp-round">
+                                                    <div class="round-icon-back-del" data-toggle="modal" data-target="#addExperienceModal">
+                                                        <i class="fa fa-trash-o"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Delete-->
+                                                <!--Edit-->
+                                                <div class="edit-exp-round" onclick="viewEduModal(@item.UserEducationID)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Edit-->
+                                                <p class="xsmall-h">
+                                                    @item.SchoolName, @item.CityName, @item.CountryName
+                                                    <i class="fa fa-map-marker" aria-hidden="true"></i>
+                                                </p>
+                                                <p class="black">@item.Details</p>
+                                                <p>
+                                                    @item.StartDate.ToString("dd MMM yyyy") -
+                                                    @if (item.CurrentStatusCheck)
+                                            {<span>Current</span> }
+                                    else
+                                    {
+
+                                        @item.EndDate.ToString("dd MMM yyyy")
+                            }
+                                                    @*<small>1 Month</small>*@
+                                                </p>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <hr class="margin-both-lr" />
+                                            </div>
+                                        </div>
+
+                            }
+                        }
+                        else
+                        {
+                            <div class="row">
+                                <p class="xsmall-h"><center>No Education</center></p>
+                            </div>
+
+                }
+
+                                    </div>
+                                </div>
+                                <!--/Education-->
+                                <!--Skills-->
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h6 class="inline small-h">Skills</h6>
+                                            <br />
+                                            <!--Add-->
+                                            <div class="right-post-icon-div" data-toggle="modal" data-target="#skillModal">
+                                                <div class="round-icon-back">
+                                                    <i class="fa fa-plus"></i>
+                                                </div>
+                                            </div>
+                                            <!--/Add-->
+                                            <hr />
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-12 margin-both-lr">
+                                                <div class="widget-tags">
+                                                    <a href="#">Java</a>
+                                                    <a href="#">Php</a>
+                                                    <a href="#">Web Development</a>
+                                                    <a href="#">Web Designing</a>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                                <!--/Skills-->
+                                <!--Certification-->
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h6 class="inline small-h">Certifications</h6>
+                                            <br />
+                                            <!--Add-->
+                                            <div class="right-post-icon-div" onclick="viewCertModal(0)">
+                                                <div class="round-icon-back">
+                                                    <i class="fa fa-plus"></i>
+                                                </div>
+                                            </div>
+                                            <!--/Add-->
+                                            <hr />
+                                        </div>
+                                        <input type="hidden" id="hiddenCertId" />
+                                        @if (ViewBag.UserCertificationList != null && ViewBag.UserCertificationList.Count != 0)
+                                {
+                                    foreach (var item in ViewBag.UserCertificationList)
+                                    {
+                                        <div class="row" id="row_cert_@item.UserCertificationId">
+                                            <div class="col-xs-12 margin-both-lr">
+                                                <strong class="small-h">@item.Name</strong>
+                                                <!--Delete-->
+                                                <div onclick="confirmDelCert(@item.UserCertificationId)" class="delete-exp-round">
+                                                    <div class="round-icon-back-del">
+                                                        <i class="fa fa-trash-o"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Delete-->
+                                                <!--Edit-->
+                                                <div class="edit-exp-round" onclick="viewCertModal(@item.UserCertificationId)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Edit-->
+                                                @if (@item.URL != null)
+                                        {
+                                            <p class="xsmall-h">
+                                                Url : @item.URL
+
+                                            </p>
+                                }
+
+                                                @if (@item.LiscenceNo != null)
+                                        {
+                                            <p class="black">Liscence No : @item.LiscenceNo</p>
+                                }
+
+                                                <p>
+                                                    Certification Date : @item.CertificationDate.ToString("dd MMM yyyy")  <br />Expiration Date : @item.ExpirationDate.ToString("dd MMM yyyy")
+                                                    @*<small>1 Month</small>*@
+                                                </p>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <hr class="margin-both-lr" />
+                                            </div>
+                                        </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="row">
+                                <p class="xsmall-h"><center>No Certification</center></p>
+                            </div>
+
+                }
+
+                                    </div>
+                                </div>
+                                <!--/Education-->
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="messages">Questions in which this user contributes will appear here...</div>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+            @* Edit PersonalDetails Modal Show *@
+            <div class="modal fade" id="myPD">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Experience</h3>
+                        </div>
+                        <div class="modal-body" id="viewPDBody">
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* / Edit Personal Details Modal Show *@
+
+
+            @* Add/Edit Experience Modal Show *@
+            <div class="modal fade" id="myExp">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Personal Details</h3>
+                        </div>
+                        <div class="modal-body" id="viewExpBody">
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* /Add/Edit Experience Modal Show *@
+
+            @* Delete Experience Modal *@
+            <div class="modal fade" id="delExpModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Delete User Experience</h3>
+                        </div>
+                        <div class="modal-body">
+                            <h6>Are you sure ? You want to delete this. </h6>
+                            <div style="text-align:center;position:absolute;left:50%;display:none;" id="loaderDivExp">
+                                <div style="position: relative; left: -50%;">
+                                    <img src="~/images/load.gif" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button href="#" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <button class="btn btn-danger" onclick="DeleteExperience()">Confirm</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            @* /Delete Experience Modal *@
+
+            @* Education Add *@
+            <div class="modal fade" id="myEdu">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Education</h3>
+                        </div>
+                        <div class="modal-body" id="viewEduBody">
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* /Education Add *@
+            @* Education Delete *@
+            <div class="modal fade" id="delEduModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Delete User Education</h3>
+                        </div>
+                        <div class="modal-body">
+                            <h6>Are you sure ? You want to delete this. </h6>
+                            <div style="text-align:center;position:absolute;left:50%;display:none;" id="loaderDivEdu">
+                                <div style="position: relative; left: -50%;">
+                                    <img src="~/images/load.gif" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                            <button class="btn btn-danger" onclick="DeleteEducation()">Confirm</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            @* /Delete Education Modal *@
+            @* Certification Add *@
+            <div class="modal fade" id="myCert">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Certification</h3>
+                        </div>
+                        <div class="modal-body" id="viewCertBody">
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* /Certification Add *@
+            @* Certification Delete *@
+            <div class="modal fade" id="delCertModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Delete User Certification</h3>
+                        </div>
+                        <div class="modal-body">
+                            <h6>Are you sure ? You want to delete this. </h6>
+                            <div style="text-align:center;position:absolute;left:50%;display:none;" id="loaderDivCert">
+                                <div style="position: relative; left: -50%;">
+                                    <img src="~/images/load.gif" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                            <button class="btn btn-danger" onclick="DeleteCertification()">Confirm</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            @* /Delete Certification Modal *@
+            @* Skill Add *@
+            <div class="modal fade" id="skillModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">Skills</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <!--SKill-->
+                                <div class="form-group">
+                                    <label for="recipient-name" class="control-label">Skills:</label>
+                                    <textarea class="input" placeholder="Description"></textarea>
+                                </div>
+                                <!--/Skill-->
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="white-btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="main-btn">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* /Skill Add *@
+
+
+
+            <!--/Modals-->
+            <!-- Aside -->
+            <aside id="aside" class="col-md-3">
+
+                <div class="center aside-profile">
+                    <h3 class="profile-less">Download CV as PDF</h3>
+                    <hr />
+                    <p>You can download your TechIn profile as CV!</p>
+                    <img src="~/images/pdf_ico.jpg" class="img-responsive" />
+                    <a asp-controller="User" asp-action="Resume" class="main-btn btn-block blue-g-btn margin-top10">
+                        <b class="white-text">Download</b>
+                    </a>
+
+                </div>
+                <!--PDF Div-->
+
+            </aside>
+            <!-- /Aside -->
+
+        </div>
+        <!-- /Row -->
+
+    </div>
+    <!-- /Container -->
+
+</div>
+<!-- /Blog -->
+<script>
+    $(document).ready(function () {
+       
+    })
+
+    var EditPersonalD = function (id) {
+        var url = "/User/UpdatePersonalDetail?Id=" + id;
+        $("#viewPDBody").load(url, function () {
+            $("#myPD").modal("show");
+
+        })
+
+    }
+//Add and Edit Experience Modal Show Function
+    var AddEditExp = function (id) {
+        var url = "/User/AddEditUserExperience?Id=" + id;
+
+        $("#viewExpBody").load(url, function () {
+            $("#myExp").modal("show");
+
+        })
+
+    }
+
+    //Delete Experiec=nce Model Popup
+    var confirmDelExp = function (id) {
+        $("#hiddenExpId").val(id);
+        $("#delExpModal").modal('show');
+    }
+    //Delete Experience
+    var DeleteExperience = function () {
+        $("#loaderDivExp").show();
+        var empId = $("#hiddenExpId").val();
+        $.ajax({
+            type: "POST",
+            url: "/User/DeleteUserExperience",
+            data: { Id: empId },
+            success: function (result) {
+                $("#loaderDivExp").hide();
+                $("#delExpModal").modal('hide');
+                $("#row_exp_" + empId).remove();
+            }
+
+        })
+    }
+
+    //Education
+    var viewEduModal = function (id) {
+        var url = "/User/AddEditUserEducation?Id=" + id;
+
+        $("#viewEduBody").load(url, function () {
+            $("#myEdu").modal("show");
+
+        })
+
+    }
+    var confirmDelEdu = function (id) {
+        $("#hiddenEduId").val(id);
+        $("#delEduModal").modal('show');
+
+    }
+    var DeleteEducation = function () {
+        $("#loaderDivEdu").show();
+        var eduId = $("#hiddenEduId").val();
+        $.ajax({
+            type: "POST",
+            url: "/User/DeleteUserEducation",
+            data: { Id: eduId },
+            success: function (result) {
+                $("#loaderDivEdu").hide();
+                $("#delEduModal").modal('hide');
+                $("#row_exp_" + eduId).remove();
+            }
+
+        })
+    }
+
+    //Certification
+    var viewCertModal = function (id) {
+        var url = "/User/AddEditUserCertification?Id=" + id;
+
+        $("#viewCertBody").load(url, function () {
+            $("#myCert").modal("show");
+
+        })
+    }
+
+    var confirmDelCert = function (id) {
+        $("#hiddenCertId").val(id);
+        $("#delCertModal").modal('show');
+
+    }
+
+    var DeleteCertification = function () {
+        $("#loaderDivCert").show();
+        var certId = $("#hiddenCertId").val();
+        $.ajax({
+            type: "POST",
+            url: "/User/DeleteUserCertification",
+            data: { Id: certId },
+            success: function (result) {
+                $("#loaderDivCert").hide();
+                debugger
+                $("#delCertModal").modal('hide');
+                $("#row_cert_" + certId).remove();
+            }
+
+        })
+    }
+</script>
