@@ -1,19 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MimeKit;
 using Tech_In.Data;
 using Tech_In.Models;
 using Tech_In.Models.AccountViewModels;
 using Tech_In.Services;
+
 
 namespace Tech_In.Controllers
 {
@@ -26,19 +30,22 @@ namespace Tech_In.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private ApplicationDbContext _context;
+        private IHostingEnvironment _hostingEnvironment;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
             ILogger<AccountController> logger,
-            ApplicationDbContext context)
+            ApplicationDbContext context,
+            IHostingEnvironment hostingEnvironment)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _logger = logger;
             _context = context;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         [TempData]
@@ -248,14 +255,43 @@ namespace Tech_In.Controllers
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
-                    await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);
+
+                    //Body of Email
+
+                    var webRoot = _hostingEnvironment.WebRootPath;//get wwwroot folder
+
+                    //get template file
+                    var pathToFile = _hostingEnvironment.WebRootPath
+                            + Path.DirectorySeparatorChar.ToString()
+                            + "Templates"
+                            + Path.DirectorySeparatorChar.ToString()
+                            + "Email Template"
+                            + Path.DirectorySeparatorChar.ToString()
+                            + "Register_Email_Template.html";
+
+                    var builder = new BodyBuilder();
+                    using (StreamReader SourceReader = System.IO.File.OpenText(pathToFile))
+                    {
+                        builder.HtmlBody = SourceReader.ReadToEnd();
+                    }
+
+                    string messageBody = string.Format(builder.HtmlBody,
+                        //subject,
+                        //String.Format("{0:dddd, d MMMM yyyy}", DateTime.Now),
+                        //model.Email,
+                        model.Email,
+                        //model.Password,
+                        //Message,
+                        callbackUrl
+                        );
+                    await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl, messageBody);
 
                     //await _signInManager.SignInAsync(user, isPersistent: false);
                     _logger.LogInformation("User created a new account with password.");
                     TempData["success"] = true;
                     //return RedirectToLocal(returnUrl);
                     //return RedirectToAction("Login");
-                    return RedirectToAction("Login");
+                    return RedirectToAction(nameof(Login));
                 }
                 AddErrors(result);
             }
@@ -366,7 +402,7 @@ namespace Tech_In.Controllers
                 throw new ApplicationException($"Unable to load user with ID '{userId}'.");
             }
             var result = await _userManager.ConfirmEmailAsync(user, code);
-            return View(result.Succeeded ? "Login" : "Error");
+            return RedirectToAction(result.Succeeded ? "Login" : "Error");
         }
 
         [HttpGet]
