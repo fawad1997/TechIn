@@ -17,7 +17,15 @@
                 </div>
                 <!--Cover Div-->
                 <div class="profile-pic-align">
-                    <img src="~/images/noimg.svg" class="img-responsive img-rounded profile-pic" />
+                    @if (Model.UserPersonalVM.ProfileImage == null)
+                    {
+                        <img src="~/images/noimg.svg" class="img-responsive img-rounded profile-pic" />
+                    }
+                    else
+                    {
+                        <img src="@Model.UserPersonalVM.ProfileImage" class="img-responsive img-rounded profile-pic" />
+                    }
+
                 </div>
                 <!--/Profile Picture-->
                 <!--Edit-->
@@ -62,7 +70,15 @@
                                 <div class="post">
                                     <div class="row">
                                         <div class="col-xs-2 col-md-1">
-                                            <img src="~/images/noimg.svg" class="post-img img-circle" />
+                                            @if (Model.UserPersonalVM.ProfileImage == null)
+    {
+                                        <img src="~/images/noimg.svg" class="post-img img-circle" />
+}
+else
+{
+                                        <img src="@Model.UserPersonalVM.ProfileImage" class="post-img img-circle" />
+}
+
                                         </div>
                                         <div class="col-xs-10 col-md-11">
                                             <h6 class="inline small-h">@Model.UserPersonalVM.FullName</h6>
@@ -101,7 +117,14 @@
                                 <div class="post">
                                     <div class="row">
                                         <div class="col-xs-2 col-md-1">
-                                            <img src="~/images/noimg.svg" class="post-img img-circle" />
+                                            @if (Model.UserPersonalVM.ProfileImage == null)
+    {
+                                        <img src="~/images/noimg.svg" class="post-img img-circle" />
+}
+else
+{
+                                        <img src="@Model.UserPersonalVM.ProfileImage" class="post-img img-circle" />
+}
                                         </div>
                                         <div class="col-xs-10 col-md-11">
                                             <h6 class="inline small-h">@Model.UserPersonalVM.FullName</h6>
