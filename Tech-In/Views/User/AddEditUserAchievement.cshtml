@@ -1,0 +1,54 @@
+﻿@model AchievmentVM
+<script src="~/lib/jquery-validation/dist/additional-methods.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<form id="achievForm">
+    @Html.HiddenFor(m => m.UserAchievementId)
+    <!--Name-->
+    <div class="form-group">
+        <label for="recipient-name" class="control-label">Achievment Name:</label>
+        @Html.TextBoxFor(m => m.Description, new { @class = "input", @placeholder = "Achievment Name" })
+        @Html.ValidationMessageFor(m => m.Description, "", new { @class = "red" })
+    </div>
+    <!--/Name-->
+
+    <div class="form-group">
+        <button id="achievSubmit" type="button" class="main-btn btn-block">
+            @if (Model.UserAchievementId > 0)
+            {
+
+                <span>Update</span>
+            }
+            else
+            {
+
+                <span>Save</span>
+            }
+        </button>
+    </div>
+    <div class="cent" id="loaderDiv">
+        <img src="~/images/load.gif" />
+    </div>
+</form>
+<script>$(document).ready(function () {
+        //Submit Form
+        debugger
+        $("#achievSubmit").click(function () {
+            $("#loaderDiv").show();
+            var achievFormData = $("#achievForm").serialize();
+            $.ajax({
+
+                type: "POST",
+                url: "/User/UpdateAchievment",
+                data: achievFormData,
+                success: function () {
+                    $("#loaderDiv").hide();
+                    $("#myAchiev").modal("hide");
+                    window.location.href = "/User/Index";
+
+                }
+
+            })
+
+        })
+
+    })</script>

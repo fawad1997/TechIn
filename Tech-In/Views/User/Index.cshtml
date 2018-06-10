@@ -18,13 +18,13 @@
                 <!--Cover Div-->
                 <div class="profile-pic-align">
                     @if (Model.UserPersonalVM.ProfileImage == null)
-                    {
-                        <img src="~/images/noimg.svg" class="img-responsive img-rounded profile-pic" />
-                    }
-                    else
-                    {
-                        <img src="@Model.UserPersonalVM.ProfileImage" class="img-responsive img-rounded profile-pic" />
-                    }
+            {
+                <img src="~/images/noimg.svg" class="img-responsive img-rounded profile-pic" />
+    }
+    else
+    {
+        <img src="@Model.UserPersonalVM.ProfileImage" class="img-responsive img-rounded profile-pic" />
+}
 
                 </div>
                 <!--/Profile Picture-->
@@ -71,13 +71,13 @@
                                     <div class="row">
                                         <div class="col-xs-2 col-md-1">
                                             @if (Model.UserPersonalVM.ProfileImage == null)
-    {
+                                    {
                                         <img src="~/images/noimg.svg" class="post-img img-circle" />
-}
-else
-{
-                                        <img src="@Model.UserPersonalVM.ProfileImage" class="post-img img-circle" />
-}
+                            }
+                            else
+                            {
+                                <img src="@Model.UserPersonalVM.ProfileImage" class="post-img img-circle" />
+                    }
 
                                         </div>
                                         <div class="col-xs-10 col-md-11">
@@ -118,13 +118,13 @@ else
                                     <div class="row">
                                         <div class="col-xs-2 col-md-1">
                                             @if (Model.UserPersonalVM.ProfileImage == null)
-    {
+                                    {
                                         <img src="~/images/noimg.svg" class="post-img img-circle" />
-}
-else
-{
-                                        <img src="@Model.UserPersonalVM.ProfileImage" class="post-img img-circle" />
-}
+                            }
+                            else
+                            {
+                                <img src="@Model.UserPersonalVM.ProfileImage" class="post-img img-circle" />
+                    }
                                         </div>
                                         <div class="col-xs-10 col-md-11">
                                             <h6 class="inline small-h">@Model.UserPersonalVM.FullName</h6>
@@ -472,7 +472,355 @@ else
 
                                     </div>
                                 </div>
-                                <!--/Education-->
+                                <!--/Certification-->
+                                <!--Achievement-->
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h6 class="inline small-h">Achievements</h6>
+                                            <br />
+                                            <!--Add-->
+                                            <div class="right-post-icon-div" onclick="viewAchievModel(0)">
+                                                <div class="round-icon-back">
+                                                    <i class="fa fa-plus"></i>
+                                                </div>
+                                            </div>
+                                            <!--/Add-->
+                                            <hr />
+                                        </div>
+                                        <input type="hidden" id="hiddenAchievId" />
+                                        @if (Model.AchievVMList != null)
+                                {
+                                        <div class="row">
+                                            @foreach (var item in Model.AchievVMList)
+                                            {
+                                            <div class="col-xs-12 margin-both-lr" id="row_Achiev_@item.UserAchievementId">
+                                                <ul>
+                                                    <li>&bull; @item.Description</li>
+                                                </ul>
+
+                                                <!--Delete-->
+                                                <div onclick="confirmDelAchiev(@item.UserAchievementId)" class="delete-exp-round">
+                                                    <div class="round-icon-back-del">
+                                                        <i class="fa fa-trash-o"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Delete-->
+                                                <!--Edit-->
+                                                <div class="edit-exp-round" onclick="viewAchievModel(@item.UserAchievementId)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Edit-->
+                                                <div class="col-xs-12">
+                                                    <hr class="margin-both-lr" />
+                                                </div>
+
+                                            </div>
+                                            }
+                                        </div>
+                        }
+                        else
+                        {
+                            <div class="row">
+                                <p class="xsmall-h"><center>No Achievement</center></p>
+                            </div>
+
+                }
+
+                                    </div>
+                                </div>
+                                <!--/Achievement-->
+                                <!--Hobbies-->
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h6 class="inline small-h">Hobbies</h6>
+                                            <br />
+                                            <!--Add-->
+                                            <div class="right-post-icon-div" onclick="viewCertModal(0)">
+                                                <div class="round-icon-back">
+                                                    <i class="fa fa-plus"></i>
+                                                </div>
+                                            </div>
+                                            <!--/Add-->
+                                            <hr />
+                                        </div>
+                                        <input type="hidden" id="hiddenCertId" />
+                                        @if (ViewBag.UserCertificationList != null && ViewBag.UserCertificationList.Count != 0)
+                                {
+                                    foreach (var item in ViewBag.UserCertificationList)
+                                    {
+                                        <div class="row" id="row_cert_@item.UserCertificationId">
+                                            <div class="col-xs-12 margin-both-lr">
+                                                <strong class="small-h">@item.Name</strong>
+                                                <!--Delete-->
+                                                <div onclick="confirmDelCert(@item.UserCertificationId)" class="delete-exp-round">
+                                                    <div class="round-icon-back-del">
+                                                        <i class="fa fa-trash-o"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Delete-->
+                                                <!--Edit-->
+                                                <div class="edit-exp-round" onclick="viewCertModal(@item.UserCertificationId)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Edit-->
+                                                @if (@item.URL != null)
+                                        {
+                                            <p class="xsmall-h">
+                                                Url : @item.URL
+
+                                            </p>
+                                }
+
+                                                @if (@item.LiscenceNo != null)
+                                        {
+                                            <p class="black">Liscence No : @item.LiscenceNo</p>
+                                }
+
+                                                <p>
+                                                    Certification Date : @item.CertificationDate.ToString("dd MMM yyyy")  <br />Expiration Date : @item.ExpirationDate.ToString("dd MMM yyyy")
+                                                    @*<small>1 Month</small>*@
+                                                </p>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <hr class="margin-both-lr" />
+                                            </div>
+                                        </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="row">
+                                <p class="xsmall-h"><center>No Hobbies</center></p>
+                            </div>
+
+                }
+
+                                    </div>
+                                </div>
+                                <!--/Hobbies-->
+                                <!--Language Skills-->
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h6 class="inline small-h">Language Skills</h6>
+                                            <br />
+                                            <!--Add-->
+                                            <div class="right-post-icon-div" onclick="viewCertModal(0)">
+                                                <div class="round-icon-back">
+                                                    <i class="fa fa-plus"></i>
+                                                </div>
+                                            </div>
+                                            <!--/Add-->
+                                            <hr />
+                                        </div>
+                                        <input type="hidden" id="hiddenCertId" />
+                                        @if (ViewBag.UserCertificationList != null && ViewBag.UserCertificationList.Count != 0)
+                                {
+                                    foreach (var item in ViewBag.UserCertificationList)
+                                    {
+                                        <div class="row" id="row_cert_@item.UserCertificationId">
+                                            <div class="col-xs-12 margin-both-lr">
+                                                <strong class="small-h">@item.Name</strong>
+                                                <!--Delete-->
+                                                <div onclick="confirmDelCert(@item.UserCertificationId)" class="delete-exp-round">
+                                                    <div class="round-icon-back-del">
+                                                        <i class="fa fa-trash-o"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Delete-->
+                                                <!--Edit-->
+                                                <div class="edit-exp-round" onclick="viewCertModal(@item.UserCertificationId)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Edit-->
+                                                @if (@item.URL != null)
+                                        {
+                                            <p class="xsmall-h">
+                                                Url : @item.URL
+
+                                            </p>
+                                }
+
+                                                @if (@item.LiscenceNo != null)
+                                        {
+                                            <p class="black">Liscence No : @item.LiscenceNo</p>
+                                }
+
+                                                <p>
+                                                    Certification Date : @item.CertificationDate.ToString("dd MMM yyyy")  <br />Expiration Date : @item.ExpirationDate.ToString("dd MMM yyyy")
+                                                    @*<small>1 Month</small>*@
+                                                </p>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <hr class="margin-both-lr" />
+                                            </div>
+                                        </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="row">
+                                <p class="xsmall-h"><center>No Language Skill Added</center></p>
+                            </div>
+
+                }
+
+                                    </div>
+                                </div>
+                                <!--/Language Skills-->
+                                <!--Journal Publications-->
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h6 class="inline small-h">Journal Publications</h6>
+                                            <br />
+                                            <!--Add-->
+                                            <div class="right-post-icon-div" onclick="viewCertModal(0)">
+                                                <div class="round-icon-back">
+                                                    <i class="fa fa-plus"></i>
+                                                </div>
+                                            </div>
+                                            <!--/Add-->
+                                            <hr />
+                                        </div>
+                                        <input type="hidden" id="hiddenCertId" />
+                                        @if (ViewBag.UserCertificationList != null && ViewBag.UserCertificationList.Count != 0)
+                                {
+                                    foreach (var item in ViewBag.UserCertificationList)
+                                    {
+                                        <div class="row" id="row_cert_@item.UserCertificationId">
+                                            <div class="col-xs-12 margin-both-lr">
+                                                <strong class="small-h">@item.Name</strong>
+                                                <!--Delete-->
+                                                <div onclick="confirmDelCert(@item.UserCertificationId)" class="delete-exp-round">
+                                                    <div class="round-icon-back-del">
+                                                        <i class="fa fa-trash-o"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Delete-->
+                                                <!--Edit-->
+                                                <div class="edit-exp-round" onclick="viewCertModal(@item.UserCertificationId)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Edit-->
+                                                @if (@item.URL != null)
+                                        {
+                                            <p class="xsmall-h">
+                                                Url : @item.URL
+
+                                            </p>
+                                }
+
+                                                @if (@item.LiscenceNo != null)
+                                        {
+                                            <p class="black">Liscence No : @item.LiscenceNo</p>
+                                }
+
+                                                <p>
+                                                    Certification Date : @item.CertificationDate.ToString("dd MMM yyyy")  <br />Expiration Date : @item.ExpirationDate.ToString("dd MMM yyyy")
+                                                    @*<small>1 Month</small>*@
+                                                </p>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <hr class="margin-both-lr" />
+                                            </div>
+                                        </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="row">
+                                <p class="xsmall-h"><center>No Journals Published</center></p>
+                            </div>
+
+                }
+
+                                    </div>
+                                </div>
+                                <!--/Journal Publicationss-->
+                                <!--Conference Publications-->
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h6 class="inline small-h">Conference Publications</h6>
+                                            <br />
+                                            <!--Add-->
+                                            <div class="right-post-icon-div" onclick="viewCertModal(0)">
+                                                <div class="round-icon-back">
+                                                    <i class="fa fa-plus"></i>
+                                                </div>
+                                            </div>
+                                            <!--/Add-->
+                                            <hr />
+                                        </div>
+                                        <input type="hidden" id="hiddenCertId" />
+                                        @if (ViewBag.UserCertificationList != null && ViewBag.UserCertificationList.Count != 0)
+                                {
+                                    foreach (var item in ViewBag.UserCertificationList)
+                                    {
+                                        <div class="row" id="row_cert_@item.UserCertificationId">
+                                            <div class="col-xs-12 margin-both-lr">
+                                                <strong class="small-h">@item.Name</strong>
+                                                <!--Delete-->
+                                                <div onclick="confirmDelCert(@item.UserCertificationId)" class="delete-exp-round">
+                                                    <div class="round-icon-back-del">
+                                                        <i class="fa fa-trash-o"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Delete-->
+                                                <!--Edit-->
+                                                <div class="edit-exp-round" onclick="viewCertModal(@item.UserCertificationId)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Edit-->
+                                                @if (@item.URL != null)
+                                        {
+                                            <p class="xsmall-h">
+                                                Url : @item.URL
+
+                                            </p>
+                                }
+
+                                                @if (@item.LiscenceNo != null)
+                                        {
+                                            <p class="black">Liscence No : @item.LiscenceNo</p>
+                                }
+
+                                                <p>
+                                                    Certification Date : @item.CertificationDate.ToString("dd MMM yyyy")  <br />Expiration Date : @item.ExpirationDate.ToString("dd MMM yyyy")
+                                                    @*<small>1 Month</small>*@
+                                                </p>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <hr class="margin-both-lr" />
+                                            </div>
+                                        </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="row">
+                                <p class="xsmall-h"><center>No Conference Publication</center></p>
+                            </div>
+
+                }
+
+                                    </div>
+                                </div>
+                                <!--/Conference Publicationss-->
+
                             </div>
                         </div>
                         <div role="tabpanel" class="tab-pane" id="messages">Questions in which this user contributes will appear here...</div>
@@ -489,7 +837,7 @@ else
                     <div class="modal-content">
                         <div class="modal-header">
                             <a href="#" class="close" data-dismiss="modal">&times;</a>
-                            <h3 class="modal-title">Experience</h3>
+                            <h3 class="modal-title">Personal Details</h3>
                         </div>
                         <div class="modal-body" id="viewPDBody">
 
@@ -507,7 +855,7 @@ else
                     <div class="modal-content">
                         <div class="modal-header">
                             <a href="#" class="close" data-dismiss="modal">&times;</a>
-                            <h3 class="modal-title">Personal Details</h3>
+                            <h3 class="modal-title">Experience</h3>
                         </div>
                         <div class="modal-body" id="viewExpBody">
 
@@ -626,6 +974,47 @@ else
                 </div>
             </div>
             @* /Delete Certification Modal *@
+            @* Achievment Add *@
+            <div class="modal fade" id="myAchiev">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Achievments</h3>
+                        </div>
+                        <div class="modal-body" id="viewAchievBody">
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* /Achievments Add *@
+            @* Achievment Delete *@
+            <div class="modal fade" id="delAchievModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Delete Achievment</h3>
+                        </div>
+                        <div class="modal-body">
+                            <h6>Are you sure ? You want to delete this. </h6>
+                            <div style="text-align:center;position:absolute;left:50%;display:none;" id="loaderDivCert">
+                                <div style="position: relative; left: -50%;">
+                                    <img src="~/images/load.gif" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                            <button class="btn btn-danger" onclick="deleteAchievment()">Confirm</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            @* /Delete Achievment Modal *@
             @* Skill Add *@
             <div class="modal fade" id="skillModal" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
@@ -790,7 +1179,36 @@ else
                 $("#delCertModal").modal('hide');
                 $("#row_cert_" + certId).remove();
             }
+        })
+    }
+
+    //Achievements
+    var viewAchievModel = function (id) {
+        var url = "/User/AddEditUserAchievement?Id=" + id;
+
+        $("#viewAchievBody").load(url, function () {
+            $("#myAchiev").modal("show");
 
         })
+    }
+    var confirmDelAchiev = function (id) {
+        $("#hiddenAchievId").val(id);
+        $("#delAchievModal").modal('show');
+    }
+    var deleteAchievment = function () {
+        $("#loaderDivAchiev").show();
+        var achievId = $("#hiddenAchievId").val();
+        $.ajax({
+            type: "POST",
+            url: "/User/DeleteUserAchievment",
+            data: { Id: achievId },
+            success: function (result) {
+                $("#loaderDivAchiev").hide();
+                debugger
+                $("#delAchievModal").modal('hide');
+                $("#row_Achiev_" + achievId).remove();
+            }
+        })
+
     }
 </script>

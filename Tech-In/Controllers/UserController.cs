@@ -56,6 +56,8 @@ namespace Tech_In.Controllers
 
             List<CertificationVM> userCertificationList = _context.UserCertification.Where(x => x.UserId == user.Id).Select(c => new CertificationVM { Name = c.Name, URL = c.URL, UserCertificationId = c.UserCertificationId, LiscenceNo = c.LiscenceNo, CertificationDate = c.CertificationDate, ExpirationDate = c.ExpirationDate }).ToList();
             ViewBag.UserCertificationList = userCertificationList;
+
+            PVM.AchievVMList = _context.UserAcheivement.Where(x => x.UserId == user.Id).Select(c => new AchievmentVM { Description = c.Description, UserAchievementId = c.UserAchievementId });
           //  ViewBag.CountryList = new SelectList(GetCountryList(), "CountryID", "CountryName");
 
             return View(PVM);
@@ -308,6 +310,58 @@ namespace Tech_In.Controllers
             if (cert != null)
             {
                 _context.Remove(cert);
+                _context.SaveChanges();
+                result = true;
+            }
+
+            return Json(result);
+        }
+
+        //Achievments
+        public async Task<IActionResult> AddEditUserAchievement(int Id)
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            AchievmentVM vm = new AchievmentVM();
+            if (Id > 0)
+            {
+                UserAcheivement achiev = _context.UserAcheivement.SingleOrDefault(x => x.UserAchievementId == Id && x.UserId == user.Id);
+                vm.UserAchievementId = achiev.UserAchievementId;
+                vm.Description = achiev.Description;
+            }
+            return PartialView(vm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateAchievment(AchievmentVM vm)
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            if (vm.UserAchievementId > 0)
+            {
+                UserAcheivement achiev = _context.UserAcheivement.SingleOrDefault(x => x.UserAchievementId == vm.UserAchievementId && x.UserId==user.Id);
+                if (achiev != null)
+                {
+                    achiev.Description = vm.Description;
+                }
+            }
+            else
+            {
+                UserAcheivement achiev = new UserAcheivement();
+                achiev.Description = vm.Description;
+                achiev.UserId = user.Id;
+                _context.UserAcheivement.Add(achiev);
+            }
+            _context.SaveChanges();
+            return RedirectToAction("Index");
+            //return View("Index");
+        }
+
+        public JsonResult DeleteUserAchievment(int Id)
+        {
+            bool result = false;
+            UserAcheivement acheivement = _context.UserAcheivement.SingleOrDefault(x => x.UserAchievementId == Id);
+            if (acheivement != null)
+            {
+                _context.Remove(acheivement);
                 _context.SaveChanges();
                 result = true;
             }
