@@ -15,6 +15,7 @@ using Tech_In.Models.ViewModels.ProfileViewModels;
 using Tech_In.Services;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace Tech_In.Controllers
 {
@@ -47,6 +48,9 @@ namespace Tech_In.Controllers
                     return RedirectToAction("CompleteProfile", "Home");
                 }
             }
+
+            HttpContext.Session.SetString("Name", _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.FirstName).SingleOrDefault());
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
             return View("Welcome");
         }
 
@@ -108,6 +112,7 @@ namespace Tech_In.Controllers
                 userPersonal.UserId = user.Id;
                 _context.UserPersonalDetail.Add(userPersonal);
                 await _context.SaveChangesAsync();
+                HttpContext.Session.SetString("Name", userPersonal.FirstName);
 
                 return RedirectToAction("Index", "User");
             }

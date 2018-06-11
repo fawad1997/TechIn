@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Tech_In.Data;
@@ -28,6 +29,7 @@ namespace Tech_In.Controllers
             {
                 return RedirectToAction("CompleteProfile", "Home");
             }
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
             return View();
         }
 
@@ -40,6 +42,7 @@ namespace Tech_In.Controllers
             {
                 return RedirectToAction("CompleteProfile", "Home");
             }
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
             return View();
         }
 
@@ -52,6 +55,7 @@ namespace Tech_In.Controllers
             {
                 return RedirectToAction("CompleteProfile", "Home");
             }
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
             return View();
         }
 
