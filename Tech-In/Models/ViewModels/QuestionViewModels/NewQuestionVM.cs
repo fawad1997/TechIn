@@ -11,12 +11,12 @@ namespace Tech_In.Models.ViewModels.QuestionViewModels
         
         public int UserQuestionID { get; set; }
 
-        [MinLength(10)]
+        [MinLength(3)]
         [Required]
         public string Title { get; set; }
 
         [Required]
-        [MinLength(100)]
+        [MinLength(10)]
         public string Description { get; set; }
 
         [Required]

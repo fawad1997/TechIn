@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Tech_In.Data;
 using Tech_In.Models;
+using Tech_In.Models.Database;
+using Tech_In.Models.ViewModels.QuestionViewModels;
 using Tech_In.Services;
 
 namespace Tech_In.Controllers
@@ -40,7 +42,13 @@ namespace Tech_In.Controllers
             {
                 return RedirectToAction("CompleteProfile", "Home");
             }
-            return View();
+            else
+            {
+                var QuestionList = _context.UserQuestion.Where(x => x.UserQuestionId==33).Select(c => new NewQuestionVM { Title = c.Title, Description = c.Description }).SingleOrDefault();
+                ViewBag.QuestionList = QuestionList;
+                return View();
+            }
+           
         }
 
         public async Task<IActionResult> New()
@@ -53,11 +61,38 @@ namespace Tech_In.Controllers
                 return RedirectToAction("CompleteProfile", "Home");
             }
             return View();
+            
         }
 
         public IActionResult Xyz()
         {
             return View();
+        }
+
+         public async Task<IActionResult> PostQuestion(NewQuestionVM vm)
+        {
+            
+            if (ModelState.IsValid)
+            {
+                var user =  await _userManager.GetCurrentUser(HttpContext);
+                UserQuestion userQuestion = new UserQuestion();
+                userQuestion.Title = vm.Title;
+                userQuestion.PostTime = DateTime.Now;
+                userQuestion.Description = vm.Description;
+                userQuestion.UserId = user.Id;
+                _context.UserQuestion.Add(userQuestion);
+                _context.SaveChanges();
+                return RedirectToAction("Detail");
+            }
+
+            return NotFound();
+        }
+        public async Task<IActionResult> ViewQuestion()
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            List<NewQuestionVM> QuestionList = _context.UserQuestion.Where(x => x.UserId == user.Id).Select(c => new NewQuestionVM { Title = c.Title, Description=c.Description}).ToList();
+            ViewBag.QuestionList = QuestionList;
+            return View("Detail");
         }
     }
 }
