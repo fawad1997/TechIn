@@ -1,0 +1,70 @@
+﻿@model PublicationVM
+<script src="~/lib/jquery-validation/dist/additional-methods.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<form id="pubForm">
+    @Html.HiddenFor(m => m.UserPublicationId)
+    @Html.HiddenFor(m => m.ConferenceOrJournal)
+    <!--Title-->
+    <div class="form-group">
+        <label for="recipient-name" class="control-label">Title:</label>
+        @Html.TextBoxFor(m => m.Title, new { @class = "input", @placeholder = "Publication Title..." })
+        @Html.ValidationMessageFor(m => m.Title, "", new { @class = "red" })
+    </div>
+    <!--/Title-->
+    <!--Text Area-->
+    <div class="form-group">
+        <label for="recipient-name" class="control-label">Description:</label>
+        @Html.TextAreaFor(m => m.Description, new { @class = "input", @placeholder = "Research Description" })
+        @Html.ValidationMessageFor(m => m.Description, "", new { @class = "red" })
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <!--Start Date-->
+            <div class="form-group">
+                <label for="recipient-name" class="control-label">Publication Year:</label>
+                <input type="date" class="input" asp-for="PublishYear">
+                @Html.ValidationMessageFor(m => m.PublishYear, "", new { @class = "red" })
+            </div>
+            <!--/Start Date-->
+        </div>
+    </div>
+    <div class="form-group">
+        <button id="pubSubmit" type="button" class="main-btn btn-block">
+            @if (Model.UserPublicationId > 0)
+            {
+
+                <span>Update</span>
+            }
+            else
+            {
+
+                <span>Save</span>
+            }
+        </button>
+    </div>
+    <div class="cent" id="loaderDiv">
+        <img src="~/images/load.gif" />
+    </div>
+</form>
+<script>$(document).ready(function () {
+        //Submit Form
+        $("#pubSubmit").click(function () {
+            
+            $("#loaderDiv").show();
+            var pubFormData = $("#pubForm").serialize();
+            $.ajax({
+                type: "POST",
+                url: "/User/UpdatePublication",
+                data: pubFormData,
+                success: function () {
+                    $("#loaderDiv").hide();
+                    $("#myJPCP").modal("hide");
+                    window.location.href = "/User/Index";
+
+                }
+            })
+        })
+
+    })
+</script>

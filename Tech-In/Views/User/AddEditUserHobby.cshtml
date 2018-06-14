@@ -1,0 +1,53 @@
+﻿@model HobbyVM
+<script src="~/lib/jquery-validation/dist/additional-methods.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<form id="hobbyForm">
+    @Html.HiddenFor(m => m.UserHobbyId)
+    <!--Name-->
+    <div class="form-group">
+        <label for="recipient-name" class="control-label">Hobby Name:</label>
+        @Html.TextBoxFor(m => m.HobbyOrIntrest, new { @class = "input", @placeholder = "Hobby" })
+        @Html.ValidationMessageFor(m => m.HobbyOrIntrest, "", new { @class = "red" })
+    </div>
+    <!--/Name-->
+
+    <div class="form-group">
+        <button id="hobbySubmit" type="button" class="main-btn btn-block">
+            @if (Model.UserHobbyId > 0)
+            {
+
+                <span>Update</span>
+            }
+            else
+            {
+
+                <span>Save</span>
+            }
+        </button>
+    </div>
+    <div class="cent" id="loaderDiv">
+        <img src="~/images/load.gif" />
+    </div>
+</form>
+<script>
+$(document).ready(function () {
+        //Submit Form
+        debugger
+        $("#hobbySubmit").click(function () {
+            $("#loaderDiv").show();
+            var hobbyFormData = $("#hobbyForm").serialize();
+            $.ajax({
+
+                type: "POST",
+                url: "/User/UpdateHobby",
+                data: hobbyFormData,
+                success: function () {
+                    $("#loaderDiv").hide();
+                    $("#myHobby").modal("hide");
+                    window.location.href = "/User/Index";
+                }
+            })
+
+        })
+
+    })</script>

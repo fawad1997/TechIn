@@ -1,0 +1,53 @@
+﻿@model LanguageSkillVM
+<script src="~/lib/jquery-validation/dist/additional-methods.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<form id="lSForm">
+    @Html.HiddenFor(m => m.LanguageSkillId)
+    <!--Name-->
+    <div class="form-group">
+        <label for="recipient-name" class="control-label">Skill Name:</label>
+        @Html.TextBoxFor(m => m.SkillName, new { @class = "input", @placeholder = "Skill" })
+        @Html.ValidationMessageFor(m => m.SkillName, "", new { @class = "red" })
+    </div>
+    <!--/Name-->
+
+    <div class="form-group">
+        <button id="lSSubmit" type="button" class="main-btn btn-block">
+            @if (Model.LanguageSkillId > 0)
+            {
+
+                <span>Update</span>
+            }
+            else
+            {
+
+                <span>Save</span>
+            }
+        </button>
+    </div>
+    <div class="cent" id="loaderDiv">
+        <img src="~/images/load.gif" />
+    </div>
+</form>
+<script>
+$(document).ready(function () {
+        //Submit Form
+        debugger
+        $("#lSSubmit").click(function () {
+            $("#loaderDiv").show();
+            var hobbyFormData = $("#lSForm").serialize();
+            $.ajax({
+
+                type: "POST",
+                url: "/User/UpdateLS",
+                data: hobbyFormData,
+                success: function () {
+                    $("#loaderDiv").hide();
+                    $("#myLS").modal("hide");
+                    window.location.href = "/User/Index";
+                }
+            })
+
+        })
+
+    })</script>

@@ -14,7 +14,11 @@ namespace Tech_In.Models.ViewModels.ProfileViewModels
 
         public IEnumerable<EducationVM> EduVMList { get; set; }
         public IEnumerable<ExperienceVM> ExpVMList { get; set; }
-
+        public IEnumerable<CertificationVM> CertificationVMList { get; set; }
         public IEnumerable<AchievmentVM> AchievVMList { get; set; }
+        public IEnumerable<HobbyVM> HobbyVMList { get; set; }
+        public IEnumerable<LanguageSkillVM> LanguageSkillVMList { get; set; }
+        public IEnumerable<PublicationVM> PublicationVMListJP { get; set; }
+        public IEnumerable<PublicationVM> PublicationVMListCP { get; set; }
     }
 }

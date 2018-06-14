@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Session;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,6 +41,8 @@ namespace Tech_In
                 .AddDefaultTokenProviders();
 
             services.AddMvc();
+            services.AddDistributedMemoryCache();
+            services.AddSession();
            
             //Configure AutthMessageSenderOptions to get the sedGrid key
             services.Configure<AuthMessageSenderOptions>(Configuration);
@@ -62,6 +65,7 @@ namespace Tech_In
             app.UseStaticFiles();
 
             app.UseAuthentication();
+            app.UseSession();
 
             app.UseMvc(routes =>
             {

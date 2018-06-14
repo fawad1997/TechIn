@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -58,8 +59,14 @@ namespace Tech_In.Controllers
             ViewBag.UserCertificationList = userCertificationList;
 
             PVM.AchievVMList = _context.UserAcheivement.Where(x => x.UserId == user.Id).Select(c => new AchievmentVM { Description = c.Description, UserAchievementId = c.UserAchievementId });
-          //  ViewBag.CountryList = new SelectList(GetCountryList(), "CountryID", "CountryName");
 
+            PVM.HobbyVMList = _context.UserHobby.Where(x => x.UserId == user.Id).Select(c => new HobbyVM { UserHobbyId = c.UserHobbyId, HobbyOrIntrest = c.HobbyOrIntrest });
+
+            PVM.LanguageSkillVMList = _context.UserLanguageSkill.Where(x => x.UserId == user.Id).Select(c => new LanguageSkillVM { LanguageSkillId = c.LanguageSkillId, SkillName = c.SkillName });
+
+            PVM.PublicationVMListJP = _context.UserPublication.Where(x => x.UserId == user.Id && x.ConferenceOrJournal==false).Select(c => new PublicationVM { Title = c.Title, PublishYear = c.PublishYear, Description = c.Description, ConferenceOrJournal = c.ConferenceOrJournal, UserPublicationId = c.UserPublicationId });
+            PVM.PublicationVMListCP = _context.UserPublication.Where(x => x.UserId == user.Id && x.ConferenceOrJournal == true).Select(c => new PublicationVM { Title = c.Title, PublishYear = c.PublishYear, Description = c.Description, ConferenceOrJournal = c.ConferenceOrJournal, UserPublicationId = c.UserPublicationId });
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
             return View(PVM);
         }
 
@@ -68,6 +75,7 @@ namespace Tech_In.Controllers
         {
             var user = await _userManager.GetCurrentUser(HttpContext);
             ViewBag.CountryList = new SelectList(GetCountryList(), "CountryId", "CountryName");
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
             UserPersonalViewModel vm = new UserPersonalViewModel();
             if (Id > 0)
             {
@@ -108,11 +116,11 @@ namespace Tech_In.Controllers
                 pd.CityId = vm.CityId;
                 if (vm.Gender == 0)
                 {
-                    pd.Gender = Models.Model.Gender.Male;
+                    pd.Gender = Gender.Male;
                 }
                 else
                 {
-                    pd.Gender = Models.Model.Gender.Female;
+                    pd.Gender = Gender.Female;
                 }
                 user.PhoneNumber = vm.PhoneNo;
                 _context.SaveChanges();
@@ -172,6 +180,7 @@ namespace Tech_In.Controllers
                 _context.UserExperience.Add(exp);
             }
             _context.SaveChanges();
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
             return RedirectToAction("Index");
             //return View("Index");
         }
@@ -239,6 +248,7 @@ namespace Tech_In.Controllers
                 _context.UserEducation.Add(edu);
             }
             _context.SaveChanges();
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
             return RedirectToAction("Index");
             //return View("Index");
         }
@@ -299,6 +309,7 @@ namespace Tech_In.Controllers
                 _context.UserCertification.Add(cert);
             }
             _context.SaveChanges();
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
             return RedirectToAction("Index");
             //return View("Index");
         }
@@ -351,6 +362,7 @@ namespace Tech_In.Controllers
                 _context.UserAcheivement.Add(achiev);
             }
             _context.SaveChanges();
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
             return RedirectToAction("Index");
             //return View("Index");
         }
@@ -362,6 +374,175 @@ namespace Tech_In.Controllers
             if (acheivement != null)
             {
                 _context.Remove(acheivement);
+                _context.SaveChanges();
+                result = true;
+            }
+
+            return Json(result);
+        }
+
+        //Hobby
+        public async Task<IActionResult> AddEditUserHobby(int Id)
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            HobbyVM vm = new HobbyVM();
+            if (Id > 0)
+            {
+                UserHobby hobby = _context.UserHobby.SingleOrDefault(x => x.UserHobbyId == Id && x.UserId == user.Id);
+                vm.UserHobbyId = hobby.UserHobbyId;
+                vm.HobbyOrIntrest = hobby.HobbyOrIntrest;
+            }
+            return PartialView(vm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateHobby(HobbyVM vm)
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            if (vm.UserHobbyId > 0)
+            {
+                UserHobby hobby = _context.UserHobby.SingleOrDefault(x => x.UserHobbyId == vm.UserHobbyId && x.UserId == user.Id);
+                if (hobby != null)
+                {
+                    hobby.HobbyOrIntrest = vm.HobbyOrIntrest;
+                }
+            }
+            else
+            {
+                UserHobby hobby = new UserHobby();
+                hobby.HobbyOrIntrest = vm.HobbyOrIntrest;
+                hobby.UserId = user.Id;
+                _context.UserHobby.Add(hobby);
+            }
+            _context.SaveChanges();
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
+            return RedirectToAction("Index");
+            //return View("Index");
+        }
+
+        public JsonResult DeleteUserHobby(int Id)
+        {
+            bool result = false;
+            UserHobby hobby = _context.UserHobby.SingleOrDefault(x => x.UserHobbyId == Id);
+            if (hobby != null)
+            {
+                _context.Remove(hobby);
+                _context.SaveChanges();
+                result = true;
+            }
+
+            return Json(result);
+        }
+
+        //User Language Skills
+        public async Task<IActionResult> AddEditLanguageSkill(int Id)
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            LanguageSkillVM vm = new LanguageSkillVM();
+            if (Id > 0)
+            {
+                UserLanguageSkill ls = _context.UserLanguageSkill.SingleOrDefault(x => x.LanguageSkillId == Id && x.UserId == user.Id);
+                vm.SkillName = ls.SkillName;
+                vm.LanguageSkillId = ls.LanguageSkillId;
+            }
+            return PartialView(vm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateLS(LanguageSkillVM vm)
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            if (vm.LanguageSkillId > 0)
+            {
+                UserLanguageSkill ls = _context.UserLanguageSkill.SingleOrDefault(x => x.LanguageSkillId == vm.LanguageSkillId && x.UserId == user.Id);
+                if (ls != null)
+                {
+                    ls.SkillName = vm.SkillName;
+                }
+            }
+            else
+            {
+                UserLanguageSkill ls = new UserLanguageSkill();
+                ls.SkillName = vm.SkillName;
+                ls.UserId = user.Id;
+                _context.UserLanguageSkill.Add(ls);
+            }
+            _context.SaveChanges();
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
+            return RedirectToAction("Index");
+            //return View("Index");
+        }
+
+        public JsonResult DeleteLanguageSkill(int Id)
+        {
+            bool result = false;
+            UserLanguageSkill ls = _context.UserLanguageSkill.SingleOrDefault(x => x.LanguageSkillId == Id);
+            if (ls != null)
+            {
+                _context.Remove(ls);
+                _context.SaveChanges();
+                result = true;
+            }
+
+            return Json(result);
+        }
+
+
+        //User Publication
+        public async Task<IActionResult> AddEditPublication(int Id,bool IsJournal)
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            PublicationVM vm = new PublicationVM();
+            if (Id > 0)
+            {
+                UserPublication publication = _context.UserPublication.SingleOrDefault(x => x.UserPublicationId == Id && x.UserId == user.Id);
+                vm.Title = publication.Title;
+                vm.PublishYear = publication.PublishYear;
+                vm.Description = publication.Description;
+                vm.UserPublicationId = publication.UserPublicationId;
+            }
+            vm.ConferenceOrJournal = IsJournal;
+            return PartialView(vm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdatePublication(PublicationVM vm)
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            if (vm.UserPublicationId > 0)
+            {
+                UserPublication publication = _context.UserPublication.SingleOrDefault(x => x.UserPublicationId == vm.UserPublicationId && x.UserId == user.Id);
+                if (publication != null)
+                {
+                    publication.Title = vm.Title;
+                    publication.PublishYear = vm.PublishYear;
+                    publication.Description = vm.Description;
+                    publication.ConferenceOrJournal = vm.ConferenceOrJournal;
+                }
+            }
+            else
+            {
+                UserPublication publication = new UserPublication();
+                publication.Title = vm.Title;
+                publication.PublishYear = vm.PublishYear;
+                publication.Description = vm.Description;
+                publication.ConferenceOrJournal = vm.ConferenceOrJournal;
+                publication.UserId = user.Id;
+                _context.UserPublication.Add(publication);
+            }
+            _context.SaveChanges();
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
+            return RedirectToAction("Index");
+            //return View("Index");
+        }
+
+        public JsonResult DeletePublication(int Id)
+        {
+            bool result = false;
+            UserPublication publication = _context.UserPublication.SingleOrDefault(x => x.UserPublicationId == Id);
+            if (publication != null)
+            {
+                _context.Remove(publication);
                 _context.SaveChanges();
                 result = true;
             }
@@ -382,6 +563,16 @@ namespace Tech_In.Controllers
             pVM.EduVMList = _context.UserEducation.Where(x => x.UserId == user.Id).Select(c => new EducationVM { Title = c.Title, Details = c.Details, SchoolName = c.SchoolName, StartDate = c.StartDate, EndDate = c.EndDate, CurrentStatusCheck = c.CurrentStatusCheck, CityId = c.CityId, CityName = c.City.CityName, CountryName = c.City.Country.CountryName, UserEducationID = c.UserEducationId }).ToList();
             pVM.ExpVMList = _context.UserExperience.Where(x => x.UserId == user.Id).Select(c => new ExperienceVM { Title = c.Title, UserExperienceId = c.UserExperienceId, CityId = c.CityID, CityName = c.City.CityName, CountryName = c.City.Country.CountryName, CompanyName = c.CompanyName, CurrentWorkCheck = c.CurrentWorkCheck, Description = c.Description, StartDate = c.StartDate, EndDate = c.EndDate }).ToList();
 
+            pVM.CertificationVMList = _context.UserCertification.Where(x => x.UserId == user.Id).Select(c => new CertificationVM { Name = c.Name, URL = c.URL, UserCertificationId = c.UserCertificationId, LiscenceNo = c.LiscenceNo, CertificationDate = c.CertificationDate, ExpirationDate = c.ExpirationDate }).ToList();
+
+            pVM.AchievVMList = _context.UserAcheivement.Where(x => x.UserId == user.Id).Select(c => new AchievmentVM { Description = c.Description, UserAchievementId = c.UserAchievementId });
+
+            pVM.HobbyVMList = _context.UserHobby.Where(x => x.UserId == user.Id).Select(c => new HobbyVM { UserHobbyId = c.UserHobbyId, HobbyOrIntrest = c.HobbyOrIntrest });
+
+            pVM.LanguageSkillVMList = _context.UserLanguageSkill.Where(x => x.UserId == user.Id).Select(c => new LanguageSkillVM { LanguageSkillId = c.LanguageSkillId, SkillName = c.SkillName });
+
+            pVM.PublicationVMListJP = _context.UserPublication.Where(x => x.UserId == user.Id && x.ConferenceOrJournal == false).Select(c => new PublicationVM { Title = c.Title, PublishYear = c.PublishYear, Description = c.Description, ConferenceOrJournal = c.ConferenceOrJournal, UserPublicationId = c.UserPublicationId });
+            pVM.PublicationVMListCP = _context.UserPublication.Where(x => x.UserId == user.Id && x.ConferenceOrJournal == true).Select(c => new PublicationVM { Title = c.Title, PublishYear = c.PublishYear, Description = c.Description, ConferenceOrJournal = c.ConferenceOrJournal, UserPublicationId = c.UserPublicationId });
 
             //Get Object from parameter and generate Resume
             //university = new University();
