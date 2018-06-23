@@ -6,7 +6,7 @@
 
 <div class="container">
     <div class="row">
-        <form>
+        <form method="post">
             <div class="col-sm-7 col-lg-8">
                 <div class="row form-group">
                     <div class="col-xs-2 col-lg-1">
@@ -14,12 +14,13 @@
                     </div>
                     <div class="col-xs-10 col-lg-11">
                         <input asp-for="Title" type="text" class="fr-form" placeholder="What's your programming question? Be specific." />
+                        <span asp-validation-for="Title" style="color:red"></span>
                     </div>
                 </div>
                 <div class="form-group">
                     <textarea asp-for="Description" class="fr-form"></textarea>
+                    <span asp-validation-for="Description" style="color:red"></span>
                 </div>
-
                 <hr />
                 <hr />
                 <div class="form-group">
@@ -48,6 +49,7 @@
                 console.log(e, e.detail);
             });
         </script>
+
         <div class="col-sm-5 col-lg-4">
             <div class="jumbotron">
                 <h5>How to Ask</h5>
@@ -61,3 +63,22 @@
         </div>
     </div>
 </div>
+<script src="https://cloud.tinymce.com/stable/tinymce.min.js"></script>
+<script>
+    $(document).ready(function () {
+        tinymce.init({
+            selector: 'textarea',
+            height: 500,
+            menubar: false,
+            plugins: [
+                'advlist autolink lists link image charmap print preview anchor textcolor',
+                'searchreplace visualblocks code fullscreen',
+                'insertdatetime media table contextmenu paste code help wordcount'
+            ],
+            toolbar: 'insert | undo redo |  formatselect | bold italic backcolor  | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+            content_css: [
+                '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+                '//www.tinymce.com/css/codepen.min.css']
+        });
+    });
+</script>

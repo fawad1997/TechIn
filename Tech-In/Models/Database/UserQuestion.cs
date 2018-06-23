@@ -13,7 +13,8 @@ namespace Tech_In.Models.Database
         public int UserQuestionId { get; set; }
         [StringLength(maximumLength: 50, MinimumLength = 3), Required]
         public string Title { get; set; }
-        [StringLength(maximumLength: 200, MinimumLength = 10),Required]
+        [Required]
+        [Column(TypeName = "nvarchar(MAX)")]
         public string Description { get; set; }
 
         [DataType(DataType.Date)]

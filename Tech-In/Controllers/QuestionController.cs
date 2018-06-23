@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -44,7 +45,12 @@ namespace Tech_In.Controllers
             {
                 return RedirectToAction("CompleteProfile", "Home");
             }
-            return View();
+            else
+            {
+                var QuestionList = _context.UserQuestion.Where(x => x.ApplicationUser.Id == user.Id).OrderByDescending(x=> x.UserQuestionId).Select(c => new NewQuestionVM { Title = c.Title, Description = HttpUtility.HtmlDecode(c.Description) }).FirstOrDefault();
+                ViewBag.QuestionList = QuestionList;
+                return View();
+            }
         }
 
         public async Task<IActionResult> New()
@@ -65,7 +71,7 @@ namespace Tech_In.Controllers
         {
             return View();
         }
-
+        [HttpPost]
          public async Task<IActionResult> PostQuestion(NewQuestionVM vm)
         {
             
@@ -75,14 +81,14 @@ namespace Tech_In.Controllers
                 UserQuestion userQuestion = new UserQuestion();
                 userQuestion.Title = vm.Title;
                 userQuestion.PostTime = DateTime.Now;
-                userQuestion.Description = vm.Description;
+                userQuestion.Description = HttpUtility.HtmlEncode(vm.Description);
                 userQuestion.UserId = user.Id;
                 _context.UserQuestion.Add(userQuestion);
                 _context.SaveChanges();
                 return RedirectToAction("Detail");
             }
 
-            return NotFound();
+            return View("New", vm);
         }
         public async Task<IActionResult> ViewQuestion()
         {
