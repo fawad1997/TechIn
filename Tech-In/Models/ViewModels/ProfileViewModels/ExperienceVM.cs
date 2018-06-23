@@ -13,7 +13,8 @@ namespace Tech_In.Models.ViewModels.ProfileViewModels
         public string Title { get; set; }
         [StringLength(maximumLength: 200, MinimumLength = 10)]
         public string Description { get; set; }
-        [StringLength(maximumLength: 100, MinimumLength = 2)]
+        [Display(Name ="Company Name")]
+        [StringLength(maximumLength: 100, MinimumLength = 2), Required]
         public string CompanyName { get; set; }
         public Boolean CurrentWorkCheck { get; set; }
 
@@ -24,8 +25,11 @@ namespace Tech_In.Models.ViewModels.ProfileViewModels
         [DisplayFormat(DataFormatString = "{0:yyyy-mm-dd}", ApplyFormatInEditMode = true)]
         public DateTime EndDate { get; set; }
 
+        [Display(Name ="City")]
+        [Required(ErrorMessage ="City Name is required.")]
         public int CityId { get; set; }
-
+        [Display(Name ="Country")]
+        [Required(ErrorMessage ="Country Name is required.")]
         public int CountryId { get; set; }
 
         //ApNetUser

@@ -5,44 +5,44 @@
     @Html.HiddenFor(m => m.UserExperienceId)
     <!--Title-->
     <div class="form-group">
-        <label for="recipient-name" class="control-label">Title:</label>
+        <label class="control-label" asp-for="Title"></label>
         @Html.TextBoxFor(m => m.Title, new { @class = "input", @placeholder = "Experience Title..." })
-        @Html.ValidationMessageFor(m => m.Title, "", new { @class = "red" })
+        @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger" })
     </div>
     <!--/Title-->
     <!--Company-->
     <div class="form-group">
-        <label for="recipient-name" class="control-label">Company Name:</label>
+        <label class="control-label" asp-for="CompanyName"></label>
         @Html.TextBoxFor(m => m.CompanyName, new { @class = "input", @placeholder = "e.g. Nexin (Pvt) Limited" })
-        @Html.ValidationMessageFor(m => m.CompanyName, "", new { @class = "red" })
+        @Html.ValidationMessageFor(m => m.CompanyName, "", new { @class = "text-danger" })
     </div>
     <!--/Company-->
     <!--Text Area-->
     <div class="form-group">
-        <label for="recipient-name" class="control-label">Description:</label>
+        <label class="control-label" asp-for="Description"></label>
         @Html.TextAreaFor(m => m.Description, new { @class = "input", @placeholder = "Job Description" })
-        @Html.ValidationMessageFor(m => m.Description, "", new { @class = "red" })
+        @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
     </div>
     <!--/Text Area-->
     <div class="row">
         <div class="col-sm-6">
             <!--Country-->
             <div class="form-group">
-                <label for="recipient-name" class="control-label">Country:</label>
+                <label class="control-label" asp-for="CountryId"></label>
                 @if (ViewBag.CountryList != null)
                 {
-                    @Html.DropDownListFor(model => model.CountryId, ViewBag.CountryList as SelectList, "--select--", new { @class = "form-control" })
+                        @Html.DropDownListFor(model => model.CountryId, ViewBag.CountryList as SelectList, "--Select--", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.CountryId, "", new { @class = "text-danger" })
                 }
-
             </div>
             <!--/Country-->
         </div>
         <div class="col-sm-6">
             <!--City-->
             <div class="form-group">
-                <label for="recipient-name" class="control-label">City:</label>
+                <label class="control-label" asp-for="CityId"></label>
                 @Html.DropDownListFor(m => m.CityId, new SelectList(""), "--Select--", new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.CityId, "", new { @class = "red" })
+                @Html.ValidationMessageFor(m => m.CityId, "", new { @class = "text-danger" })
             </div>
             <!--/City-->
         </div>
@@ -51,16 +51,16 @@
         <div class="col-sm-6">
             <!--Start Date-->
             <div class="form-group">
-                <label for="recipient-name" class="control-label">From:</label>
+                <label class="control-label">From</label>
                 <input type="date" class="input" asp-for="StartDate">
-                @Html.ValidationMessageFor(m => m.StartDate, "", new { @class = "red" })
+                @Html.ValidationMessageFor(m => m.StartDate, "", new { @class = "text-danger" })
             </div>
             <!--/Start Date-->
         </div>
         <div class="col-sm-6">
             <!--End Date-->
             <div class="form-group" id="EndDateDiv">
-                <label for="recipient-name" class="control-label">To:</label>
+                <label class="control-label">To</label>
                 @Html.TextBoxFor(m => m.EndDate, new { @class = "input", @type = "date" })
             </div>
             <!--/End Date-->
@@ -94,28 +94,104 @@
 </form>
 <script>
     $(document).ready(function () {
+
+        //Form Validation
+        $('#expForm').bootstrapValidator({
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                Title: {
+                    validators: {
+                        stringLength: {
+                            min: 3,
+                            max: 50,
+                            message: 'Title can contain minimum 3 and maximum 50 letters'
+                        },
+                        regexp: {
+                            regexp: /^[a-z\s.#]+$/i,
+                            message: 'Title can contains alphabets only.'
+                        },
+                        notEmpty: {
+                            message: 'Title is required'
+                        }
+                    }
+                },
+                CompanyName: {
+                    validators: {
+                        stringLength: {
+                            min: 2,
+                            max: 100,
+                            message: 'Company Name should contain minimum 2 characters'
+                        },
+                        notEmpty: {
+                            message: 'Company Name is required'
+                        }
+                    }
+                },
+                Description: {
+                    validators: {
+                        stringLength: {
+                            min: 10,
+                            max: 200,
+                            message: 'Description should contain minimum 10 characters and max 200.'
+                        }
+                    }
+                },
+                StartDate: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Date of Birth is required'
+                        }
+                    }
+                },
+                CountryId: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Country Name is required'
+                        }
+                    }
+                },
+                CityId: {
+                    validators: {
+                        notEmpty: {
+                            message: 'City Name is required'
+                        }
+                    }
+                },
+
+            }
+        });
+
+
         //Submit Form
         $("#expSubmit").click(function () {
-            if (!$("#expForm").valid()) {
-                return false;
-            }
-            $("#loaderDiv").show();
-            var expFormData = $("#expForm").serialize();
-            $.ajax({
+            var validator = $('#expForm').data('bootstrapValidator');
+            validator.validate();
+            if (validator.isValid()) {
+                $("#loaderDiv").show();
+                var expFormData = $("#expForm").serialize();
+                $.ajax({
 
-                type: "POST",
-                url: "/User/UpdateExperience",
-                data: expFormData,
-                success: function () {
-                    $("#loaderDiv").hide();
-                    $("#myExp").modal("hide");
-                    window.location.href = "/User/Index";
+                    type: "POST",
+                    url: "/User/UpdateExperience",
+                    data: expFormData,
+                    success: function (result) {
+                        if (result.success) {
+                            $("#loaderDiv").hide();
+                            $("#myExp").modal("hide");
+                            window.location.href = "/User/Index";
+                        } else {
+                            $("#loaderDiv").hide();
+                            $('#expForm').html(result);
 
-                }
-
-            })
-
-        })
+                        }
+                    }
+                })
+            }//If Is Valid
+        })//Submit Button Click
 
 
         //For DIsplaying Cities List

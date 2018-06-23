@@ -8,46 +8,46 @@
         <div class="col-sm-6">
             <!--First Name-->
             <div class="form-group">
-                <label class="control-label">First Name:</label>
+                <label class="control-label">First Name<strong class="text-danger"> *</strong></label>
                 @Html.TextBoxFor(m => m.FirstName, new { @class = "input", @placeholder = "First Name" })
-                @Html.ValidationMessageFor(m => m.LastName, "", new { @class = "red" })
+                @Html.ValidationMessageFor(m => m.FirstName, "", new { @class = "text-danger" })
             </div>
             <!--/First Name-->
         </div>
         <div class="col-sm-6">
             <!--Last Name-->
             <div class="form-group">
-                <label class="control-label">Last Name:</label>
+                <label class="control-label">Last Name</label>
                 @Html.TextBoxFor(m => m.LastName, new { @class = "input", @placeholder = "Last Name" })
-                @Html.ValidationMessageFor(m => m.LastName, "", new { @class = "red" })
+                @Html.ValidationMessageFor(m => m.LastName, "", new { @class = "text-danger" })
             </div>
             <!--/Last Name-->
         </div>
     </div>
     <!--Phone No-->
     <div class="form-group">
-        <label class="control-label">Phone No:</label>
-        @Html.TextBoxFor(m => m.PhoneNo, new { @class = "input", @placeholder = "e.g. +923055513575" })
-        @Html.ValidationMessageFor(m => m.PhoneNo, "", new { @class = "red" })
+        <label class="control-label">Phone No</label>
+        @Html.TextBoxFor(m => m.PhoneNo, new { @class = "input", @placeholder = "e.g. 923055513575" })
+        @Html.ValidationMessageFor(m => m.PhoneNo, "", new { @class = "text-danger" })
     </div>
     <!--/Phone No-->
     <!--Phone No-->
     <div class="form-group">
-        <label class="control-label">Email:</label>
+        <label class="control-label">Email</label>
         @Html.TextBoxFor(m => m.Email, new { @class = "input", @disabled = "true" })
-        @Html.ValidationMessageFor(m => m.Email, "", new { @class = "red" })
+        @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
     </div>
     <!--/Phone No-->
     <div class="row">
         <div class="col-xs-6">
             <div class="form-group">
-                <label asp-for="DOB" class="control-label"></label>
+                <label asp-for="DOB" class="control-label"></label><strong class="text-danger"> *</strong>
                 <input asp-for="DOB" class="form-control" />
                 <span asp-validation-for="DOB" class="text-danger"></span>
             </div>
         </div>
         <div class="col-xs-6">
-            <label asp-for="Gender" class="control-label"></label>
+            <label asp-for="Gender" class="control-label"></label><strong class="text-danger"> *</strong>
             <div class="form-group">
                 <label class="radio-inline">
                     <input type="radio" asp-for="Gender" value="0" checked> Male
@@ -63,21 +63,21 @@
         <div class="col-sm-6">
             <!--Country-->
             <div class="form-group">
-                <label for="recipient-name" class="control-label">Country:</label>
+                <label class="control-label">Country<strong class="text-danger"> *</strong></label>
                 @if (ViewBag.CountryList != null)
                 {
-                    @Html.DropDownListFor(model => model.CountryId, ViewBag.CountryList as SelectList, "--Select--", new { @class = "form-control" })
+                        @Html.DropDownListFor(model => model.CountryId, ViewBag.CountryList as SelectList, "--Select--", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.CountryId, "", new { @class = "text-danger" })
                 }
-
             </div>
             <!--/Country-->
         </div>
         <div class="col-sm-6">
             <!--City-->
             <div class="form-group">
-                <label for="recipient-name" class="control-label">City:</label>
+                <label class="control-label">City<strong class="text-danger"> *</strong></label>
                 @Html.DropDownListFor(m => m.CityId, new SelectList(""), "--Select--", new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.CityId, "", new { @class = "red" })
+                @Html.ValidationMessageFor(m => m.CityId, "", new { @class = "text-danger" })
             </div>
             <!--/City-->
         </div>
@@ -96,30 +96,104 @@
 
 <script>
     $(document).ready(function () {
-        //Submit Form
-        debugger
-        $("#PDSubmit").click(function () {
-            if (!$("#PDForm").valid()) {
-                return false;
+
+        //Form Validation
+        $('#PDForm').bootstrapValidator({
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                FirstName: {
+                    validators: {
+                        stringLength: {
+                            min: 2,
+                            max: 50,
+                            message: 'First name can contain minimum 2 and maximum 50 letters'
+                        },
+                        regexp: {
+                            regexp: /^[a-z]+$/i,
+                            message: 'First Name can contain alphabets only'
+                        },
+                        notEmpty: {
+                            message: 'Please Enter your First name'
+                        }
+                    }
+                },
+                LastName: {
+                    validators: {
+                        stringLength: {
+                            min: 2,
+                            max: 100,
+                            message: 'Last Name can contain minimum 2 characters'
+                        },
+                        regexp: {
+                            regexp: /^[a-z\s]+$/i,
+                            message: 'Last Name can contain alphabets only'
+                        }
+                    }
+                },
+                PhoneNo: {
+                    validators: {
+                        numeric: {
+                            message: 'The Phone No must be a number.'
+                        }
+                    }
+                },
+                DOB: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Date of Birth is required'
+                        }
+                    }
+                },
+                CountryId: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Country Name is required'
+                        }
+                    }
+                },
+                CityId: {
+                    validators: {
+                        notEmpty: {
+                            message: 'City Name is required'
+                        }
+                    }
+                },
+
             }
-            $("#loaderDiv").show();
-            debugger
-            var pDFormData = $("#PDForm").serialize();
-            $.ajax({
+        });
 
-                type: "POST",
-                url: "/User/UpdatePersonalDetails",
-                data: pDFormData,
-                success: function () {
-                    $("#loaderDiv").hide();
-                    $("#myPD").modal("hide");
-                    window.location.href = "/User/Index";
+        //Submit Form
+        $("#PDSubmit").click(function () {
+            var validator = $('#PDForm').data('bootstrapValidator');
+            validator.validate();
+           // $('#PDForm').bootstrapValidator('validate');
+            if (validator.isValid()) {
+                $("#loaderDiv").show();
+                var pDFormData = $("#PDForm").serialize();
 
-                }
+                $.ajax({
+                    type: "POST",
+                    url: "/User/UpdatePersonalDetails",
+                    data: pDFormData,
+                    success: function (result) {
+                        if (result.success) {
+                            $("#loaderDiv").hide();
+                            $("#myPD").modal("hide");
+                            window.location.href = "/User/Index";
+                        } else {
+                            $("#loaderDiv").hide();
+                            $('#PDForm').html(result);
 
-            })
-
-        })
+                        }
+                    }
+                })
+            }//If IsValid
+            
+        })//PDSubmit Button Ends
 
 
         //For DIsplaying Cities List
@@ -136,9 +210,8 @@
                     $("#CityId").append(response);
 
                 }
+            })//Ajax Ends
+        })//Display City List Ends
 
-            })
-        })
-
-    })
+    })//Document Ready Ends
 </script>

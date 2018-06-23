@@ -12,7 +12,7 @@
     <link rel="icon" href="~/images/logotop.png" />
     <title>Complete Profile</title>
     <!-- Bootstrap -->
-    <link type="text/css" rel="stylesheet" href="~/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
     <!-- Font Awesome Icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
@@ -20,17 +20,20 @@
     <!-- Custom stlylesheet -->
     <link type="text/css" rel="stylesheet" href="~/css/style.css" />
     <style>
+
         .form-group > label {
             color: black;
         }
+
         #footer > div > div > div > ul > li > a {
-             cursor:not-allowed;
+            cursor: not-allowed;
         }
 
         body {
             background-image: url("/images/whiteback.png");
         }
-        input[type="text"], input[type="date"]{
+
+        input[type="text"], input[type="date"] {
             background: white;
         }
     </style>
@@ -74,7 +77,7 @@
         <hr />
         <div class="row">
             <div class="col-md-push-2 col-md-8">
-                <form asp-action="CompleteProfile" method="post" enctype="multipart/form-data">
+                <form id="validateForm" asp-action="CompleteProfile" method="post" enctype="multipart/form-data">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="row">
                         <div class="col-xs-6">
@@ -283,7 +286,88 @@
     </footer>
     <!-- /Footer -->
     <script src="~/js/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/js/bootstrapValidator.js"></script>
     <script>
+
+        $(document).ready(function () {
+
+            $('#validateForm').bootstrapValidator({
+                feedbackIcons: {
+                    valid: 'glyphicon glyphicon-ok',
+                    invalid: 'glyphicon glyphicon-remove',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                fields: {
+                    FirstName: {
+                        validators: {
+                            stringLength: {
+                                min: 2,
+                                max: 50,
+                                message: 'First name can contain minimum 2 and maximum 50 letters'
+                            },
+                            regexp: {
+                                regexp: /^[a-z]+$/i,
+                                message: 'First Name can contain alphabets only'
+                            },
+                            notEmpty: {
+                                message: 'Please Enter your First name'
+                            }
+                        }
+                    },
+                    LastName: {
+                        validators: {
+                            stringLength: {
+                                min: 2,
+                                max: 100,
+                                message: 'Last Name can contain minimum 2 characters'
+                            },
+                            regexp: {
+                                regexp: /^[a-z\s]+$/i,
+                                message: 'Last Name can contain alphabets only'
+                            }
+                        }
+                    },
+                    DOB: {
+                        validators: {
+                            notEmpty: {
+                                message: 'Date of Birth is required'
+                            }
+                        }
+                    },
+                    ProfileImage: {
+                        validators: {
+                            regexp: {
+                                regexp: /\.(jp?g|png)$/i,
+                                message: 'only Jpeg, jpg and png formats are allowed.'
+                            },
+                            file: {
+                                extension: 'jpeg,png,jpg',
+                                type: 'image/jpeg,image/png,image/jpg',
+                                maxSize: 2048 * 1024,
+                                message: 'The selected file is not valid'
+                            }
+                        }
+                    },
+                    CountryId: {
+                        validators: {
+                            notEmpty: {
+                                message: 'Country Name is required'
+                            }
+                        }
+                    },
+                    CityId: {
+                        validators: {
+                            notEmpty: {
+                                message: 'City Name is required'
+                            }
+                        }
+                    },
+                    
+                }
+            });
+
+        });
+
         //For DIsplaying Cities List
         $("#CountryId").change(function () {
             var countryId = $(this).val();

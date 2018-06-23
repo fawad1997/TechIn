@@ -104,6 +104,7 @@ namespace Tech_In.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdatePersonalDetails(UserPersonalViewModel vm)
         {
             if (ModelState.IsValid)
@@ -125,20 +126,26 @@ namespace Tech_In.Controllers
                 user.PhoneNumber = vm.PhoneNo;
                 _context.SaveChanges();
             }
-            return RedirectToAction("Index");
+            else
+            {
+                vm.Email = HttpContext.Session.GetString("Email");
+                ViewBag.CountryList = new SelectList(GetCountryList(), "CountryId", "CountryName");
+                return PartialView("UpdatePersonalDetail", vm);
+            }
+            return Json(new { success = true });
         }
 
         
 
         //User Experience
-
         public IActionResult AddEditUserExperience(int Id)
         {
             ViewBag.CountryList = new SelectList(GetCountryList(), "CountryId", "CountryName");
             ExperienceVM vm = new ExperienceVM();
             if (Id > 0)
             {
-                UserExperience exp = _context.UserExperience.SingleOrDefault(x => x.UserExperienceId == Id);
+                string userId = HttpContext.Session.GetString("UserId");
+                UserExperience exp = _context.UserExperience.SingleOrDefault(x => x.UserExperienceId == Id && x.UserId == userId);
                 vm.Title = exp.Title;
                 vm.CompanyName = exp.CompanyName;
                 vm.CityId = exp.CityID;
@@ -152,36 +159,46 @@ namespace Tech_In.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateExperience(ExperienceVM vm)
+        public IActionResult UpdateExperience(ExperienceVM vm)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
-            if (vm.UserExperienceId > 0)
+            //var user = await _userManager.GetCurrentUser(HttpContext);
+            if (ModelState.IsValid)
             {
-                UserExperience exp= _context.UserExperience.SingleOrDefault(x => x.UserExperienceId == vm.UserExperienceId);
-                exp.Title = vm.Title;
-                exp.CompanyName = vm.CompanyName;
-                exp.CityID = vm.CityId;
-                exp.CurrentWorkCheck = vm.CurrentWorkCheck;
-                exp.Description = vm.Description;
-                exp.StartDate = vm.StartDate;
-                exp.EndDate = vm.EndDate;
+                string userId = HttpContext.Session.GetString("UserId");
+                if (vm.UserExperienceId > 0)
+                {
+                    UserExperience exp = _context.UserExperience.SingleOrDefault(x => x.UserExperienceId == vm.UserExperienceId && x.UserId == userId);
+                    exp.Title = vm.Title;
+                    exp.CompanyName = vm.CompanyName;
+                    exp.CityID = vm.CityId;
+                    exp.CurrentWorkCheck = vm.CurrentWorkCheck;
+                    exp.Description = vm.Description;
+                    exp.StartDate = vm.StartDate;
+                    exp.EndDate = vm.EndDate;
+                }
+                else
+                {
+                    UserExperience exp = new UserExperience();
+                    exp.Title = vm.Title;
+                    exp.CompanyName = vm.CompanyName;
+                    exp.CityID = vm.CityId;
+                    exp.CurrentWorkCheck = vm.CurrentWorkCheck;
+                    exp.Description = vm.Description;
+                    exp.StartDate = vm.StartDate;
+                    exp.EndDate = vm.EndDate;
+                    exp.UserId = userId;
+                    _context.UserExperience.Add(exp);
+                }
+                _context.SaveChanges();
             }
             else
             {
-                UserExperience exp = new UserExperience();
-                exp.Title = vm.Title;
-                exp.CompanyName = vm.CompanyName;
-                exp.CityID = vm.CityId;
-                exp.CurrentWorkCheck = vm.CurrentWorkCheck;
-                exp.Description = vm.Description;
-                exp.StartDate = vm.StartDate;
-                exp.EndDate = vm.EndDate;
-                exp.UserId = user.Id;
-                _context.UserExperience.Add(exp);
+                ViewBag.CountryList = new SelectList(GetCountryList(), "CountryId", "CountryName");
+                return PartialView("AddEditUserExperience", vm);
             }
-            _context.SaveChanges();
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
-            return RedirectToAction("Index");
+            return Json(new { success = true });
+            //@ViewBag.UName = HttpContext.Session.GetString("Name");
+            //return RedirectToAction("Index");
             //return View("Index");
         }
 
