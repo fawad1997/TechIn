@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Tech_In.Data;
@@ -30,6 +31,7 @@ namespace Tech_In.Controllers
             {
                 return RedirectToAction("CompleteProfile", "Home");
             }
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
             return View();
         }
 
@@ -42,13 +44,7 @@ namespace Tech_In.Controllers
             {
                 return RedirectToAction("CompleteProfile", "Home");
             }
-            else
-            {
-                var QuestionList = _context.UserQuestion.Where(x => x.UserQuestionId==33).Select(c => new NewQuestionVM { Title = c.Title, Description = c.Description }).SingleOrDefault();
-                ViewBag.QuestionList = QuestionList;
-                return View();
-            }
-           
+            return View();
         }
 
         public async Task<IActionResult> New()
@@ -60,6 +56,7 @@ namespace Tech_In.Controllers
             {
                 return RedirectToAction("CompleteProfile", "Home");
             }
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
             return View();
             
         }
