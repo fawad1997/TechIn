@@ -21,6 +21,9 @@ namespace Tech_In.Models.Database
         [DisplayFormat(DataFormatString = "{0:yyyy-mm-dd}", ApplyFormatInEditMode = true)]
         public DateTime PostTime { get; set; }
 
+        [Required]
+        public List<QuestionSkill> Tag { set; get; }
+
         //ApNetUser
         public string UserId { get; set; }
         [ForeignKey("UserId")]

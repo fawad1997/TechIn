@@ -1,4 +1,4 @@
-﻿
+﻿@model List<UserQuestion>
 @{
     ViewData["Title"] = "Questions | TechIn";
 }
@@ -21,152 +21,38 @@
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active" id="home">
                         <br />
-                        <div class="row">
+                        @foreach (var question in Model)
+                        {
+                            <div class="row">
+                                <hr />
+                                <div class="col-xs-1 grey-back">
+                                    <span>
+                                        <strong>0</strong><br />Votes
+                                    </span>
+                                </div>
+                                <div class="col-xs-1 grey-back">
+                                    <span>
+                                        <strong>0</strong><br />Answers
+                                    </span>
+                                </div>
+                                <div class="col-xs-1 grey-back">
+                                    <span>
+                                        <strong>15</strong><br />Views
+                                    </span>
+                                </div>
+                                <div class="col-xs-9">
+                                    <h3 class="font-size16 margin-bottom6"><a href="/Question/QuestionDetail/@question.UserQuestionId">@question.Title</a></h3>
+                                    <span class="widget-tags-sm">
+                                        @*@foreach (var tag in question.Tag)
+                                        {
+                                            <a href="#">skill</a>
+                                        }*@
+                                    </span>
+                                    <p class="inline small-font margintop6 float-right"><i class="fa fa-clock-o"></i> @question.PostTime <a><i class="fa fa-user"></i> @question.ApplicationUser.UserName</a></p>
+                                </div>
+                            </div>
                             <hr />
-                            <div class="col-xs-1 grey-back">
-                                <span>
-                                    <strong>0</strong><br />Votes
-                                </span>
-                            </div>
-                            <div class="col-xs-1 grey-back">
-                                <span>
-                                    <strong>0</strong><br />Answers
-                                </span>
-                            </div>
-                            <div class="col-xs-1 grey-back">
-                                <span>
-                                    <strong>15</strong><br />Views
-                                </span>
-                            </div>
-                            <div class="col-xs-9">
-                                <h3 class="font-size16 margin-bottom6"><a asp-controller="Question" asp-action="Detail">I can't reduce the apk size using proguard on xamarin.android</a></h3>
-                                <span class="widget-tags-sm">
-                                    <a href="#">Web</a>
-                                    <a href="#">Design</a>
-                                    <a href="#">Graphic</a>
-                                    <a href="#">Marketing</a>
-                                    <a href="#">Development</a>
-                                </span>
-                                <p class="inline small-font margintop6 float-right"><i class="fa fa-clock-o"></i> asked 9 min ago <a><i class="fa fa-user"></i> Fawad Bin Tariq</a> <strong>54</strong></p>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <hr />
-                            <div class="col-xs-1 grey-back">
-                                <span>
-                                    <strong>0</strong><br />Votes
-                                </span>
-                            </div>
-                            <div class="col-xs-1 grey-back answer-back">
-                                <span>
-                                    <strong>1</strong><br />Answer
-                                </span>
-                            </div>
-                            <div class="col-xs-1 grey-back">
-                                <span>
-                                    <strong>15</strong><br />Views
-                                </span>
-                            </div>
-                            <div class="col-xs-9">
-                                <h3 class="font-size16 margin-bottom6"><a>I can't reduce the apk size using proguard on xamarin.android</a></h3>
-                                <span class="widget-tags-sm">
-                                    <a href="#">Web</a>
-                                    <a href="#">Design</a>
-                                    <a href="#">Graphic</a>
-                                    <a href="#">Marketing</a>
-                                    <a href="#">Development</a>
-                                </span>
-                                <p class="inline small-font margintop6 float-right"><i class="fa fa-clock-o"></i> asked 9 min ago <a><i class="fa fa-user"></i> Fawad Bin Tariq</a> <strong>54</strong></p>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <hr />
-                            <div class="col-xs-1 grey-back">
-                                <span>
-                                    <strong>0</strong><br />Votes
-                                </span>
-                            </div>
-                            <div class="col-xs-1 grey-back">
-                                <span>
-                                    <strong>0</strong><br />Answers
-                                </span>
-                            </div>
-                            <div class="col-xs-1 grey-back">
-                                <span>
-                                    <strong>15</strong><br />Views
-                                </span>
-                            </div>
-                            <div class="col-xs-9">
-                                <h3 class="font-size16 margin-bottom6"><a>I can't reduce the apk size using proguard on xamarin.android</a></h3>
-                                <span class="widget-tags-sm">
-                                    <a href="#">Web</a>
-                                    <a href="#">Design</a>
-                                    <a href="#">Graphic</a>
-                                    <a href="#">Marketing</a>
-                                    <a href="#">Development</a>
-                                </span>
-                                <p class="inline small-font margintop6 float-right"><i class="fa fa-clock-o"></i> asked 9 min ago <a><i class="fa fa-user"></i> Fawad Bin Tariq</a> <strong>54</strong></p>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <hr />
-                            <div class="col-xs-1 grey-back">
-                                <span>
-                                    <strong>0</strong><br />Votes
-                                </span>
-                            </div>
-                            <div class="col-xs-1 grey-back">
-                                <span>
-                                    <strong>0</strong><br />Answers
-                                </span>
-                            </div>
-                            <div class="col-xs-1 grey-back">
-                                <span>
-                                    <strong>15</strong><br />Views
-                                </span>
-                            </div>
-                            <div class="col-xs-9">
-                                <h3 class="font-size16 margin-bottom6"><a>I can't reduce the apk size using proguard on xamarin.android</a></h3>
-                                <span class="widget-tags-sm">
-                                    <a href="#">Web</a>
-                                    <a href="#">Design</a>
-                                    <a href="#">Graphic</a>
-                                    <a href="#">Marketing</a>
-                                    <a href="#">Development</a>
-                                </span>
-                                <p class="inline small-font margintop6 float-right"><i class="fa fa-clock-o"></i> asked 9 min ago <a><i class="fa fa-user"></i> Fawad Bin Tariq</a> <strong>54</strong></p>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <hr />
-                            <div class="col-xs-1 grey-back">
-                                <span>
-                                    <strong>0</strong><br />Votes
-                                </span>
-                            </div>
-                            <div class="col-xs-1 grey-back answer-backuv">
-                                <span>
-                                    <strong>1</strong><br />Answer
-                                </span>
-                            </div>
-                            <div class="col-xs-1 grey-back">
-                                <span>
-                                    <strong>15</strong><br />Views
-                                </span>
-                            </div>
-                            <div class="col-xs-9">
-                                <h3 class="font-size16 margin-bottom6"><a>I can't reduce the apk size using proguard on xamarin.android</a></h3>
-                                <span class="widget-tags-sm">
-                                    <a href="#">Web</a>
-                                    <a href="#">Design</a>
-                                    <a href="#">Graphic</a>
-                                    <a href="#">Marketing</a>
-                                    <a href="#">Development</a>
-                                </span>
-                                <p class="inline small-font margintop6 float-right"><i class="fa fa-clock-o"></i> asked 9 min ago <a><i class="fa fa-user"></i> Fawad Bin Tariq</a> <strong>54</strong></p>
-                            </div>
-                        </div>
-                        <hr />
+                        }
                     </div>
                     <div role="tabpanel" class="tab-pane" id="profile">
                         <div class="row">
@@ -327,12 +213,22 @@
             <!-- Search -->
             <div class="widget">
                 <div class="widget-search">
-                    <input class="search-input" type="text" placeholder="search questions">
-                    <button class="search-btn" type="button">
+                    <input class="search-input" id="searchText" type="text" placeholder="search questions">
+                    <button class="search-btn" id="searchButton" type="button">
                         <i class="fa fa-search"></i>
                     </button>
                 </div>
             </div>
+            <script>
+                $(document).ready(function () {
+                    $('#searchButton').click(function () {
+                        var text = $('#searchText').val();
+                        if (text) {
+                            window.location.href = "/Question/SearchDetails?text=" + text;
+                        }
+                    });
+                 });
+            </script>
             <!-- /Search -->
 
             <button onclick="location.href='@Url.Action("New", "Question")'" class="main-btn btn-block">Ask a Question</button>

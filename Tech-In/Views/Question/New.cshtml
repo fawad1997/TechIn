@@ -26,12 +26,13 @@
                 <div class="form-group">
                     <strong>Tags </strong>
                     <input asp-for="Tags" name="tags" type="text" class="fr-form" value="css,html,javascript,css" placeholder="atleast one tag, such as 'java', maximum 5." />
+                    
                 </div>
                 <button asp-controller="Question" asp-action="PostQuestion" class="main-btn">Ask a Question</button>
                 <br />
             </div>
         </form>
-        @*<iframe src="https://localhost:44347/Question/Xyz" style="height:250px;width:100%;"></iframe>*@
+
         <!-- Initialize Tagify for both Input and Textaera -->
         <script>
             var input = document.querySelector('input[name=tags]'),
