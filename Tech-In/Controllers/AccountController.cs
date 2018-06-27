@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -81,6 +82,8 @@ namespace Tech_In.Controllers
                     var user = await _userManager.FindByEmailAsync(model.Email);
                     if (user != null)
                     {
+                        HttpContext.Session.SetString("UserId",user.Id);
+                        HttpContext.Session.SetString("Email", user.Email);
                         var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
                         if (userPersonalRow == null)
                         {
@@ -88,6 +91,7 @@ namespace Tech_In.Controllers
                         }
                         else
                         {
+                            HttpContext.Session.SetString("Name", userPersonalRow.FirstName);
                             _logger.LogInformation("User logged in.");
                             return RedirectToLocal(returnUrl);
                         }

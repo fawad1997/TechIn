@@ -14,7 +14,7 @@ namespace Tech_In.Models.ViewModels.ProfileViewModels
         [Required]
         [StringLength(50, MinimumLength = 2)]
         [Display(Name = "First Name ")]
-        [RegularExpression(@"^[a-zA-Z\s]+$",ErrorMessage ="First Name can only contain aplhabets")]
+        [RegularExpression(@"^[a-zA-Z]+$",ErrorMessage ="First Name can only contain aplhabets")]
         public string FirstName { get; set; }
 
         [StringLength(100, MinimumLength = 2)]

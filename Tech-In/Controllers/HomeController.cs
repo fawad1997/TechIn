@@ -65,6 +65,7 @@ namespace Tech_In.Controllers
 
         [Authorize]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CompleteProfile(CompleteProfileVM vm)
         {
             if (ModelState.IsValid)
