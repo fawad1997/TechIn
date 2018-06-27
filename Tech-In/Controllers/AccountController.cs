@@ -381,6 +381,7 @@ namespace Tech_In.Controllers
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
+                        await _userManager.ConfirmEmailAsync(await _userManager.FindByEmailAsync(user.Email), await _userManager.GenerateEmailConfirmationTokenAsync(user));
                         return RedirectToLocal(returnUrl);
                     }
                 }

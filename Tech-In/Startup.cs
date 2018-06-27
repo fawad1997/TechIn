@@ -27,6 +27,24 @@ namespace Tech_In
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
+            services.AddAuthentication().AddFacebook(facebookOptions =>
+            {
+                facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
+                facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+            });
+
+            services.AddAuthentication().AddGoogle(googleOptions =>
+            {
+                googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
+                googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+            });
+
+            //services.AddAuthentication().AddLinkedIn(options =>
+            //{
+            //    options.ClientId = Configuration["Authentication:LinkedIn:ClientId"];
+            //    options.ClientSecret = Configuration["Authentication:LinkedIn:ClientSecret"];
+            //});
+
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
             

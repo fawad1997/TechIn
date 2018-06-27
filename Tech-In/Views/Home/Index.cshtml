@@ -8,47 +8,47 @@
 @* ***Question Section*** *@
 
 <div id="question" class="section md-padding">
-     @*Container*@ 
+    @*Container*@
     <div class="container">
-         @*Row*@ 
+        @*Row*@
         <div class="row">
             <!-- Section header -->
             <div class="section-header text-center">
                 <h2 class="title">Questions</h2>
             </div>
             <!-- /Section header -->
-             @* Questions img *@ 
+            @* Questions img *@
             <div class="col-sm-6">
                 <img src="~/images/question.png" alt="" class="img-responsive" style="max-height:450px;" />
             </div>
             @* /Question img *@
             <div class="col-sm-6">
-                 @* ask questions *@ 
+                @* ask questions *@
                 <div class="service bottom-padding2">
                     <i class="fa fa-plus"></i>
                     <h3>Ask Questions</h3>
                     <p>Got stuck in any problem? Ask Question and get your problem solved!</p>
                 </div>
-                 @* /ask questions *@ 
-                 @* answer questions *@ 
+                @* /ask questions *@
+                @* answer questions *@
                 <div class="service bottom-padding2">
                     <i class="fa fa-edit"></i>
                     <h3>Answer Questions</h3>
                     <p>Answer questions and get you reward!</p>
                 </div>
-                 @*/answer questions*@ 
-                 @*answer questions*@ 
+                @*/answer questions*@
+                @*answer questions*@
                 <div class="service bottom-padding2">
                     <i class="fa fa-check"></i>
                     <h3>Rate Questions</h3>
                     <p>Rate positive or negative to help others to improve!</p>
                 </div>
-                 @*/answer questions*@ 
+                @*/answer questions*@
             </div>
         </div>
-         @*/Row*@ 
+        @*/Row*@
     </div>
-     @*/Container*@ 
+    @*/Container*@
 </div>
 
 @* ***/Question Section*** *@
@@ -307,23 +307,29 @@
         Get started for free — join the
         <strong>IT World</strong>
     </p>
+    @model RegisterViewModel
     <div class="row">
-        <div class="container">
-            <div class="col-sm-3">
-                <input type="text" class="input" placeholder="Pick a username" aria-labelledby="Username" />
+        <form asp-route-returnUrl="@ViewData["ReturnUrl"]" asp-action="Register" asp-controller="Account" method="post">
+            <div class="container">
+                <div class="col-sm-3">
+                    <input asp-for="Email" class="input" placeholder="Your email address" aria-labelledby="Username" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="col-sm-3">
+                    <input asp-for="Password" class="input" placeholder="Create a password" aria-labelledby="Email" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="col-sm-3">
+                    <input asp-for="ConfirmPassword" class="input" placeholder="confirm your password" aria-labelledby="Password" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+                <div class="col-sm-3">
+                    <button type="submit" class="main-btn btn-block blue-g-btn">
+                        <b>Sign up for TechIn</b>
+                    </button>
+                </div>
             </div>
-            <div class="col-sm-3">
-                <input type="email" class="input" placeholder="Your email address" aria-labelledby="Email" />
-            </div>
-            <div class="col-sm-3">
-                <input type="password" class="input" placeholder="Create a password" aria-labelledby="Password" />
-            </div>
-            <div class="col-sm-3">
-                <button class="main-btn btn-block blue-g-btn">
-                    <b>Sign up for TechIn</b>
-                </button>
-            </div>
-        </div>
+        </form>
     </div>
     <p class="sm-signup-p">
         By clicking "Sign up for TechIn", you agree to our terms of service and privacy policy. We’ll occasionally send you account
@@ -331,3 +337,6 @@
     </p>
 </div>
 <!--/Sign Up-->
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
