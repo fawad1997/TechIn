@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
@@ -32,6 +33,14 @@ namespace Tech_In.Controllers
         private readonly ILogger _logger;
         private ApplicationDbContext _context;
         private IHostingEnvironment _hostingEnvironment;
+        struct GoogleAccountImage
+        {
+            public string url;
+        }
+        struct GoogleAccountInfo
+        {
+            public GoogleAccountImage image;
+        }
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
@@ -108,7 +117,13 @@ namespace Tech_In.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    var user = await _userManager.FindByEmailAsync(model.Email);
+                    if (user != null)
+                    {
+                        ModelState.AddModelError(string.Empty, "The Entered Password is incorrect for provided Email Address");
+                    }
+                    else
+                        ModelState.AddModelError(string.Empty, "Invalid Email Address.");
                     return View(model);
                 }
             }
@@ -354,8 +369,33 @@ namespace Tech_In.Controllers
                 // If the user does not have an account, then ask the user to create an account.
                 ViewData["ReturnUrl"] = returnUrl;
                 ViewData["LoginProvider"] = info.LoginProvider;
-                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-                return View("ExternalLogin", new ExternalLoginViewModel { Email = email });
+                var api_key = "AIzaSyDF5lu9AaDT6XlLmMoFb3g0yJvVNGAWlZo";
+                var identifier = info.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
+                var image = "";
+                if (info.LoginProvider == "Facebook")
+                {
+                    image = $"https://graph.facebook.com/{identifier}/picture?type=large";
+                }
+                if (info.LoginProvider == "Google")
+                {
+                    using (var wc = new WebClient())
+                    {
+                        string json = wc.DownloadString($"https://www.googleapis.com/plus/v1/people/{identifier}?fields=image&key={api_key}");
+                        var o = Newtonsoft.Json.JsonConvert.DeserializeObject<GoogleAccountInfo>(json);
+                        image = o.image.url;
+                    }
+                }
+                var ELVM = new ExternalLoginViewModel
+                {
+                    Email = info.Principal.FindFirstValue(ClaimTypes.Email),
+                    Name = info.Principal.FindFirstValue(ClaimTypes.Name),
+                    Identifier = identifier,
+                    //Country = info.Principal.FindFirstValue(ClaimTypes.Country),
+                    //Gender = info.Principal.FindFirstValue(ClaimTypes.Gender),
+                    Picture = image
+
+                };
+                return View("ExternalLogin", ELVM/*new ExternalLoginViewModel { Email = email }*/);
             }
         }
 

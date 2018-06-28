@@ -31,6 +31,8 @@ namespace Tech_In
             {
                 facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
                 facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+                //facebookOptions.Scope.Add("public_profile");
+                //facebookOptions.Fields.Add("name");
             });
 
             services.AddAuthentication().AddGoogle(googleOptions =>
