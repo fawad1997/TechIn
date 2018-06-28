@@ -20,7 +20,8 @@ namespace Tech_In.Models.Database
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-mm-dd}", ApplyFormatInEditMode = true)]
         public DateTime TimeApproved { get; set; }
-
+        
+        public List<QuestionSkill> Question { set; get; }
 
         //ApNetUser Added By
         public string UserId { get; set; }

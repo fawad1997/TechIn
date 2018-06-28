@@ -20,6 +20,6 @@ namespace Tech_In.Models.ViewModels.QuestionViewModels
         public string Description { get; set; }
 
         [Required]
-        public string Tags { get; set; }
+        public List<QuestionTagViewModel> Tags { get; set; }
     }
 }

@@ -44,6 +44,18 @@ namespace Tech_In.Data
         {
             base.OnModelCreating(builder);
 
+            //builder.Entity<QuestionSkill>().HasKey(x => new { x.UserQuestion , x.SkillTag });
+
+            ////If you name your foreign keys correctly, then you don't need this.
+            //builder.Entity<SkillTag>()
+            //    .HasMany(pt => pt.Question)
+            //    .WithMany(p => p.)
+            //    .HasForeignKey(pt => pt.BookId);
+
+            //builder.Entity<UserQuestion>()
+            //    .HasOne(pt => pt.Author)
+            //    .WithMany(t => t.BooksLink)
+            //    .HasForeignKey(pt => pt.AuthorId);
 
             //"Server=tcp:techin.database.windows.net,1433;Initial Catalog=techin;Persist Security Info=False;User ID=tech;Password=Fawad1997;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
             //Data Source=DESKTOP-RJ6TPH2;Initial Catalog=techin;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False
