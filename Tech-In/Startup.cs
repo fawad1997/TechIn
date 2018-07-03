@@ -27,6 +27,37 @@ namespace Tech_In
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
+            services.AddAuthentication().AddFacebook(facebookOptions =>
+            {
+                //facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
+                //facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+                facebookOptions.AppId = Configuration.GetConnectionString("FacebookAppId");
+                facebookOptions.AppSecret = Configuration.GetConnectionString("FacebookAppSecret");
+                //facebookOptions.Scope.Add("public_profile");
+                //facebookOptions.Scope.Add("user_birthday");
+                //facebookOptions.Scope.Add("user_location");
+                //facebookOptions.Scope.Add("user_gender");
+                //facebookOptions.Scope.Add("user_hometown");
+                //facebookOptions.Fields.Add("name");
+                //facebookOptions.Fields.Add("birthday");
+                //facebookOptions.Fields.Add("hometown");
+                //facebookOptions.Fields.Add("gender");
+            });
+
+            services.AddAuthentication().AddGoogle(googleOptions =>
+            {
+                //googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
+                //googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+                googleOptions.ClientId = Configuration.GetConnectionString("GoogleClientId");
+                googleOptions.ClientSecret = Configuration.GetConnectionString("GoogleClientSecret");
+            });
+
+            //services.AddAuthentication().AddLinkedIn(options =>
+            //{
+            //    options.ClientId = Configuration["Authentication:LinkedIn:ClientId"];
+            //    options.ClientSecret = Configuration["Authentication:LinkedIn:ClientSecret"];
+            //});
+
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
             

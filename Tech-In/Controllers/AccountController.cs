@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
@@ -18,7 +19,8 @@ using Tech_In.Data;
 using Tech_In.Models;
 using Tech_In.Models.AccountViewModels;
 using Tech_In.Services;
-
+using Facebook;
+using Tech_In.Models.Model;
 
 namespace Tech_In.Controllers
 {
@@ -32,6 +34,14 @@ namespace Tech_In.Controllers
         private readonly ILogger _logger;
         private ApplicationDbContext _context;
         private IHostingEnvironment _hostingEnvironment;
+        struct GoogleAccountImage
+        {
+            public string url;
+        }
+        struct GoogleAccountInfo
+        {
+            public GoogleAccountImage image;
+        }
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
@@ -47,6 +57,14 @@ namespace Tech_In.Controllers
             _logger = logger;
             _context = context;
             _hostingEnvironment = hostingEnvironment;
+        }
+        [AllowAnonymous]
+        public ActionResult UserDetails()
+        {
+            var client = new FacebookClient("EAAdRFbKuurMBACHZBZAgNgue05EY3NpbXLaZCbobe91gmfZBvVkhFqgGeg4KItL2GL7Vk0CrsM9BL3Ymnf7EI1GxNRpZCsaTGtbCZCiqvdW3WBEEoCyZC4ZA2MBulgLZC4XVRJZAngh1rmgVBhOySgSQZCMwHDQxlvzfC1sQx6gVhis2QZDZD");
+            dynamic fbresult = client.Get("me?fields=id,email,first_name,last_name,gender,locale,link,timezone,location,picture");
+            FacebookUserModel facebookUser = Newtonsoft.Json.JsonConvert.DeserializeObject<FacebookUserModel>(fbresult.ToString());
+            return View(facebookUser);
         }
 
         [TempData]
@@ -108,7 +126,16 @@ namespace Tech_In.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    var user = await _userManager.FindByEmailAsync(model.Email);
+                    if (user != null)
+                    {
+                        if (user.EmailConfirmed == false)
+                            ModelState.AddModelError(string.Empty, "Please confirm your Email Address befor log In");
+                        else
+                            ModelState.AddModelError(string.Empty, "The Entered Password is incorrect for provided Email Address");
+                    }
+                    else
+                        ModelState.AddModelError(string.Empty, "Email Adress not found in our Records. Invalid Email Address.");
                     return View(model);
                 }
             }
@@ -354,8 +381,46 @@ namespace Tech_In.Controllers
                 // If the user does not have an account, then ask the user to create an account.
                 ViewData["ReturnUrl"] = returnUrl;
                 ViewData["LoginProvider"] = info.LoginProvider;
-                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-                return View("ExternalLogin", new ExternalLoginViewModel { Email = email });
+                var api_key = "AIzaSyDF5lu9AaDT6XlLmMoFb3g0yJvVNGAWlZo";
+                var identifier = info.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
+                var image = "";
+                if (info.LoginProvider == "Facebook")
+                {
+                    image = $"https://graph.facebook.com/{identifier}/picture?type=large";
+                }
+                if (info.LoginProvider == "Google")
+                {
+                    using (var wc = new WebClient())
+                    {
+                        string json = wc.DownloadString($"https://www.googleapis.com/plus/v1/people/{identifier}?fields=image&key={api_key}");
+                        var o = Newtonsoft.Json.JsonConvert.DeserializeObject<GoogleAccountInfo>(json);
+                        image = o.image.url;
+                    }
+                }
+                string[] name = info.Principal.FindFirstValue(ClaimTypes.Name).ToString().Trim().Split(new char[] { ' ' }, 2);
+                string fname = null, lname = null;
+                if (name.Length == 1)
+                {
+                    fname = name[0];
+                    lname = " ";
+                }
+                else
+                {
+                    fname = name[0];
+                    lname = name[1];
+                }
+                var ELVM = new ExternalLoginViewModel
+                {
+                    Email = info.Principal.FindFirstValue(ClaimTypes.Email),
+                    FirstName = fname,
+                    LastName=lname,
+                    Identifier = identifier,
+                    //Country = info.Principal.FindFirstValue(ClaimTypes.Country),
+                    //Gender = info.Principal.FindFirstValue(ClaimTypes.Gender),
+                    Picture = image
+
+                };
+                return View("ExternalLogin", ELVM/*new ExternalLoginViewModel { Email = email }*/);
             }
         }
 
@@ -374,6 +439,24 @@ namespace Tech_In.Controllers
                 }
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                 var result = await _userManager.CreateAsync(user);
+                UserPersonalDetail userPersonal = new UserPersonalDetail();
+                userPersonal.IsDOBPublic = model.DOBVisibility;
+                userPersonal.DOB = model.DOB;
+                if (model.Gender == 0)
+                {
+                    userPersonal.Gender = Gender.Male;
+                }
+                else
+                {
+                    userPersonal.Gender = Gender.Female;
+                }
+                userPersonal.CityId = 4;
+                userPersonal.UserId = user.Id;
+                userPersonal.ProfileImage = model.Picture;
+                userPersonal.FirstName = model.FirstName;
+                userPersonal.LastName = model.LastName;
+                _context.UserPersonalDetail.Add(userPersonal);
+                await _context.SaveChangesAsync();
                 if (result.Succeeded)
                 {
                     result = await _userManager.AddLoginAsync(user, info);
@@ -381,7 +464,11 @@ namespace Tech_In.Controllers
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
-                        return RedirectToLocal(returnUrl);
+                        await _userManager.ConfirmEmailAsync(await _userManager.FindByEmailAsync(user.Email), await _userManager.GenerateEmailConfirmationTokenAsync(user));
+                        //return RedirectToLocal(returnUrl);
+                        HttpContext.Session.SetString("Name", userPersonal.FirstName);
+
+                        return RedirectToAction("Index", "User");
                     }
                 }
                 AddErrors(result);
