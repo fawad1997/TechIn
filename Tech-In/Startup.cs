@@ -32,7 +32,14 @@ namespace Tech_In
                 facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
                 facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
                 //facebookOptions.Scope.Add("public_profile");
+                //facebookOptions.Scope.Add("user_birthday");
+                //facebookOptions.Scope.Add("user_location");
+                //facebookOptions.Scope.Add("user_gender");
+                //facebookOptions.Scope.Add("user_hometown");
                 //facebookOptions.Fields.Add("name");
+                //facebookOptions.Fields.Add("birthday");
+                //facebookOptions.Fields.Add("hometown");
+                //facebookOptions.Fields.Add("gender");
             });
 
             services.AddAuthentication().AddGoogle(googleOptions =>
