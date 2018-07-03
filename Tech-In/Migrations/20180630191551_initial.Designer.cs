@@ -12,8 +12,8 @@ using Tech_In.Models.Model;
 namespace Tech_In.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180623163923_changed-database-User-question-description-max-lenght")]
-    partial class changeddatabaseUserquestiondescriptionmaxlenght
+    [Migration("20180630191551_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -530,6 +530,7 @@ namespace Tech_In.Migrations
                     b.Property<int>("CityID");
 
                     b.Property<string>("CompanyName")
+                        .IsRequired()
                         .HasMaxLength(100);
 
                     b.Property<bool>("CurrentWorkCheck");
@@ -656,12 +657,12 @@ namespace Tech_In.Migrations
             modelBuilder.Entity("Tech_In.Models.Database.QuestionSkill", b =>
                 {
                     b.HasOne("Tech_In.Models.Database.SkillTag", "SkillTag")
-                        .WithMany()
+                        .WithMany("Question")
                         .HasForeignKey("SkillTagId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Tech_In.Models.Database.UserQuestion", "UserQuestion")
-                        .WithMany()
+                        .WithMany("Tag")
                         .HasForeignKey("UserQuestionId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -729,8 +730,8 @@ namespace Tech_In.Migrations
                         .WithMany("UserQAnswers")
                         .HasForeignKey("UserId");
 
-                    b.HasOne("Tech_In.Models.Database.UserQuestion", "UserQuestion")
-                        .WithMany()
+                    b.HasOne("Tech_In.Models.Database.UserQuestion")
+                        .WithMany("UserQAnswer")
                         .HasForeignKey("UserQuestionId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

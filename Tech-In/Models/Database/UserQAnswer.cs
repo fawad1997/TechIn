@@ -11,8 +11,9 @@ namespace Tech_In.Models.Database
     {
         [Key]
         public int UserQAnswerId { get; set; }
-        [StringLength(maximumLength: 50, MinimumLength = 3), Required]
 
+        [Required]
+        [Column(TypeName = "nvarchar(MAX)")]
         public string Description { get; set; }
 
         [DataType(DataType.Date)]
@@ -20,9 +21,7 @@ namespace Tech_In.Models.Database
         public DateTime PostTime { get; set; }
 
         public int UserQuestionId { get; set; }
-        public virtual UserQuestion UserQuestion { get; set; }
-
-
+        
         //ApNetUser
         public string UserId { get; set; }
         [ForeignKey("UserId")]

@@ -21,5 +21,7 @@ namespace Tech_In.Models.ViewModels.QuestionViewModels
 
         [Required]
         public List<QuestionTagViewModel> Tags { get; set; }
+
+        public List<QAnswerViewModel> Answers { get; set; }
     }
 }

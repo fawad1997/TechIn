@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Tech_In.Migrations
 {
-    public partial class InitialMigrationsignorechanges : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -303,7 +303,7 @@ namespace Tech_In.Migrations
                 {
                     UserQuestionId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Description = table.Column<string>(maxLength: 200, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(MAX)", nullable: false),
                     PostTime = table.Column<DateTime>(nullable: false),
                     Title = table.Column<string>(maxLength: 50, nullable: false),
                     UserId = table.Column<string>(nullable: true)
@@ -457,7 +457,7 @@ namespace Tech_In.Migrations
                     UserExperienceId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     CityID = table.Column<int>(nullable: false),
-                    CompanyName = table.Column<string>(maxLength: 100, nullable: true),
+                    CompanyName = table.Column<string>(maxLength: 100, nullable: false),
                     CurrentWorkCheck = table.Column<bool>(nullable: false),
                     Description = table.Column<string>(maxLength: 200, nullable: true),
                     EndDate = table.Column<DateTime>(nullable: false),

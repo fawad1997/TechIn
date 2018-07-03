@@ -398,7 +398,7 @@ namespace Tech_In.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(50);
+                        .HasColumnType("nvarchar(MAX)");
 
                     b.Property<DateTime>("PostTime");
 
@@ -529,6 +529,7 @@ namespace Tech_In.Migrations
                     b.Property<int>("CityID");
 
                     b.Property<string>("CompanyName")
+                        .IsRequired()
                         .HasMaxLength(100);
 
                     b.Property<bool>("CurrentWorkCheck");
@@ -655,12 +656,12 @@ namespace Tech_In.Migrations
             modelBuilder.Entity("Tech_In.Models.Database.QuestionSkill", b =>
                 {
                     b.HasOne("Tech_In.Models.Database.SkillTag", "SkillTag")
-                        .WithMany()
+                        .WithMany("Question")
                         .HasForeignKey("SkillTagId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Tech_In.Models.Database.UserQuestion", "UserQuestion")
-                        .WithMany()
+                        .WithMany("Tag")
                         .HasForeignKey("UserQuestionId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -728,8 +729,8 @@ namespace Tech_In.Migrations
                         .WithMany("UserQAnswers")
                         .HasForeignKey("UserId");
 
-                    b.HasOne("Tech_In.Models.Database.UserQuestion", "UserQuestion")
-                        .WithMany()
+                    b.HasOne("Tech_In.Models.Database.UserQuestion")
+                        .WithMany("UserQAnswer")
                         .HasForeignKey("UserQuestionId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

@@ -22,8 +22,9 @@ namespace Tech_In.Models.Database
         public DateTime PostTime { get; set; }
 
         [Required]
-        public List<QuestionSkill> Tag { set; get; }
+        public ICollection<QuestionSkill> Tag { set; get; }
 
+        public ICollection<UserQAnswer> UserQAnswer { get; set; }
         //ApNetUser
         public string UserId { get; set; }
         [ForeignKey("UserId")]
