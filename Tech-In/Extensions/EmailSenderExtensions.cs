@@ -12,7 +12,7 @@ namespace Tech_In.Services
         public static Task SendEmailConfirmationAsync(this IEmailSender emailSender, string email, string link, string body)
         {
             return emailSender.SendEmailAsync(email, 
-                "Confirm your email",
+                "Confirm your Email",
                 body
                 );
         }

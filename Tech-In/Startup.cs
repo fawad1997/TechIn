@@ -29,8 +29,10 @@ namespace Tech_In
 
             services.AddAuthentication().AddFacebook(facebookOptions =>
             {
-                facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
-                facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+                //facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
+                //facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+                facebookOptions.AppId = Configuration.GetConnectionString("FacebookAppId");
+                facebookOptions.AppSecret = Configuration.GetConnectionString("FacebookAppSecret");
                 //facebookOptions.Scope.Add("public_profile");
                 //facebookOptions.Scope.Add("user_birthday");
                 //facebookOptions.Scope.Add("user_location");
@@ -44,8 +46,10 @@ namespace Tech_In
 
             services.AddAuthentication().AddGoogle(googleOptions =>
             {
-                googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
-                googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+                //googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
+                //googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+                googleOptions.ClientId = Configuration.GetConnectionString("GoogleClientId");
+                googleOptions.ClientSecret = Configuration.GetConnectionString("GoogleClientSecret");
             });
 
             //services.AddAuthentication().AddLinkedIn(options =>
