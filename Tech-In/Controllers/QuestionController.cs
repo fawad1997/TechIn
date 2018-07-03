@@ -37,7 +37,7 @@ namespace Tech_In.Controllers
             return View(questionList);
         }
 
-        public async Task<IActionResult> Detail()
+        public async Task<IActionResult> Detail(int id)
         {
             //Check User Profile is complete or not
             var user = await _userManager.GetCurrentUser(HttpContext);
@@ -48,8 +48,7 @@ namespace Tech_In.Controllers
             }
             else
             {
-                var QuestionList = _context.UserQuestion.Where(x => x.ApplicationUser.Id == user.Id)
-                                                        .OrderByDescending(x => x.UserQuestionId)
+                var QuestionList = _context.UserQuestion.Where(x => x.ApplicationUser.Id == user.Id && x.UserQuestionId == id)
                                                         .Select(c => new NewQuestionVM
                                                         {
                                                             Title = c.Title,
@@ -60,7 +59,18 @@ namespace Tech_In.Controllers
                                                                 UserQAnswerId = x.UserQAnswerId,
                                                                 Date = x.PostTime.ToString("yyyy-MM-dd HH:mm:ss"),
                                                                 User = x.ApplicationUser.UserName
-                                                            }).ToList()
+                                                            }).ToList(),
+                                                            Comment = c.UserQAComment.Select(z => new QACommentsViewModel
+                                                            {
+                                                                UserQuestionId = z.UserQuestionId,
+                                                                UserQAnswerId = z.UserQAnswerId,
+                                                                Description = z.Description,
+                                                                IsAnswer = z.IsAnswer,
+                                                                Visibility = z.Visibility,
+                                                                UserQACommentID = z.UserQACommentID,
+
+                                                                UserId = z.ApplicationUser.Id,
+                                                            }).ToList(),
                                                         }).FirstOrDefault();
                 ViewBag.QuestionList = QuestionList;
                 return View();
@@ -90,7 +100,20 @@ namespace Tech_In.Controllers
                              UserQAnswerId = x.UserQAnswerId,
                              Date = x.PostTime.ToString("yyyy-MM-dd HH:mm:ss"),
                              User = x.ApplicationUser.UserName
-                         }).ToList()
+                         }).ToList(),
+                         Comment = c.UserQAComment.Select(z => new QACommentsViewModel
+                         {
+                             UserQuestionId = z.UserQuestionId,
+                             UserQAnswerId = z.UserQAnswerId,
+                             Description = z.Description,
+                             IsAnswer = z.IsAnswer,
+                             Visibility = z.Visibility,
+                             UserQACommentID = z.UserQACommentID,
+
+                             UserId = z.ApplicationUser.Id,
+                         }).ToList(),
+                         Voting = c.UserQAVoting.Sum(x=> x.Value),
+                         
                      }).SingleOrDefault();
                 ViewBag.QuestionList = QuestionList;
                 return View("Detail");
@@ -166,10 +189,12 @@ namespace Tech_In.Controllers
                 userQuestion.PostTime = DateTime.Now;
                 userQuestion.Description = HttpUtility.HtmlEncode(vm.Description);
                 userQuestion.UserId = user.Id;
+
                 //userQuestion.Tag = list;
                 _context.UserQuestion.Add(userQuestion);
                 _context.SaveChanges();
-                return RedirectToAction("Detail");
+
+                return RedirectToAction($"QuestionDetail", new { id = _context.UserQuestion.OrderByDescending(c => c.UserQuestionId).FirstOrDefault().UserQuestionId });
             }
 
             return View("New", vm);
@@ -195,10 +220,60 @@ namespace Tech_In.Controllers
                 userQAnswer.UserQuestionId = vm.QAnswerViewModel.QuestionId;
                 _context.UserQAnswer.Add(userQAnswer);
                 _context.SaveChanges();
-                return RedirectToAction($"QuestionDetail",new { id = vm.QAnswerViewModel.QuestionId });
+                return RedirectToAction($"QuestionDetail", new { id = vm.QAnswerViewModel.QuestionId });
             }
 
             return View("Detail", vm.NewQuestionVM);
+        }
+        public async Task<IActionResult> UpVote(int id)
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            var question = _context.UserQuestion.FirstOrDefault(c => c.UserQuestionId == id);
+            _context.UserQAVoting.Add(new UserQAVoting()
+            {
+                Value = +1,
+                IsAnswer = false,
+                UserQuestionId = question.UserQuestionId,
+                Visibility = true
+            });
+            _context.SaveChanges();
+            return RedirectToAction($"QuestionDetail", new { id = id });
+        }
+        public async Task<IActionResult> DownVote(int id)
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            var question = _context.UserQuestion.FirstOrDefault(c => c.UserQuestionId == id);
+            _context.UserQAVoting.Add(new UserQAVoting()
+            {
+                Value = -1,
+                IsAnswer = false,
+                UserQuestionId = question.UserQuestionId,
+                Visibility = true,
+                
+            });
+            _context.SaveChanges();
+            return RedirectToAction($"QuestionDetail", new { id = id });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PostComment(CommonViewModel vm)
+        {
+
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetCurrentUser(HttpContext);
+                UserQAComment userQAComment = new UserQAComment();
+                userQAComment.Description = vm.QACommentsViewModel.Description;
+                userQAComment.UserId = user.Id;
+                userQAComment.UserQuestionId = vm.QACommentsViewModel.UserQuestionId;
+                userQAComment.UserQAnswerId = vm.QACommentsViewModel.UserQAnswerId;
+                userQAComment.Visibility = false;
+                userQAComment.IsAnswer = false;
+                _context.UserQAComment.Add(userQAComment);
+                _context.SaveChanges();
+                return RedirectToAction($"QuestionDetail", new { id = vm.QACommentsViewModel.UserQuestionId });
+            }
+            return View("Detail", vm.QAnswerViewModel);
         }
 
     }

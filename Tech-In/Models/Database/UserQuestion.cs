@@ -25,6 +25,11 @@ namespace Tech_In.Models.Database
         public ICollection<QuestionSkill> Tag { set; get; }
 
         public ICollection<UserQAnswer> UserQAnswer { get; set; }
+
+        public ICollection<UserQAComment> UserQAComment { get; set; }
+
+        public ICollection<UserQAVoting> UserQAVoting { get; set; }
+
         //ApNetUser
         public string UserId { get; set; }
         [ForeignKey("UserId")]

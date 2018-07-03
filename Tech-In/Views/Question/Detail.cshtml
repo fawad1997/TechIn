@@ -21,17 +21,19 @@
                         <div class="row">
                             <div class="col-xs-2 col-md-1">
                                 <center>
-                                    <div class="row">
-                                        <a id="triangle-up"></a>
-                                    </div>
-                                    <br /><br />
-                                    <div class="row">
-                                        <strong class="lg-font">0</strong>
-                                    </div>
-                                    <br /><br />
-                                    <div class="row">
-                                        <a id="triangle-down"></a>
-                                    </div>
+                                    <form method="post">
+                                        <div class="row">
+                                            <a href="/Question/UpVote/@ViewBag.QuestionId" id="triangle-up"></a>
+                                        </div>
+                                        <br /><br />
+                                        <div class="row">
+                                            <strong class="lg-font">@(ViewBag.QuestionList.Voting != null ? ViewBag.QuestionList.Voting : 0)</strong>
+                                        </div>
+                                        <br /><br />
+                                        <div class="row">
+                                            <a href="/Question/DownVote/@ViewBag.QuestionId" id="triangle-down"></a>
+                                        </div>
+                                    </form>
                                 </center>
                             </div>
                             <div class="col-xs-10 col-md-11 ">
@@ -50,10 +52,19 @@
                         </div>
                         <!-- blog tags -->
                     </div>
+                    <!--Comments -->
+                    @foreach(var comment in ViewBag.QuestionList.Comment)
+                      {<div class="row">
+                        <div class="col-xs-6 col-md-8">
+                             @comment.Description;
+                          </div>
+                             </div>
+         
+                      }
 
 
                     @foreach (var answer in ViewBag.QuestionList.Answers)
-    {
+                      {
 
                 <div class="row">
                     <div class="col-xs-6 col-md-8">
@@ -70,7 +81,15 @@
                 </div>
 
 }
-                    <hr />
+                    <h6>add a comment</h6>
+                    <form method="post">
+                        <input asp-for="QACommentsViewModel.UserQuestionId" value="@ViewBag.QuestionId" type="hidden" />
+                        <input asp-for="QACommentsViewModel.Description" />
+                        <button asp-controller="Question" asp-action="PostComment" class="btn">add a comment</button>
+                    </form>
+                    <hr width=100% color="black"/>
+
+
                     <h4>Your Answer</h4>
                     <form method="post">
                         <div class="row">

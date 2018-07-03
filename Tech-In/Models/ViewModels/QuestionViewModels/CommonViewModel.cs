@@ -9,5 +9,7 @@ namespace Tech_In.Models.ViewModels.QuestionViewModels
     {
         public QAnswerViewModel QAnswerViewModel { set; get; }
         public NewQuestionVM NewQuestionVM { set; get; }
+        public QACommentsViewModel QACommentsViewModel { set; get; }
+        public QAVotingViewModel QAVotingViewModel { set; get; }
     }
 }

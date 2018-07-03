@@ -12,6 +12,7 @@ namespace Tech_In.Models.Database
         [Key]
         public int UserQACommentID { get; set; }
 
+        [StringLength(maximumLength: 200, MinimumLength = 10), Required]
         public string Description { get; set; }
 
         public Boolean Visibility { get; set; }
@@ -20,8 +21,6 @@ namespace Tech_In.Models.Database
         public Nullable<int> UserQuestionId { get; set; }
         public Nullable<int> UserQAnswerId { get; set; }
 
-        public virtual UserQuestion UserQuestion { get; set; }
-        public virtual UserQAnswer UserQAnswer { get; set; }
         //ApNetUser
         public string UserId { get; set; }
         [ForeignKey("UserId")]
