@@ -48,7 +48,20 @@ namespace Tech_In.Controllers
             }
             else
             {
-                var QuestionList = _context.UserQuestion.Where(x => x.ApplicationUser.Id == user.Id).OrderByDescending(x => x.UserQuestionId).Select(c => new NewQuestionVM { Title = c.Title, Description = HttpUtility.HtmlDecode(c.Description) }).FirstOrDefault();
+                var QuestionList = _context.UserQuestion.Where(x => x.ApplicationUser.Id == user.Id)
+                                                        .OrderByDescending(x => x.UserQuestionId)
+                                                        .Select(c => new NewQuestionVM
+                                                        {
+                                                            Title = c.Title,
+                                                            Description = HttpUtility.HtmlDecode(c.Description),
+                                                            Answers = c.UserQAnswer.Select(x => new QAnswerViewModel
+                                                            {
+                                                                Description = HttpUtility.HtmlDecode(x.Description),
+                                                                UserQAnswerId = x.UserQAnswerId,
+                                                                Date = x.PostTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                                                                User = x.ApplicationUser.UserName
+                                                            }).ToList()
+                                                        }).FirstOrDefault();
                 ViewBag.QuestionList = QuestionList;
                 return View();
             }
@@ -57,6 +70,7 @@ namespace Tech_In.Controllers
         public async Task<IActionResult> QuestionDetail(int id)
         {
             //Check User Profile is complete or not
+            ViewBag.QuestionId = id;
             var user = await _userManager.GetCurrentUser(HttpContext);
             var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
             if (userPersonalRow == null)
@@ -65,7 +79,19 @@ namespace Tech_In.Controllers
             }
             else
             {
-                var QuestionList = _context.UserQuestion.Where(x => x.UserQuestionId == id).Select(c => new NewQuestionVM { Title = c.Title, Description = HttpUtility.HtmlDecode(c.Description) }).SingleOrDefault();
+                var QuestionList = _context.UserQuestion.Where(x => x.UserQuestionId == id)
+                     .Select(c => new NewQuestionVM
+                     {
+                         Title = c.Title,
+                         Description = HttpUtility.HtmlDecode(c.Description),
+                         Answers = c.UserQAnswer.Select(x => new QAnswerViewModel
+                         {
+                             Description = HttpUtility.HtmlDecode(x.Description),
+                             UserQAnswerId = x.UserQAnswerId,
+                             Date = x.PostTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                             User = x.ApplicationUser.UserName
+                         }).ToList()
+                     }).SingleOrDefault();
                 ViewBag.QuestionList = QuestionList;
                 return View("Detail");
             }
@@ -84,7 +110,7 @@ namespace Tech_In.Controllers
             }
             else
             {
-                var QuestionList = _context.UserQuestion.Where(x => x.Description.ToLower().Contains(text)  || x.Title.ToLower().Contains(text)).Select(c => new UserQuestion { ApplicationUser = c.ApplicationUser , PostTime = c.PostTime , Tag = c.Tag , UserQuestionId = c.UserQuestionId, UserId = c.UserId , Title = c.Title, Description = HttpUtility.HtmlDecode(c.Description) }).ToList();
+                var QuestionList = _context.UserQuestion.Where(x => x.Description.ToLower().Contains(text) || x.Title.ToLower().Contains(text)).Select(c => new UserQuestion { ApplicationUser = c.ApplicationUser, PostTime = c.PostTime, Tag = c.Tag, UserQuestionId = c.UserQuestionId, UserId = c.UserId, Title = c.Title, Description = HttpUtility.HtmlDecode(c.Description) }).ToList();
                 return View("Index", QuestionList);
             }
         }
@@ -155,5 +181,25 @@ namespace Tech_In.Controllers
             ViewBag.QuestionList = QuestionList;
             return View("Detail");
         }
+        [HttpPost]
+        public async Task<IActionResult> PostAnswer(CommonViewModel vm)
+        {
+
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetCurrentUser(HttpContext);
+                UserQAnswer userQAnswer = new UserQAnswer();
+                userQAnswer.Description = HttpUtility.HtmlEncode(vm.QAnswerViewModel.Description);
+                userQAnswer.PostTime = DateTime.UtcNow;
+                userQAnswer.UserId = user.Id;
+                userQAnswer.UserQuestionId = vm.QAnswerViewModel.QuestionId;
+                _context.UserQAnswer.Add(userQAnswer);
+                _context.SaveChanges();
+                return RedirectToAction($"QuestionDetail",new { id = vm.QAnswerViewModel.QuestionId });
+            }
+
+            return View("Detail", vm.NewQuestionVM);
+        }
+
     }
 }
