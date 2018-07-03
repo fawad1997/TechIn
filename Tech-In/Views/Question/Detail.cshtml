@@ -44,27 +44,40 @@
                         </div>
                         <!-- blog tags -->
                         <div class="blog-tags">
-                            <a href="#">
-                                <i name="tags" class="fa fa-tag"></i>
-                                <input name='tags' readonly value='@ViewBag.QuestionList.Tags'>
-                            </a>
+                            <div class="widget-tags">
+                                <a href="#">Web</a>
+                                <a href="#">Design</a>
+                                <a href="#">Graphic</a>
+                                <a href="#">Marketing</a>
+                                <a href="#">Development</a>
+                            </div>
+                            @*<input name='tags' readonly value='@ViewBag.QuestionList.Tags'>*@
+
 
                         </div>
                         <!-- blog tags -->
                     </div>
+
                     <!--Comments -->
-                    @foreach(var comment in ViewBag.QuestionList.Comment)
-                      {<div class="row">
-                        <div class="col-xs-6 col-md-8">
-                             @comment.Description;
-                          </div>
-                             </div>
-         
-                      }
+                    @foreach (var comment in ViewBag.QuestionList.Comment)
+    {<div class="row">
+                    <div class="col-xs-6 col-md-8">
+                        @comment.Description;
+                    </div>
+                </div>
+}
+                    <hr width=100% color="black" />
+                    <h6>add a comment</h6>
+                    <form method="post">
+                        <input asp-for="QACommentsViewModel.UserQuestionId" value="@ViewBag.QuestionId" type="hidden" />
+                        <input asp-for="QACommentsViewModel.Description" />
+                        <button asp-controller="Question" asp-action="PostComment" class="btn">add a comment</button>
+                    </form>
+                   
 
-
+                    <hr width=100% color="black" />
                     @foreach (var answer in ViewBag.QuestionList.Answers)
-                      {
+    {
 
                 <div class="row">
                     <div class="col-xs-6 col-md-8">
@@ -79,17 +92,7 @@
                         </div>
                     </div>
                 </div>
-
 }
-                    <h6>add a comment</h6>
-                    <form method="post">
-                        <input asp-for="QACommentsViewModel.UserQuestionId" value="@ViewBag.QuestionId" type="hidden" />
-                        <input asp-for="QACommentsViewModel.Description" />
-                        <button asp-controller="Question" asp-action="PostComment" class="btn">add a comment</button>
-                    </form>
-                    <hr width=100% color="black"/>
-
-
                     <h4>Your Answer</h4>
                     <form method="post">
                         <div class="row">

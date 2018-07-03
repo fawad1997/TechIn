@@ -26,7 +26,7 @@
                 <div class="form-group">
                     <strong>Tags </strong>
                     <input asp-for="Tags" name="tags" type="text" class="fr-form" value="css,html,javascript,css" placeholder="atleast one tag, such as 'java', maximum 5." />
-                    
+
                 </div>
                 <button asp-controller="Question" asp-action="PostQuestion" class="main-btn">Ask a Question</button>
                 <br />
@@ -64,6 +64,14 @@
         </div>
     </div>
 </div>
+<!-- Tagify -->
+<link href="~/css/tagify.css" rel="stylesheet" />
+<script src="~/js/tagify.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="~/js/jQuery.tagify.js"></script>
+<script src="~/js/popper.js"></script>
+<script src="~/js/tagify.suggestions.js"></script>
+
 <script src="https://cloud.tinymce.com/stable/tinymce.min.js"></script>
 <script>
     $(document).ready(function () {
