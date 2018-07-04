@@ -135,16 +135,25 @@ namespace Tech_In.Controllers
             return Json(new { success = true });
         }
 
-        
+        public async Task<string> SetUserId()
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            HttpContext.Session.SetString("UserId", user.Id);
+            return user.Id;
+        }
 
         //User Experience
-        public IActionResult AddEditUserExperience(int Id)
+        public async Task<IActionResult> AddEditUserExperience(int Id)
         {
             ViewBag.CountryList = new SelectList(GetCountryList(), "CountryId", "CountryName");
             ExperienceVM vm = new ExperienceVM();
             if (Id > 0)
             {
                 string userId = HttpContext.Session.GetString("UserId");
+                if (userId == null)
+                {
+                    userId = await SetUserId();
+                }
                 UserExperience exp = _context.UserExperience.SingleOrDefault(x => x.UserExperienceId == Id && x.UserId == userId);
                 vm.Title = exp.Title;
                 vm.CompanyName = exp.CompanyName;
@@ -159,12 +168,16 @@ namespace Tech_In.Controllers
         }
 
         [HttpPost]
-        public IActionResult UpdateExperience(ExperienceVM vm)
+        public async Task<IActionResult> UpdateExperience(ExperienceVM vm)
         {
             //var user = await _userManager.GetCurrentUser(HttpContext);
             if (ModelState.IsValid)
             {
                 string userId = HttpContext.Session.GetString("UserId");
+                if (userId == null)
+                {
+                    userId = await SetUserId();
+                }
                 if (vm.UserExperienceId > 0)
                 {
                     UserExperience exp = _context.UserExperience.SingleOrDefault(x => x.UserExperienceId == vm.UserExperienceId && x.UserId == userId);
@@ -202,10 +215,15 @@ namespace Tech_In.Controllers
             //return View("Index");
         }
 
-        public JsonResult DeleteUserExperience(int Id)
+        public async Task<JsonResult> DeleteUserExperience(int Id)
         {
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
             bool result = false;
-            UserExperience exp = _context.UserExperience.SingleOrDefault(x => x.UserExperienceId == Id);
+            UserExperience exp = _context.UserExperience.SingleOrDefault(x => x.UserExperienceId == Id && x.UserId==userId);
             if (exp != null)
             {
                 _context.Remove(exp);
@@ -217,13 +235,18 @@ namespace Tech_In.Controllers
         }
 
         //User Education
-        public IActionResult AddEditUserEducation(int Id)
+        public async Task<IActionResult> AddEditUserEducation(int Id)
         {
             ViewBag.CountryList = new SelectList(GetCountryList(), "CountryId", "CountryName");
             EducationVM vm = new EducationVM();
             if (Id > 0)
             {
-                UserEducation edu = _context.UserEducation.SingleOrDefault(x => x.UserEducationId == Id);
+                string userId = HttpContext.Session.GetString("UserId");
+                if (userId == null)
+                {
+                    userId = await SetUserId();
+                }
+                UserEducation edu = _context.UserEducation.SingleOrDefault(x => x.UserEducationId == Id && x.UserId == userId);
                 vm.Title = edu.Title;
                 vm.SchoolName = edu.SchoolName;
                 vm.Details = edu.Details;
@@ -239,7 +262,12 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateEducation(EducationVM vm)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
+           // var user = await _userManager.GetCurrentUser(HttpContext);
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
             if (vm.UserEducationID > 0)
             {
                 UserEducation edu = _context.UserEducation.SingleOrDefault(x => x.UserEducationId == vm.UserEducationID);
@@ -261,7 +289,7 @@ namespace Tech_In.Controllers
                 edu.Details = vm.Details;
                 edu.StartDate = vm.StartDate;
                 edu.EndDate = vm.EndDate;
-                edu.UserId = user.Id;
+                edu.UserId = userId;
                 _context.UserEducation.Add(edu);
             }
             _context.SaveChanges();
@@ -270,10 +298,15 @@ namespace Tech_In.Controllers
             //return View("Index");
         }
 
-        public JsonResult DeleteUserEducation(int Id)
+        public async Task<JsonResult> DeleteUserEducation(int Id)
         {
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
             bool result = false;
-            UserEducation edu = _context.UserEducation.SingleOrDefault(x => x.UserEducationId == Id);
+            UserEducation edu = _context.UserEducation.SingleOrDefault(x => x.UserEducationId == Id && x.UserId == userId);
             if (edu != null)
             {
                 _context.Remove(edu);
@@ -285,12 +318,17 @@ namespace Tech_In.Controllers
         }
 
         //Certification
-        public IActionResult AddEditUserCertification(int Id)
+        public async Task<IActionResult> AddEditUserCertification(int Id)
         {
             CertificationVM vm = new CertificationVM();
             if (Id > 0)
             {
-                UserCertification cert = _context.UserCertification.SingleOrDefault(x => x.UserCertificationId == Id);
+                string userId = HttpContext.Session.GetString("UserId");
+                if (userId == null)
+                {
+                    userId = await SetUserId();
+                }
+                UserCertification cert = _context.UserCertification.SingleOrDefault(x => x.UserCertificationId == Id && x.UserId == userId);
                 vm.Name = cert.Name;
                 vm.CertificationDate = cert.CertificationDate;
                 vm.ExpirationDate = cert.ExpirationDate;
@@ -304,7 +342,11 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateCertification(CertificationVM vm)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
             if (vm.UserCertificationId > 0)
             {
                 UserCertification cert = _context.UserCertification.SingleOrDefault(x => x.UserCertificationId == vm.UserCertificationId);
@@ -322,7 +364,7 @@ namespace Tech_In.Controllers
                 cert.ExpirationDate = vm.ExpirationDate;
                 cert.LiscenceNo = vm.LiscenceNo;
                 cert.URL = vm.URL;
-                cert.UserId = user.Id;
+                cert.UserId = userId;
                 _context.UserCertification.Add(cert);
             }
             _context.SaveChanges();
@@ -331,10 +373,15 @@ namespace Tech_In.Controllers
             //return View("Index");
         }
 
-        public JsonResult DeleteUserCertification(int Id)
+        public async Task<JsonResult> DeleteUserCertification(int Id)
         {
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
             bool result = false;
-            UserCertification cert = _context.UserCertification.SingleOrDefault(x => x.UserCertificationId == Id);
+            UserCertification cert = _context.UserCertification.SingleOrDefault(x => x.UserCertificationId == Id && x.UserId == userId);
             if (cert != null)
             {
                 _context.Remove(cert);
@@ -348,11 +395,15 @@ namespace Tech_In.Controllers
         //Achievments
         public async Task<IActionResult> AddEditUserAchievement(int Id)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
             AchievmentVM vm = new AchievmentVM();
             if (Id > 0)
             {
-                UserAcheivement achiev = _context.UserAcheivement.SingleOrDefault(x => x.UserAchievementId == Id && x.UserId == user.Id);
+                UserAcheivement achiev = _context.UserAcheivement.SingleOrDefault(x => x.UserAchievementId == Id && x.UserId == userId);
                 vm.UserAchievementId = achiev.UserAchievementId;
                 vm.Description = achiev.Description;
             }
@@ -362,10 +413,14 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateAchievment(AchievmentVM vm)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
             if (vm.UserAchievementId > 0)
             {
-                UserAcheivement achiev = _context.UserAcheivement.SingleOrDefault(x => x.UserAchievementId == vm.UserAchievementId && x.UserId==user.Id);
+                UserAcheivement achiev = _context.UserAcheivement.SingleOrDefault(x => x.UserAchievementId == vm.UserAchievementId && x.UserId==userId);
                 if (achiev != null)
                 {
                     achiev.Description = vm.Description;
@@ -375,7 +430,7 @@ namespace Tech_In.Controllers
             {
                 UserAcheivement achiev = new UserAcheivement();
                 achiev.Description = vm.Description;
-                achiev.UserId = user.Id;
+                achiev.UserId = userId;
                 _context.UserAcheivement.Add(achiev);
             }
             _context.SaveChanges();
@@ -384,10 +439,15 @@ namespace Tech_In.Controllers
             //return View("Index");
         }
 
-        public JsonResult DeleteUserAchievment(int Id)
+        public async Task<JsonResult> DeleteUserAchievment(int Id)
         {
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
             bool result = false;
-            UserAcheivement acheivement = _context.UserAcheivement.SingleOrDefault(x => x.UserAchievementId == Id);
+            UserAcheivement acheivement = _context.UserAcheivement.SingleOrDefault(x => x.UserAchievementId == Id && x.UserId == userId);
             if (acheivement != null)
             {
                 _context.Remove(acheivement);
@@ -401,11 +461,15 @@ namespace Tech_In.Controllers
         //Hobby
         public async Task<IActionResult> AddEditUserHobby(int Id)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
             HobbyVM vm = new HobbyVM();
             if (Id > 0)
             {
-                UserHobby hobby = _context.UserHobby.SingleOrDefault(x => x.UserHobbyId == Id && x.UserId == user.Id);
+                UserHobby hobby = _context.UserHobby.SingleOrDefault(x => x.UserHobbyId == Id && x.UserId == userId);
                 vm.UserHobbyId = hobby.UserHobbyId;
                 vm.HobbyOrIntrest = hobby.HobbyOrIntrest;
             }
@@ -415,10 +479,14 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateHobby(HobbyVM vm)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
             if (vm.UserHobbyId > 0)
             {
-                UserHobby hobby = _context.UserHobby.SingleOrDefault(x => x.UserHobbyId == vm.UserHobbyId && x.UserId == user.Id);
+                UserHobby hobby = _context.UserHobby.SingleOrDefault(x => x.UserHobbyId == vm.UserHobbyId && x.UserId == userId);
                 if (hobby != null)
                 {
                     hobby.HobbyOrIntrest = vm.HobbyOrIntrest;
@@ -428,7 +496,7 @@ namespace Tech_In.Controllers
             {
                 UserHobby hobby = new UserHobby();
                 hobby.HobbyOrIntrest = vm.HobbyOrIntrest;
-                hobby.UserId = user.Id;
+                hobby.UserId = userId;
                 _context.UserHobby.Add(hobby);
             }
             _context.SaveChanges();
@@ -437,10 +505,15 @@ namespace Tech_In.Controllers
             //return View("Index");
         }
 
-        public JsonResult DeleteUserHobby(int Id)
+        public async Task<JsonResult> DeleteUserHobby(int Id)
         {
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
             bool result = false;
-            UserHobby hobby = _context.UserHobby.SingleOrDefault(x => x.UserHobbyId == Id);
+            UserHobby hobby = _context.UserHobby.SingleOrDefault(x => x.UserHobbyId == Id && x.UserId == userId);
             if (hobby != null)
             {
                 _context.Remove(hobby);
@@ -454,11 +527,15 @@ namespace Tech_In.Controllers
         //User Language Skills
         public async Task<IActionResult> AddEditLanguageSkill(int Id)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
             LanguageSkillVM vm = new LanguageSkillVM();
             if (Id > 0)
             {
-                UserLanguageSkill ls = _context.UserLanguageSkill.SingleOrDefault(x => x.LanguageSkillId == Id && x.UserId == user.Id);
+                UserLanguageSkill ls = _context.UserLanguageSkill.SingleOrDefault(x => x.LanguageSkillId == Id && x.UserId == userId);
                 vm.SkillName = ls.SkillName;
                 vm.LanguageSkillId = ls.LanguageSkillId;
             }
@@ -468,10 +545,14 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateLS(LanguageSkillVM vm)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
             if (vm.LanguageSkillId > 0)
             {
-                UserLanguageSkill ls = _context.UserLanguageSkill.SingleOrDefault(x => x.LanguageSkillId == vm.LanguageSkillId && x.UserId == user.Id);
+                UserLanguageSkill ls = _context.UserLanguageSkill.SingleOrDefault(x => x.LanguageSkillId == vm.LanguageSkillId && x.UserId == userId);
                 if (ls != null)
                 {
                     ls.SkillName = vm.SkillName;
@@ -481,7 +562,7 @@ namespace Tech_In.Controllers
             {
                 UserLanguageSkill ls = new UserLanguageSkill();
                 ls.SkillName = vm.SkillName;
-                ls.UserId = user.Id;
+                ls.UserId = userId;
                 _context.UserLanguageSkill.Add(ls);
             }
             _context.SaveChanges();
@@ -490,10 +571,15 @@ namespace Tech_In.Controllers
             //return View("Index");
         }
 
-        public JsonResult DeleteLanguageSkill(int Id)
+        public async Task<JsonResult> DeleteLanguageSkill(int Id)
         {
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
             bool result = false;
-            UserLanguageSkill ls = _context.UserLanguageSkill.SingleOrDefault(x => x.LanguageSkillId == Id);
+            UserLanguageSkill ls = _context.UserLanguageSkill.SingleOrDefault(x => x.LanguageSkillId == Id && x.UserId == userId);
             if (ls != null)
             {
                 _context.Remove(ls);
@@ -508,11 +594,15 @@ namespace Tech_In.Controllers
         //User Publication
         public async Task<IActionResult> AddEditPublication(int Id,bool IsJournal)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
             PublicationVM vm = new PublicationVM();
             if (Id > 0)
             {
-                UserPublication publication = _context.UserPublication.SingleOrDefault(x => x.UserPublicationId == Id && x.UserId == user.Id);
+                UserPublication publication = _context.UserPublication.SingleOrDefault(x => x.UserPublicationId == Id && x.UserId == userId);
                 vm.Title = publication.Title;
                 vm.PublishYear = publication.PublishYear;
                 vm.Description = publication.Description;
@@ -525,10 +615,14 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdatePublication(PublicationVM vm)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
             if (vm.UserPublicationId > 0)
             {
-                UserPublication publication = _context.UserPublication.SingleOrDefault(x => x.UserPublicationId == vm.UserPublicationId && x.UserId == user.Id);
+                UserPublication publication = _context.UserPublication.SingleOrDefault(x => x.UserPublicationId == vm.UserPublicationId && x.UserId == userId);
                 if (publication != null)
                 {
                     publication.Title = vm.Title;
@@ -544,7 +638,7 @@ namespace Tech_In.Controllers
                 publication.PublishYear = vm.PublishYear;
                 publication.Description = vm.Description;
                 publication.ConferenceOrJournal = vm.ConferenceOrJournal;
-                publication.UserId = user.Id;
+                publication.UserId = userId;
                 _context.UserPublication.Add(publication);
             }
             _context.SaveChanges();
@@ -553,10 +647,15 @@ namespace Tech_In.Controllers
             //return View("Index");
         }
 
-        public JsonResult DeletePublication(int Id)
+        public async Task<JsonResult> DeletePublication(int Id)
         {
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
             bool result = false;
-            UserPublication publication = _context.UserPublication.SingleOrDefault(x => x.UserPublicationId == Id);
+            UserPublication publication = _context.UserPublication.SingleOrDefault(x => x.UserPublicationId == Id && x.UserId == userId);
             if (publication != null)
             {
                 _context.Remove(publication);
@@ -608,13 +707,13 @@ namespace Tech_In.Controllers
 
         public List<Country> GetCountryList()
         {
-            List<Country> countries = _context.Country.ToList();
+            List<Country> countries = _context.Country.OrderBy(x=> x.CountryName).ToList();
             return countries;
         }
         
         public IActionResult GetCitiesList(int CountryId)
         {
-            List<City> cities = _context.City.Where(x => x.CountryId == CountryId).ToList();
+            List<City> cities = _context.City.Where(x => x.CountryId == CountryId).OrderBy(x=> x.CityName).ToList();
             ViewBag.CitiesList = new SelectList(cities, "CityId", "CityName");
             return PartialView("CitiesPartial");
         }

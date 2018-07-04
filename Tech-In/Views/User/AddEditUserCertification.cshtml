@@ -65,10 +65,48 @@
 </form>
 <script>
     $(document).ready(function () {
+
+        //Form Validation
+        $('#certForm').bootstrapValidator({
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                Name: {
+                    validators: {
+                        stringLength: {
+                            min: 3,
+                            max: 50,
+                            message: 'Title can contain minimum 3 and maximum 50 letters'
+                        },
+                        regexp: {
+                            regexp: /^[a-z\s()]+$/i,
+                            message: 'Title can contains alphabets only.'
+                        },
+                        notEmpty: {
+                            message: 'Title is required'
+                        }
+                    }
+                },
+                CertificationDate: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Certification Date is required'
+                        }
+                    }
+                },
+
+            }
+        });
+
         //Submit Form
         debugger
         $("#certSubmit").click(function () {
-            if (!$("#certForm").valid()) {
+            var validator = $('#certForm').data('bootstrapValidator');
+            validator.validate();
+            if (!(validator.isValid())) {
                 return false;
             }
             $("#loaderDiv").show();

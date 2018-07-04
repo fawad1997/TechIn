@@ -30,10 +30,43 @@
     </div>
 </form>
 <script>
-$(document).ready(function () {
+    $(document).ready(function () {
+        //Form Validation
+        $('#lSForm').bootstrapValidator({
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                SkillName: {
+                    validators: {
+                        stringLength: {
+                            min: 3,
+                            max: 20,
+                            message: 'Skill can contain minimum 3 and maximum 20 letters'
+                        },
+                        regexp: {
+                            regexp: /^[a-z\s]+$/i,
+                            message: 'Skill can contains alphabets only.'
+                        },
+                        notEmpty: {
+                            message: 'Skill is required'
+                        }
+                    }
+                },
+            }
+        });
+        
+
         //Submit Form
         debugger
         $("#lSSubmit").click(function () {
+            var validator = $('#lSForm').data('bootstrapValidator');
+            validator.validate();
+            if (!(validator.isValid())) {
+                return false;
+            }
             $("#loaderDiv").show();
             var hobbyFormData = $("#lSForm").serialize();
             $.ajax({

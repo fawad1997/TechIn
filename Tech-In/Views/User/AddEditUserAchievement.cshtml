@@ -30,9 +30,42 @@
     </div>
 </form>
 <script>$(document).ready(function () {
+    //Form Validation
+    $('#achievForm').bootstrapValidator({
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            Description: {
+                validators: {
+                    stringLength: {
+                        min: 5,
+                        max: 70,
+                        message: 'Achivement name can contain minimum 5 and maximum 70 letters'
+                    },
+                    regexp: {
+                        regexp: /^[a-z\s()]+$/i,
+                        message: 'Achivement name can contains alphabets only.'
+                    },
+                    notEmpty: {
+                        message: 'Achivement name is required'
+                    }
+                }
+            },
+        }
+    });
+   
+
         //Submit Form
         debugger
-        $("#achievSubmit").click(function () {
+    $("#achievSubmit").click(function () {
+        var validator = $('#achievForm').data('bootstrapValidator');
+        validator.validate();
+        if (!(validator.isValid())) {
+            return false;
+        }
             $("#loaderDiv").show();
             var achievFormData = $("#achievForm").serialize();
             $.ajax({

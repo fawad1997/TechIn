@@ -48,8 +48,61 @@
     </div>
 </form>
 <script>$(document).ready(function () {
+    //Form Validation
+    $('#pubForm').bootstrapValidator({
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            Name: {
+                validators: {
+                    stringLength: {
+                        min: 5,
+                        max: 50,
+                        message: 'Title can contain minimum 5 and maximum 50 letters'
+                    },
+                    regexp: {
+                        regexp: /^[a-z\s()]+$/i,
+                        message: 'Title can contains alphabets only.'
+                    },
+                    notEmpty: {
+                        message: 'Title is required'
+                    }
+                }
+            },
+            PublishYear: {
+                validators: {
+                    notEmpty: {
+                        message: 'Publish Year is required'
+                    }
+                }
+            },
+            Description: {
+                validators: {
+                    stringLength: {
+                        min: 15,
+                        max: 200,
+                        message: 'Description can contain minimum 15 and maximum 200 letters'
+                    },
+                    regexp: {
+                        regexp: /^[a-z\s().0-9]+$/i,
+                        message: 'Description can contail valid characters only.'
+                    },
+                }
+            },
+
+        }
+    });
+
         //Submit Form
-        $("#pubSubmit").click(function () {
+    $("#pubSubmit").click(function () {
+        var validator = $('#pubForm').data('bootstrapValidator');
+        validator.validate();
+        if (!(validator.isValid())) {
+            return false;
+        }
             
             $("#loaderDiv").show();
             var pubFormData = $("#pubForm").serialize();

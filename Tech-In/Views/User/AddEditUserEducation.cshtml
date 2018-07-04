@@ -95,10 +95,85 @@
 </form>
 <script>
     $(document).ready(function () {
+
+        //Form Validation
+        $('#eduForm').bootstrapValidator({
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                Title: {
+                    validators: {
+                        stringLength: {
+                            min: 3,
+                            max: 50,
+                            message: 'Title can contain minimum 3 and maximum 50 letters'
+                        },
+                        regexp: {
+                            regexp: /^[a-z\s()]+$/i,
+                            message: 'Title can contains alphabets only.'
+                        },
+                        notEmpty: {
+                            message: 'Title is required'
+                        }
+                    }
+                },
+                SchoolName: {
+                    validators: {
+                        stringLength: {
+                            min: 3,
+                            max: 100,
+                            message: 'Collage Name should contain minimum 1 characters'
+                        },
+                        notEmpty: {
+                            message: 'Collage Name is required'
+                        }
+                    }
+                },
+                Details: {
+                    validators: {
+                        stringLength: {
+                            min: 10,
+                            max: 200,
+                            message: 'Details should contain minimum 10 characters and max 200.'
+                        }
+                    }
+                },
+                StartDate: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Start Date is required'
+                        }
+                    }
+                },
+                CountryId: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Country Name is required'
+                        }
+                    }
+                },
+                CityId: {
+                    validators: {
+                        notEmpty: {
+                            message: 'City Name is required'
+                        }
+                    }
+                },
+
+            }
+        });
+
+
+
         //Submit Form
         debugger
         $("#eduSubmit").click(function () {
-            if (!$("#eduForm").valid()) {
+            var validator = $('#eduForm').data('bootstrapValidator');
+            validator.validate();
+            if (!(validator.isValid())) {
                 return false;
             }
             $("#loaderDiv").show();

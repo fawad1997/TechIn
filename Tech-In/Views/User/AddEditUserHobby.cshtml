@@ -30,10 +30,44 @@
     </div>
 </form>
 <script>
-$(document).ready(function () {
+    $(document).ready(function () {
+
+        //Form Validation
+        $('#hobbyForm').bootstrapValidator({
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                HobbyOrIntrest: {
+                    validators: {
+                        stringLength: {
+                            min: 3,
+                            max: 20,
+                            message: 'Hobby can contain minimum 3 and maximum 20 letters'
+                        },
+                        regexp: {
+                            regexp: /^[a-z\s]+$/i,
+                            message: 'Hobby can contains alphabets only.'
+                        },
+                        notEmpty: {
+                            message: 'Hobby is required'
+                        }
+                    }
+                },
+            }
+        });
+
+      
         //Submit Form
         debugger
         $("#hobbySubmit").click(function () {
+            var validator = $('#hobbyForm').data('bootstrapValidator');
+            validator.validate();
+            if (!(validator.isValid())) {
+                return false;
+            }
             $("#loaderDiv").show();
             var hobbyFormData = $("#hobbyForm").serialize();
             $.ajax({
