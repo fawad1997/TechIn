@@ -42,38 +42,38 @@ namespace Tech_In.Controllers
             //Check User Profile is complete or not
             var user = await _userManager.GetCurrentUser(HttpContext);
             var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
-            if (userPersonalRow == null)
+            if (userPersonalRow != null)
             {
-                return RedirectToAction("CompleteProfile", "Home");
+                var QuestionList = _context.UserQuestion.Where(x => x.ApplicationUser.Id == user.Id && x.UserQuestionId == id)
+                                           .Select(c => new NewQuestionVM
+                                           {
+                                               Title = c.Title,
+                                               Description = HttpUtility.HtmlDecode(c.Description),
+                                               Answers = c.UserQAnswer.Select(x => new QAnswerViewModel
+                                               {
+                                                   Description = HttpUtility.HtmlDecode(x.Description),
+                                                   UserQAnswerId = x.UserQAnswerId,
+                                                   Date = x.PostTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                                                   User = x.ApplicationUser.UserName
+                                               }).ToList(),
+                                               Comment = c.UserQAComment.Select(z => new QACommentsViewModel
+                                               {
+                                                   UserQuestionId = z.UserQuestionId,
+                                                   UserQAnswerId = z.UserQAnswerId,
+                                                   Description = z.Description,
+                                                   IsAnswer = z.IsAnswer,
+                                                   Visibility = z.Visibility,
+                                                   UserQACommentID = z.UserQACommentID,
+
+                                                   UserId = z.ApplicationUser.Id,
+                                               }).ToList(),
+                                           }).FirstOrDefault();
+                ViewBag.QuestionList = QuestionList;
+                return View();
             }
             else
             {
-                var QuestionList = _context.UserQuestion.Where(x => x.ApplicationUser.Id == user.Id && x.UserQuestionId == id)
-                                                        .Select(c => new NewQuestionVM
-                                                        {
-                                                            Title = c.Title,
-                                                            Description = HttpUtility.HtmlDecode(c.Description),
-                                                            Answers = c.UserQAnswer.Select(x => new QAnswerViewModel
-                                                            {
-                                                                Description = HttpUtility.HtmlDecode(x.Description),
-                                                                UserQAnswerId = x.UserQAnswerId,
-                                                                Date = x.PostTime.ToString("yyyy-MM-dd HH:mm:ss"),
-                                                                User = x.ApplicationUser.UserName
-                                                            }).ToList(),
-                                                            Comment = c.UserQAComment.Select(z => new QACommentsViewModel
-                                                            {
-                                                                UserQuestionId = z.UserQuestionId,
-                                                                UserQAnswerId = z.UserQAnswerId,
-                                                                Description = z.Description,
-                                                                IsAnswer = z.IsAnswer,
-                                                                Visibility = z.Visibility,
-                                                                UserQACommentID = z.UserQACommentID,
-
-                                                                UserId = z.ApplicationUser.Id,
-                                                            }).ToList(),
-                                                        }).FirstOrDefault();
-                ViewBag.QuestionList = QuestionList;
-                return View();
+                return RedirectToAction("CompleteProfile", "Home");
             }
         }
 

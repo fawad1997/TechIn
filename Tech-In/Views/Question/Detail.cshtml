@@ -110,19 +110,29 @@
             <!-- Aside -->
             <aside id="aside" class="col-md-3">
 
-                <button class="main-btn btn-block">Ask a Question</button>
+                <button onclick="location.href='@Url.Action("New","Question")'" class="main-btn btn-block">Ask a Question</button>
                 <hr />
 
                 <!-- Search -->
                 <div class="widget">
                     <div class="widget-search">
-                        <input class="search-input" type="text" placeholder="search questions">
-                        <button class="search-btn" type="button">
+                        <input class="search-input" id="searchText" type="text" placeholder="search questions">
+                        <button class="search-btn" id="searchButton" type="button">
                             <i class="fa fa-search"></i>
                         </button>
                     </div>
                 </div>
                 <!-- /Search -->
+                $(document).ready(function () {
+                $('#searchButton').click(function () {
+                var text = $('#searchText').val();
+                if (text) {
+                window.location.href = "/Question/SearchDetails?text=" + text;
+                }
+                });
+                });
+                </script>
+
                 <!-- Tags -->
                 <div class="widget">
                     <h3 class="title">Tags</h3>
