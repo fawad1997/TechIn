@@ -89,27 +89,26 @@ namespace Tech_In.Services
             _pdfPTable.AddCell(_pdfPCell);
             _pdfPTable.CompleteRow();
 
-            //Address Row
+            ////////Address Row
+            //////_fontStyle = FontFactory.GetFont("Calibri", 12f, 1);
+            //////_fontStyle.SetColor(25, 111, 61);
+            //////_pdfPCell = new PdfPCell(new Phrase("Address: ", _fontStyle));
+            //////_pdfPCell.Colspan = 1;
+            //////_pdfPCell.HorizontalAlignment = Element.ALIGN_LEFT;
+            //////_pdfPCell.Border = 0;
+            //////_pdfPCell.BackgroundColor = BaseColor.WHITE;
+            //////_pdfPCell.ExtraParagraphSpace = 0;
+            //////_pdfPTable.AddCell(_pdfPCell);
 
-            _fontStyle = FontFactory.GetFont("Calibri", 12f, 1);
-            _fontStyle.SetColor(25, 111, 61);
-            _pdfPCell = new PdfPCell(new Phrase("Address: ", _fontStyle));
-            _pdfPCell.Colspan = 1;
-            _pdfPCell.HorizontalAlignment = Element.ALIGN_LEFT;
-            _pdfPCell.Border = 0;
-            _pdfPCell.BackgroundColor = BaseColor.WHITE;
-            _pdfPCell.ExtraParagraphSpace = 0;
-            _pdfPTable.AddCell(_pdfPCell);
-
-            _fontStyle = FontFactory.GetFont("Calibri", 11f, 0);
-            _pdfPCell = new PdfPCell(new Phrase("House 1, Sector 1, Khan Akbar Town, New Shakrial, Islamabad, Pakistan ", _fontStyle));
-            _pdfPCell.Colspan = 5;
-            _pdfPCell.HorizontalAlignment = Element.ALIGN_LEFT;
-            _pdfPCell.VerticalAlignment = Element.ALIGN_BOTTOM;
-            _pdfPCell.Border = 0;
-            _pdfPCell.BackgroundColor = BaseColor.WHITE;
-            _pdfPCell.ExtraParagraphSpace = 0;
-            _pdfPTable.AddCell(_pdfPCell);
+            //////_fontStyle = FontFactory.GetFont("Calibri", 11f, 0);
+            //////_pdfPCell = new PdfPCell(new Phrase("House 1, Sector 1, Khan Akbar Town, New Shakrial, Islamabad, Pakistan ", _fontStyle));
+            //////_pdfPCell.Colspan = 5;
+            //////_pdfPCell.HorizontalAlignment = Element.ALIGN_LEFT;
+            //////_pdfPCell.VerticalAlignment = Element.ALIGN_BOTTOM;
+            //////_pdfPCell.Border = 0;
+            //////_pdfPCell.BackgroundColor = BaseColor.WHITE;
+            //////_pdfPCell.ExtraParagraphSpace = 0;
+            //////_pdfPTable.AddCell(_pdfPCell);
 
 
             //_fontStyle = FontFactory.GetFont("Calibri", 8f, 0);
@@ -297,6 +296,7 @@ namespace Tech_In.Services
                 //_pdfPCell.BackgroundColor = BaseColor.WHITE;
                 //_pdfPCell.ExtraParagraphSpace = 0;
                 //_pdfPTable.AddCell(_pdfPCell);
+                NewLine();
 
             }
 
@@ -355,6 +355,7 @@ namespace Tech_In.Services
                 _pdfPCell.BackgroundColor = BaseColor.WHITE;
                 _pdfPCell.ExtraParagraphSpace = 0;
                 _pdfPTable.AddCell(_pdfPCell);
+                NewLine();
 
             }
 
@@ -401,26 +402,32 @@ namespace Tech_In.Services
                 _pdfPTable.AddCell(_pdfPCell);
 
                 _pdfPTable.CompleteRow();
+                if (u.URL != null)
+                {
+                    _fontStyle = FontFactory.GetFont("Calibri", 12f, 0);
+                    _pdfPCell = new PdfPCell(new Phrase("URL : " + u.URL, _fontStyle));
+                    _pdfPCell.Colspan = _totalColumn;
+                    _pdfPCell.HorizontalAlignment = Element.ALIGN_LEFT;
+                    _pdfPCell.Border = 0;
+                    _pdfPCell.BackgroundColor = BaseColor.WHITE;
+                    _pdfPCell.ExtraParagraphSpace = 0;
+                    _pdfPTable.AddCell(_pdfPCell);
 
-                _fontStyle = FontFactory.GetFont("Calibri", 12f, 0);
-                _pdfPCell = new PdfPCell(new Phrase("URL : "+u.URL, _fontStyle));
-                _pdfPCell.Colspan = _totalColumn;
-                _pdfPCell.HorizontalAlignment = Element.ALIGN_LEFT;
-                _pdfPCell.Border = 0;
-                _pdfPCell.BackgroundColor = BaseColor.WHITE;
-                _pdfPCell.ExtraParagraphSpace = 0;
-                _pdfPTable.AddCell(_pdfPCell);
+                }
+                if (u.LiscenceNo != null)
+                {
+                    _fontStyle = FontFactory.GetFont("Calibri", 12f, 0);
+                    _pdfPCell = new PdfPCell(new Phrase("\tLiscence no : " + u.LiscenceNo, _fontStyle));
+                    _pdfPCell.Colspan = _totalColumn;
+                    _pdfPCell.HorizontalAlignment = Element.ALIGN_LEFT;
+                    _pdfPCell.Border = 0;
+                    _pdfPCell.BackgroundColor = BaseColor.WHITE;
+                    _pdfPCell.ExtraParagraphSpace = 0;
+                    _pdfPTable.AddCell(_pdfPCell);
 
-                _fontStyle = FontFactory.GetFont("Calibri", 12f, 0);
-                _pdfPCell = new PdfPCell(new Phrase("\tLiscence no : "+u.LiscenceNo, _fontStyle));
-                _pdfPCell.Colspan = _totalColumn;
-                _pdfPCell.HorizontalAlignment = Element.ALIGN_LEFT;
-                _pdfPCell.Border = 0;
-                _pdfPCell.BackgroundColor = BaseColor.WHITE;
-                _pdfPCell.ExtraParagraphSpace = 0;
-                _pdfPTable.AddCell(_pdfPCell);
-
+                }
                 _pdfPTable.CompleteRow();
+                NewLine();
             }
             NewLine();
         }
@@ -559,6 +566,7 @@ namespace Tech_In.Services
                 _pdfPCell.BackgroundColor = BaseColor.WHITE;
                 _pdfPCell.ExtraParagraphSpace = 0;
                 _pdfPTable.AddCell(_pdfPCell);
+                NewLine();
 
             }
 
@@ -614,6 +622,7 @@ namespace Tech_In.Services
                 _pdfPCell.BackgroundColor = BaseColor.WHITE;
                 _pdfPCell.ExtraParagraphSpace = 0;
                 _pdfPTable.AddCell(_pdfPCell);
+                NewLine();
 
             }
 
@@ -661,7 +670,7 @@ namespace Tech_In.Services
             _pdfPTable.AddCell(_pdfPCell);
             _pdfPTable.CompleteRow();
             #endregion
-        }l
+        }
 
         private void NewLine()
         {
