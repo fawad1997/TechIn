@@ -16,6 +16,8 @@ namespace Tech_In.Models.ViewModels.QuestionViewModels
 
         public Boolean Visibility { get; set; }
 
+        public string PostedBy { set; get; }
+
         public Boolean IsAnswer { get; set; }
         public Nullable<int> UserQuestionId { get; set; }
         public Nullable<int> UserQAnswerId { get; set; }

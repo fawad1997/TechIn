@@ -19,6 +19,8 @@ namespace Tech_In.Models.ViewModels.QuestionViewModels
         [MinLength(10)]
         public string Description { get; set; }
 
+        public string PostedBy { set; get; }
+
         [Required]
         public List<QuestionTagViewModel> Tags { get; set; }
 

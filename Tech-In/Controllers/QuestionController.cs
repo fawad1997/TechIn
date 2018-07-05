@@ -75,10 +75,12 @@ namespace Tech_In.Controllers
             {
                 return RedirectToAction("CompleteProfile", "Home");
             }
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
         }
 
         public async Task<IActionResult> QuestionDetail(int id)
         {
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
             //Check User Profile is complete or not
             ViewBag.QuestionId = id;
             var user = await _userManager.GetCurrentUser(HttpContext);
@@ -94,12 +96,15 @@ namespace Tech_In.Controllers
                      {
                          Title = c.Title,
                          Description = HttpUtility.HtmlDecode(c.Description),
+                         PostedBy= _context.UserPersonalDetail.Where(aa=> aa.UserId== c.UserId).Select(z=> z.FirstName).SingleOrDefault(),
+
+
                          Answers = c.UserQAnswer.Select(x => new QAnswerViewModel
                          {
                              Description = HttpUtility.HtmlDecode(x.Description),
                              UserQAnswerId = x.UserQAnswerId,
                              Date = x.PostTime.ToString("yyyy-MM-dd HH:mm:ss"),
-                             User = x.ApplicationUser.UserName
+                             User = _context.UserPersonalDetail.Where(y => y.UserId == x.ApplicationUser.Id).Select(z => z.FirstName).SingleOrDefault()
                          }).ToList(),
                          Comment = c.UserQAComment.Select(z => new QACommentsViewModel
                          {
@@ -109,7 +114,8 @@ namespace Tech_In.Controllers
                              IsAnswer = z.IsAnswer,
                              Visibility = z.Visibility,
                              UserQACommentID = z.UserQACommentID,
-
+                             PostedBy= _context.UserPersonalDetail.Where(aa=> aa.UserId == z.UserId).Select(aaa=> aaa.FirstName).SingleOrDefault(),
+                             
                              UserId = z.ApplicationUser.Id,
                          }).ToList(),
                          Voting = c.UserQAVoting.Sum(x=> x.Value),
@@ -123,6 +129,7 @@ namespace Tech_In.Controllers
 
         public async Task<IActionResult> SearchDetails(string text)
         {
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
             text = text.ToLower();
             //Check User Profile is complete or not
             var user = await _userManager.GetCurrentUser(HttpContext);
@@ -159,7 +166,7 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> PostQuestion(NewQuestionVM vm)
         {
-
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetCurrentUser(HttpContext);
@@ -201,6 +208,7 @@ namespace Tech_In.Controllers
         }
         public async Task<IActionResult> ViewQuestion()
         {
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
             var user = await _userManager.GetCurrentUser(HttpContext);
             List<NewQuestionVM> QuestionList = _context.UserQuestion.Where(x => x.UserId == user.Id).Select(c => new NewQuestionVM { Title = c.Title, Description = c.Description }).ToList();
             ViewBag.QuestionList = QuestionList;
@@ -209,7 +217,7 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> PostAnswer(CommonViewModel vm)
         {
-
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetCurrentUser(HttpContext);

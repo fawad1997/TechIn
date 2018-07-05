@@ -61,16 +61,22 @@
                     <!--Comments -->
                     @foreach (var comment in ViewBag.QuestionList.Comment)
     {<div class="row">
-                    <div class="col-xs-6 col-md-8">
-                        @comment.Description;
-                    </div>
-                </div>
+    <div class="col-xs-6 col-md-8">
+        @comment.Description;
+    </div>
+    <div class="col-xs-6 col-md-4">
+        <div class="grey-back float-right">
+              <br />
+            <strong>@comment.PostedBy</strong>
+        </div>
+    </div>
+</div>
 }
                     <hr width=100% color="black" />
                     <h6>add a comment</h6>
                     <form method="post">
                         <input asp-for="QACommentsViewModel.UserQuestionId" value="@ViewBag.QuestionId" type="hidden" />
-                        <input asp-for="QACommentsViewModel.Description" />
+                        <input asp-for="QACommentsViewModel.Description" required />
                         <button asp-controller="Question" asp-action="PostComment" class="btn">add a comment</button>
                     </form>
                    
@@ -87,7 +93,6 @@
                         <div class="grey-back float-right">
                             <span><i class="fa fa-clock-o"></i>  @answer.Date</span>
                             <br />
-                            <img style="height:30px;width:30px;" src="~/images/a.jpg" />
                             <strong>@answer.User</strong>
                         </div>
                     </div>
@@ -123,6 +128,7 @@
                     </div>
                 </div>
                 <!-- /Search -->
+                <script>
                 $(document).ready(function () {
                 $('#searchButton').click(function () {
                 var text = $('#searchText').val();
