@@ -76,11 +76,10 @@
                     <h6>add a comment</h6>
                     <form method="post">
                         <input asp-for="QACommentsViewModel.UserQuestionId" value="@ViewBag.QuestionId" type="hidden" />
-                        <input asp-for="QACommentsViewModel.Description" required />
-                        <button asp-controller="Question" asp-action="PostComment" class="btn">add a comment</button>
+                        <input asp-for="QACommentsViewModel.Description"  id="cmt"  required />
+                        <button asp-controller="Question" asp-action="PostComment" onclick="document.getElementById('cmt').style.display="block"  class="btn">add a comment</button>
                     </form>
                    
-
                     <hr width=100% color="black" />
                     @foreach (var answer in ViewBag.QuestionList.Answers)
     {

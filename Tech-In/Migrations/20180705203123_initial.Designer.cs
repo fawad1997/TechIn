@@ -12,7 +12,7 @@ using Tech_In.Models.Model;
 namespace Tech_In.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180630191551_initial")]
+    [Migration("20180705203123_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -369,7 +369,9 @@ namespace Tech_In.Migrations
                     b.Property<int>("UserQACommentID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(200);
 
                     b.Property<bool>("IsAnswer");
 
@@ -385,8 +387,6 @@ namespace Tech_In.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("UserQAnswerId");
-
                     b.HasIndex("UserQuestionId");
 
                     b.ToTable("UserQAComment");
@@ -399,7 +399,7 @@ namespace Tech_In.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(50);
+                        .HasColumnType("nvarchar(MAX)");
 
                     b.Property<DateTime>("PostTime");
 
@@ -436,8 +436,6 @@ namespace Tech_In.Migrations
                     b.HasKey("UserQAVotingID");
 
                     b.HasIndex("UserId");
-
-                    b.HasIndex("UserQAnswerId");
 
                     b.HasIndex("UserQuestionId");
 
@@ -715,12 +713,8 @@ namespace Tech_In.Migrations
                         .WithMany("UserQAComments")
                         .HasForeignKey("UserId");
 
-                    b.HasOne("Tech_In.Models.Database.UserQAnswer", "UserQAnswer")
-                        .WithMany()
-                        .HasForeignKey("UserQAnswerId");
-
-                    b.HasOne("Tech_In.Models.Database.UserQuestion", "UserQuestion")
-                        .WithMany()
+                    b.HasOne("Tech_In.Models.Database.UserQuestion")
+                        .WithMany("UserQAComment")
                         .HasForeignKey("UserQuestionId");
                 });
 
@@ -742,12 +736,8 @@ namespace Tech_In.Migrations
                         .WithMany("UserQAVotings")
                         .HasForeignKey("UserId");
 
-                    b.HasOne("Tech_In.Models.Database.UserQAnswer", "UserQAnswer")
-                        .WithMany()
-                        .HasForeignKey("UserQAnswerId");
-
-                    b.HasOne("Tech_In.Models.Database.UserQuestion", "UserQuestion")
-                        .WithMany()
+                    b.HasOne("Tech_In.Models.Database.UserQuestion")
+                        .WithMany("UserQAVoting")
                         .HasForeignKey("UserQuestionId");
                 });
 

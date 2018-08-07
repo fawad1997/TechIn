@@ -159,10 +159,7 @@ namespace Tech_In.Controllers
 
         }
 
-        public IActionResult Xyz()
-        {
-            return View();
-        }
+       
         [HttpPost]
         public async Task<IActionResult> PostQuestion(NewQuestionVM vm)
         {

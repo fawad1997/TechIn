@@ -391,12 +391,42 @@ namespace Tech_In.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserQAComment",
+                columns: table => new
+                {
+                    UserQACommentID = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Description = table.Column<string>(maxLength: 200, nullable: false),
+                    IsAnswer = table.Column<bool>(nullable: false),
+                    UserId = table.Column<string>(nullable: true),
+                    UserQAnswerId = table.Column<int>(nullable: true),
+                    UserQuestionId = table.Column<int>(nullable: true),
+                    Visibility = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserQAComment", x => x.UserQACommentID);
+                    table.ForeignKey(
+                        name: "FK_UserQAComment_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserQAComment_UserQuestion_UserQuestionId",
+                        column: x => x.UserQuestionId,
+                        principalTable: "UserQuestion",
+                        principalColumn: "UserQuestionId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserQAnswer",
                 columns: table => new
                 {
                     UserQAnswerId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Description = table.Column<string>(maxLength: 50, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(MAX)", nullable: false),
                     PostTime = table.Column<DateTime>(nullable: false),
                     UserId = table.Column<string>(nullable: true),
                     UserQuestionId = table.Column<int>(nullable: false)
@@ -416,6 +446,36 @@ namespace Tech_In.Migrations
                         principalTable: "UserQuestion",
                         principalColumn: "UserQuestionId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserQAVoting",
+                columns: table => new
+                {
+                    UserQAVotingID = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    IsAnswer = table.Column<bool>(nullable: false),
+                    UserId = table.Column<string>(nullable: true),
+                    UserQAnswerId = table.Column<int>(nullable: true),
+                    UserQuestionId = table.Column<int>(nullable: true),
+                    Value = table.Column<int>(nullable: false),
+                    Visibility = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserQAVoting", x => x.UserQAVotingID);
+                    table.ForeignKey(
+                        name: "FK_UserQAVoting_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserQAVoting_UserQuestion_UserQuestionId",
+                        column: x => x.UserQuestionId,
+                        principalTable: "UserQuestion",
+                        principalColumn: "UserQuestionId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -516,78 +576,6 @@ namespace Tech_In.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserQAComment",
-                columns: table => new
-                {
-                    UserQACommentID = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Description = table.Column<string>(nullable: true),
-                    IsAnswer = table.Column<bool>(nullable: false),
-                    UserId = table.Column<string>(nullable: true),
-                    UserQAnswerId = table.Column<int>(nullable: true),
-                    UserQuestionId = table.Column<int>(nullable: true),
-                    Visibility = table.Column<bool>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserQAComment", x => x.UserQACommentID);
-                    table.ForeignKey(
-                        name: "FK_UserQAComment_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_UserQAComment_UserQAnswer_UserQAnswerId",
-                        column: x => x.UserQAnswerId,
-                        principalTable: "UserQAnswer",
-                        principalColumn: "UserQAnswerId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_UserQAComment_UserQuestion_UserQuestionId",
-                        column: x => x.UserQuestionId,
-                        principalTable: "UserQuestion",
-                        principalColumn: "UserQuestionId",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserQAVoting",
-                columns: table => new
-                {
-                    UserQAVotingID = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    IsAnswer = table.Column<bool>(nullable: false),
-                    UserId = table.Column<string>(nullable: true),
-                    UserQAnswerId = table.Column<int>(nullable: true),
-                    UserQuestionId = table.Column<int>(nullable: true),
-                    Value = table.Column<int>(nullable: false),
-                    Visibility = table.Column<bool>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserQAVoting", x => x.UserQAVotingID);
-                    table.ForeignKey(
-                        name: "FK_UserQAVoting_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_UserQAVoting_UserQAnswer_UserQAnswerId",
-                        column: x => x.UserQAnswerId,
-                        principalTable: "UserQAnswer",
-                        principalColumn: "UserQAnswerId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_UserQAVoting_UserQuestion_UserQuestionId",
-                        column: x => x.UserQuestionId,
-                        principalTable: "UserQuestion",
-                        principalColumn: "UserQuestionId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -711,11 +699,6 @@ namespace Tech_In.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserQAComment_UserQAnswerId",
-                table: "UserQAComment",
-                column: "UserQAnswerId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UserQAComment_UserQuestionId",
                 table: "UserQAComment",
                 column: "UserQuestionId");
@@ -734,11 +717,6 @@ namespace Tech_In.Migrations
                 name: "IX_UserQAVoting_UserId",
                 table: "UserQAVoting",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserQAVoting_UserQAnswerId",
-                table: "UserQAVoting",
-                column: "UserQAnswerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserQAVoting_UserQuestionId",
@@ -809,6 +787,9 @@ namespace Tech_In.Migrations
                 name: "UserQAComment");
 
             migrationBuilder.DropTable(
+                name: "UserQAnswer");
+
+            migrationBuilder.DropTable(
                 name: "UserQAVoting");
 
             migrationBuilder.DropTable(
@@ -821,16 +802,13 @@ namespace Tech_In.Migrations
                 name: "City");
 
             migrationBuilder.DropTable(
-                name: "UserQAnswer");
+                name: "UserQuestion");
 
             migrationBuilder.DropTable(
                 name: "SkillTag");
 
             migrationBuilder.DropTable(
                 name: "Country");
-
-            migrationBuilder.DropTable(
-                name: "UserQuestion");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
