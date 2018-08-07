@@ -85,18 +85,14 @@ namespace Tech_In.Controllers
             ViewBag.QuestionId = id;
             var user = await _userManager.GetCurrentUser(HttpContext);
             var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
-            if (userPersonalRow == null)
-            {
-                return RedirectToAction("CompleteProfile", "Home");
-            }
-            else
+            if (userPersonalRow != null)
             {
                 var QuestionList = _context.UserQuestion.Where(x => x.UserQuestionId == id)
                      .Select(c => new NewQuestionVM
                      {
                          Title = c.Title,
                          Description = HttpUtility.HtmlDecode(c.Description),
-                         PostedBy= _context.UserPersonalDetail.Where(aa=> aa.UserId== c.UserId).Select(z=> z.FirstName).SingleOrDefault(),
+                         PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.FirstName).SingleOrDefault(),
 
 
                          Answers = c.UserQAnswer.Select(x => new QAnswerViewModel
@@ -114,15 +110,20 @@ namespace Tech_In.Controllers
                              IsAnswer = z.IsAnswer,
                              Visibility = z.Visibility,
                              UserQACommentID = z.UserQACommentID,
-                             PostedBy= _context.UserPersonalDetail.Where(aa=> aa.UserId == z.UserId).Select(aaa=> aaa.FirstName).SingleOrDefault(),
-                             
+                             PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == z.UserId).Select(aaa => aaa.FirstName).SingleOrDefault(),
+
                              UserId = z.ApplicationUser.Id,
                          }).ToList(),
-                         Voting = c.UserQAVoting.Sum(x=> x.Value),
-                         
+                         Voting = c.UserQAVoting.Sum(x => x.Value),
+
                      }).SingleOrDefault();
                 ViewBag.QuestionList = QuestionList;
                 return View("Detail");
+            }
+            else
+            {
+                return RedirectToAction("CompleteProfile", "Home");
+               
             }
         }
 
@@ -134,14 +135,15 @@ namespace Tech_In.Controllers
             //Check User Profile is complete or not
             var user = await _userManager.GetCurrentUser(HttpContext);
             var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
-            if (userPersonalRow == null)
-            {
-                return RedirectToAction("CompleteProfile", "Home");
-            }
-            else
+            if (userPersonalRow != null)
             {
                 var QuestionList = _context.UserQuestion.Where(x => x.Description.ToLower().Contains(text) || x.Title.ToLower().Contains(text)).Select(c => new UserQuestion { ApplicationUser = c.ApplicationUser, PostTime = c.PostTime, Tag = c.Tag, UserQuestionId = c.UserQuestionId, UserId = c.UserId, Title = c.Title, Description = HttpUtility.HtmlDecode(c.Description) }).ToList();
                 return View("Index", QuestionList);
+                
+            }
+            else
+            {
+                return RedirectToAction("CompleteProfile", "Home");
             }
         }
 
@@ -159,7 +161,7 @@ namespace Tech_In.Controllers
 
         }
 
-       
+        
         [HttpPost]
         public async Task<IActionResult> PostQuestion(NewQuestionVM vm)
         {
