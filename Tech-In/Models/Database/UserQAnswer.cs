@@ -21,6 +21,7 @@ namespace Tech_In.Models.Database
         public DateTime PostTime { get; set; }
 
         public int UserQuestionId { get; set; }
+
         
         //ApNetUser
         public string UserId { get; set; }

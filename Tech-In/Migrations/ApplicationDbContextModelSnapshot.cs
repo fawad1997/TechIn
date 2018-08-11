@@ -436,8 +436,6 @@ namespace Tech_In.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("UserQAnswerId");
-
                     b.HasIndex("UserQuestionId");
 
                     b.ToTable("UserQAVoting");
@@ -737,12 +735,8 @@ namespace Tech_In.Migrations
                         .WithMany("UserQAVotings")
                         .HasForeignKey("UserId");
 
-                    b.HasOne("Tech_In.Models.Database.UserQAnswer", "UserQAnswer")
-                        .WithMany()
-                        .HasForeignKey("UserQAnswerId");
-
-                    b.HasOne("Tech_In.Models.Database.UserQuestion", "UserQuestion")
-                        .WithMany()
+                    b.HasOne("Tech_In.Models.Database.UserQuestion")
+                        .WithMany("UserQAVoting")
                         .HasForeignKey("UserQuestionId");
                 });
 
