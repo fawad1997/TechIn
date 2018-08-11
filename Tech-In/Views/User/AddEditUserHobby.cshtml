@@ -75,10 +75,14 @@
                 type: "POST",
                 url: "/User/UpdateHobby",
                 data: hobbyFormData,
-                success: function () {
+                success: function (data) {
                     $("#loaderDiv").hide();
                     $("#myHobby").modal("hide");
+                    //alert(JSON.stringify(data.hobbies, undefined,2));
                     window.location.href = "/User/Index";
+                },
+                error: function (result) {
+                    alert("Something went wrong!");
                 }
             })
 

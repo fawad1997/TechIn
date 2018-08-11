@@ -52,7 +52,7 @@
             <!--Start Date-->
             <div class="form-group">
                 <label class="control-label">From</label>
-                <input type="date" class="input" asp-for="StartDate">
+                <input asp-for="StartDate" class="input" min="1970-01-01" max="2018-08-08">
                 @Html.ValidationMessageFor(m => m.StartDate, "", new { @class = "text-danger" })
             </div>
             <!--/Start Date-->
@@ -164,6 +164,36 @@
 
             }
         });
+
+        //Dates
+
+        var startDate = document.getElementById('StartDate');
+        var endDate = document.getElementById('EndDate');
+        startDate.valueAsDate = new Date();
+        
+        endDate.valueAsDate = new Date();
+
+        
+        var todaysDate = new Date();
+
+        function convertDate(date) {
+            var yyyy = date.getFullYear().toString();
+            var mm = (date.getMonth() + 1).toString();
+            var dd = date.getDate().toString();
+
+            var mmChars = mm.split('');
+            var ddChars = dd.split('');
+
+            return yyyy + '-' + (mmChars[1] ? mm : "0" + mmChars[0]) + '-' + (ddChars[1] ? dd : "0" + ddChars[0]);
+        } //Coverts Date to yyyy-mm-dd
+        startDate.setAttribute("max", convertDate(todaysDate));
+        endDate.setAttribute("max", convertDate(todaysDate));
+        endDate.setAttribute("min", convertDate(todaysDate));
+        startDate.onchange = function () {
+            endDate.setAttribute("min", convertDate(startDate.valueAsDate));
+            //alert(startDate.valueAsDate);
+            //console.log(convertDate(startDate.valueAsDate));
+        }
 
 
         //Submit Form

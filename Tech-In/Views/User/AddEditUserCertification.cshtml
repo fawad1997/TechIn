@@ -101,6 +101,32 @@
             }
         });
 
+
+        var startDate = document.getElementById('CertificationDate');
+        var endDate = document.getElementById('ExpirationDate');
+        startDate.valueAsDate = new Date();
+
+        endDate.valueAsDate = new Date();
+
+
+        var todaysDate = new Date();
+
+        function convertDate(date) {
+            var yyyy = date.getFullYear().toString();
+            var mm = (date.getMonth() + 1).toString();
+            var dd = date.getDate().toString();
+
+            var mmChars = mm.split('');
+            var ddChars = dd.split('');
+
+            return yyyy + '-' + (mmChars[1] ? mm : "0" + mmChars[0]) + '-' + (ddChars[1] ? dd : "0" + ddChars[0]);
+        } //Coverts Date to yyyy-mm-dd
+
+        startDate.setAttribute("max", convertDate(todaysDate));
+        startDate.onchange = function () {
+            endDate.setAttribute("min", convertDate(startDate.valueAsDate));
+        }
+
         //Submit Form
         debugger
         $("#certSubmit").click(function () {

@@ -7,21 +7,21 @@
     <!--Title-->
     <div class="form-group">
         <label for="recipient-name" class="control-label">Title:</label>
-        @Html.TextBoxFor(m => m.Title, new { @class = "input", @placeholder = "Education Title..." })
+        @Html.TextBoxFor(m => m.Title, new { @class = "input", @placeholder = "Education Title...", @maxlength = "50" })
         @Html.ValidationMessageFor(m => m.Title, "", new { @class = "red" })
     </div>
     <!--/Title-->
     <!--Company-->
     <div class="form-group">
         <label for="recipient-name" class="control-label">School/Collage:</label>
-        @Html.TextBoxFor(m => m.SchoolName, new { @class = "input", @placeholder = "e.g. Capital University" })
+        @Html.TextBoxFor(m => m.SchoolName, new { @class = "input", @placeholder = "e.g. Capital University", @maxlength = "100" })
         @Html.ValidationMessageFor(m => m.SchoolName, "", new { @class = "red" })
     </div>
     <!--/Company-->
     <!--Text Area-->
     <div class="form-group">
         <label for="recipient-name" class="control-label">Details:</label>
-        @Html.TextAreaFor(m => m.Details, new { @class = "input", @placeholder = "Details" })
+        @Html.TextAreaFor(m => m.Details, new { @class = "input", @placeholder = "Details", @maxlength = "200" })
         @Html.ValidationMessageFor(m => m.Details, "", new { @class = "red" })
     </div>
     <!--/Text Area-->
@@ -125,7 +125,7 @@
                         stringLength: {
                             min: 3,
                             max: 100,
-                            message: 'Collage Name should contain minimum 1 characters'
+                            message: 'Collage Name should contain minimum 3 characters'
                         },
                         notEmpty: {
                             message: 'Collage Name is required'
@@ -166,7 +166,35 @@
             }
         });
 
+        //Dates
 
+        var startDate = document.getElementById('StartDate');
+        var endDate = document.getElementById('EndDate');
+        startDate.valueAsDate = new Date();
+
+        endDate.valueAsDate = new Date();
+
+
+        var todaysDate = new Date();
+
+        function convertDate(date) {
+            var yyyy = date.getFullYear().toString();
+            var mm = (date.getMonth() + 1).toString();
+            var dd = date.getDate().toString();
+
+            var mmChars = mm.split('');
+            var ddChars = dd.split('');
+
+            return yyyy + '-' + (mmChars[1] ? mm : "0" + mmChars[0]) + '-' + (ddChars[1] ? dd : "0" + ddChars[0]);
+        } //Coverts Date to yyyy-mm-dd
+        startDate.setAttribute("max", convertDate(todaysDate));
+        endDate.setAttribute("max", convertDate(todaysDate));
+        endDate.setAttribute("min", convertDate(todaysDate));
+        startDate.onchange = function () {
+            endDate.setAttribute("min", convertDate(startDate.valueAsDate));
+            //alert(startDate.valueAsDate);
+            //console.log(convertDate(startDate.valueAsDate));
+        }
 
         //Submit Form
         debugger

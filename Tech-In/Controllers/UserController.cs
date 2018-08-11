@@ -500,7 +500,9 @@ namespace Tech_In.Controllers
                 _context.UserHobby.Add(hobby);
             }
             _context.SaveChanges();
+            var hobbiess = _context.UserHobby.ToList();
             @ViewBag.UName = HttpContext.Session.GetString("Name");
+            //return Json(new { hobbies = hobbiess });
             return RedirectToAction("Index");
             //return View("Index");
         }
