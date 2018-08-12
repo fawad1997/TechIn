@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using Tech_In.Data;
+using Tech_In.Extensions;
 using Tech_In.Models;
 using Tech_In.Services;
 
@@ -57,6 +58,14 @@ namespace Tech_In
             //    options.ClientId = Configuration["Authentication:LinkedIn:ClientId"];
             //    options.ClientSecret = Configuration["Authentication:LinkedIn:ClientSecret"];
             //});
+
+            //Model Mappings
+            var configMap = new AutoMapper.MapperConfiguration(c =>
+            {
+                c.AddProfile(new ModelMapping());
+            });
+            var mapping = configMap.CreateMapper();
+            services.AddSingleton(mapping);
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();

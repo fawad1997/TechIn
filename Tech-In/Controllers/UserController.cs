@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -21,11 +22,13 @@ namespace Tech_In.Controllers
     {
         private readonly ApplicationDbContext _context;
         private UserManager<ApplicationUser> _userManager;
+        private readonly IMapper _mapper;
 
-        public UserController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public UserController(ApplicationDbContext context, UserManager<ApplicationUser> userManager,IMapper mapper)
         {
             _context = context;
             _userManager = userManager;
+            _mapper = mapper;
         }
 
 
@@ -262,7 +265,6 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateEducation(EducationVM vm)
         {
-           // var user = await _userManager.GetCurrentUser(HttpContext);
             string userId = HttpContext.Session.GetString("UserId");
             if (userId == null)
             {
@@ -271,6 +273,9 @@ namespace Tech_In.Controllers
             if (vm.UserEducationID > 0)
             {
                 UserEducation edu = _context.UserEducation.SingleOrDefault(x => x.UserEducationId == vm.UserEducationID);
+                //int eduId = edu.UserEducationId; 
+                //edu = _mapper.Map<UserEducation>(vm);
+                //edu.UserEducationId = eduId;
                 edu.Title = vm.Title;
                 edu.SchoolName = vm.SchoolName;
                 edu.CityId = vm.CityId;
@@ -281,21 +286,13 @@ namespace Tech_In.Controllers
             }
             else
             {
-                UserEducation edu = new UserEducation();
-                edu.Title = vm.Title;
-                edu.SchoolName = vm.SchoolName;
-                edu.CityId = vm.CityId;
-                edu.CurrentStatusCheck = vm.CurrentStatusCheck;
-                edu.Details = vm.Details;
-                edu.StartDate = vm.StartDate;
-                edu.EndDate = vm.EndDate;
+                var edu = _mapper.Map<UserEducation>(vm);
                 edu.UserId = userId;
                 _context.UserEducation.Add(edu);
             }
             _context.SaveChanges();
             @ViewBag.UName = HttpContext.Session.GetString("Name");
             return RedirectToAction("Index");
-            //return View("Index");
         }
 
         public async Task<JsonResult> DeleteUserEducation(int Id)
