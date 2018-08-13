@@ -17,7 +17,9 @@ namespace Tech_In.Models.ViewModels.QuestionViewModels
         public int QuestionId { get; set; }
 
         public string User { get; set; }
-        public string Date { get; set; }
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-mm-dd}", ApplyFormatInEditMode = true)]
+        public DateTime Date { get; set; }
 
     }
 }

@@ -93,13 +93,13 @@ namespace Tech_In.Controllers
                          Title = c.Title,
                          Description = HttpUtility.HtmlDecode(c.Description),
                          PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.FirstName).SingleOrDefault(),
-
-
+                         UserPic = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.ProfileImage).SingleOrDefault(),
+                         PostTime = c.PostTime,
                          Answers = c.UserQAnswer.Select(x => new QAnswerViewModel
-                         {
+                         {  
                              Description = HttpUtility.HtmlDecode(x.Description),
                              UserQAnswerId = x.UserQAnswerId,
-                             Date = x.PostTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                             Date = x.PostTime,
                              User = _context.UserPersonalDetail.Where(y => y.UserId == x.ApplicationUser.Id).Select(z => z.FirstName).SingleOrDefault()
                          }).ToList(),
                          Comment = c.UserQAComment.Select(z => new QACommentsViewModel
@@ -114,16 +114,20 @@ namespace Tech_In.Controllers
 
                              UserId = z.ApplicationUser.Id,
                          }).ToList(),
-                         Voting = c.UserQAVoting.Sum(x => x.Value),
+                         Voting = c.UserQAVoting.Sum(x => x.Value)
 
                      }).SingleOrDefault();
                 ViewBag.QuestionList = QuestionList;
+                if (TempData["Msg"] != null)
+                {
+                    ViewBag.VoteMsg = TempData["Msg"];
+                    ViewBag.Color = TempData["Color"];
+                }
                 return View("Detail");
             }
             else
             {
                 return RedirectToAction("CompleteProfile", "Home");
-               
             }
         }
 
@@ -238,7 +242,13 @@ namespace Tech_In.Controllers
             if (isQuestion)
             {
                 var isAlreadyVoted = _context.UserQAVoting.FirstOrDefault(x => x.UserQuestionId == id && x.UserId == user.Id);
-                if(isAlreadyVoted == null)
+                var isVotingOwnQuestion = _context.UserQuestion.FirstOrDefault(x => x.UserQuestionId == id && x.UserId == user.Id);
+                if(isVotingOwnQuestion != null)
+                {
+                    TempData["Msg"] = "You can't vote your own question!";
+                    TempData["Color"] = "error";
+                }
+                else if(isAlreadyVoted == null)
                 {
                     var question = _context.UserQuestion.FirstOrDefault(c => c.UserQuestionId == id);
                     _context.UserQAVoting.Add(new UserQAVoting()
@@ -249,6 +259,13 @@ namespace Tech_In.Controllers
                         Visibility = true,
                         UserId = user.Id
                     });
+                    TempData["Msg"] = "Thank you for your feedback!";
+                    TempData["Color"] = "success";
+                }
+                else
+                {
+                    TempData["Msg"] = "You have already casted your vote!";
+                    TempData["Color"] = "error";
                 }
             }
             _context.SaveChanges();

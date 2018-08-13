@@ -20,6 +20,9 @@ namespace Tech_In.Models.ViewModels.QuestionViewModels
         public string Description { get; set; }
 
         public string PostedBy { set; get; }
+        public string UserPic { get; set; }
+        [DisplayFormat(DataFormatString = "{0:yyyy-mm-dd}", ApplyFormatInEditMode = true)]
+        public DateTime PostTime { get; set; }
 
         [Required]
         public List<QuestionTagViewModel> Tags { get; set; }
