@@ -232,17 +232,25 @@ namespace Tech_In.Controllers
 
             return View("Detail", vm.NewQuestionVM);
         }
-        public async Task<IActionResult> UpVote(int id)
+        public async Task<IActionResult> UpVote(int id,Boolean isQuestion)
         {
             var user = await _userManager.GetCurrentUser(HttpContext);
-            var question = _context.UserQuestion.FirstOrDefault(c => c.UserQuestionId == id);
-            _context.UserQAVoting.Add(new UserQAVoting()
+            if (isQuestion)
             {
-                Value = +1,
-                IsAnswer = false,
-                UserQuestionId = question.UserQuestionId,
-                Visibility = true
-            });
+                var isAlreadyVoted = _context.UserQAVoting.FirstOrDefault(x => x.UserQuestionId == id && x.UserId == user.Id);
+                if(isAlreadyVoted == null)
+                {
+                    var question = _context.UserQuestion.FirstOrDefault(c => c.UserQuestionId == id);
+                    _context.UserQAVoting.Add(new UserQAVoting()
+                    {
+                        Value = +1,
+                        IsAnswer = false,
+                        UserQuestionId = question.UserQuestionId,
+                        Visibility = true,
+                        UserId = user.Id
+                    });
+                }
+            }
             _context.SaveChanges();
             return RedirectToAction($"QuestionDetail", new { id = id });
         }
