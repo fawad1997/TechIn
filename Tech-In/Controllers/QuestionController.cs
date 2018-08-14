@@ -11,6 +11,8 @@ using Tech_In.Models;
 using Tech_In.Models.Database;
 using Tech_In.Models.ViewModels.QuestionViewModels;
 using Tech_In.Services;
+using Microsoft.EntityFrameworkCore;
+using Tech_In.Extensions;
 
 namespace Tech_In.Controllers
 {
@@ -23,18 +25,34 @@ namespace Tech_In.Controllers
             _context = context;
             _userManager = userManager;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder,string currentFilter,string searchString,int? page)
         {
-            //Check User Profile is complete or not
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+           
+            ViewData["CurrentFilter"] = searchString;
+
+            //Check User Profile is complete or not 
             var user = await _userManager.GetCurrentUser(HttpContext);
             var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
-            var questionList = _context.UserQuestion.OrderByDescending(x => x.UserQuestionId).ToList();
+            //var questionList = _context.UserQuestion.OrderByDescending(x => x.UserQuestionId).ToList();
+            var questions = from q in _context.UserQuestion select q;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                questions = questions.Where(s => s.Description.Contains(searchString)
+                                || s.Title.Contains(searchString));
+            }
             if (userPersonalRow == null)
             {
                 return RedirectToAction("CompleteProfile", "Home");
             }
             @ViewBag.UName = HttpContext.Session.GetString("Name");
-            return View(questionList);
+            int pageSize = 4;
+            return View(await PaginatedList<UserQuestion>.CreateAsync(questions.AsNoTracking(), page ?? 1, pageSize));
+
+           
+            //return View(questionList);
         }
 
         public async Task<IActionResult> Detail(int id)
