@@ -46,7 +46,7 @@
                                 <center>
                                     <form method="post">
                                         <div class="row">
-                                            <a href="/Question/UpVote/@ViewBag.QuestionId?isQuestion=true" id="triangle-up"></a>
+                                            <a href="/Question/UpVote/@ViewBag.QuestionId?isQuestion=true&ans=0" id="triangle-up"></a>
                                         </div>
                                         <br /><br />
                                         <div class="row">
@@ -54,7 +54,7 @@
                                         </div>
                                         <br /><br />
                                         <div class="row">
-                                            <a href="/Question/DownVote/@ViewBag.QuestionId" id="triangle-down"></a>
+                                            <a href="/Question/DownVote/@ViewBag.QuestionId?isQuestion=true&ans=0" id="triangle-down"></a>
                                         </div>
                                     </form>
                                 </center>
@@ -144,15 +144,15 @@
                         <center>
                             <form method="post">
                                 <div class="row">
-                                    <a href="/Question/UpVote/@answer.UserQAnswerId?isQuestion=false" id="triangle-up"></a>
+                                    <a href="/Question/UpVote/@ViewBag.QuestionId?isQuestion=false&ans=@answer.UserQAnswerId" id="triangle-up"></a>
                                 </div>
                                 <br /><br />
                                 <div class="row">
-                                    <strong class="lg-font">@(ViewBag.QuestionList.Voting != null ? ViewBag.QuestionList.Voting : 0)</strong>
+                                    <strong class="lg-font">@(answer.Votes != null ? answer.Votes : 0)</strong>
                                 </div>
                                 <br /><br />
                                 <div class="row">
-                                    <a href="/Question/DownVote/@answer.UserQAnswerId?isQuestion=false" id="triangle-down"></a>
+                                    <a href="/Question/DownVote/@ViewBag.QuestionId?isQuestion=false&ans=@answer.UserQAnswerId" id="triangle-down"></a>
                                 </div>
                             </form>
                         </center>
@@ -161,7 +161,7 @@
                         @Html.Raw(answer.Description)
                     </div>
                 </div>
-                <div style="text-align:left;" class="grey-back float-right col-lg-3 col-md-3 col-xs-4">
+                <div style="text-align:left;" class="grey-back float-right col-lg-4 col-md-4 col-xs-5">
                     <div class="row">
                         @if (@ViewBag.QuestionList.UserPic == null)
         {
@@ -172,16 +172,16 @@ else
                 <img class="pull-left" style="height:40px;width:40px; margin-left:8%;margin-right:1%;" src="@ViewBag.QuestionList.UserPic" />
 }
 
-                        <span><i class="fa fa-clock-o"></i>  @answer.Date</span>
+                        <span><i class="fa fa-clock-o"></i>  @answer.Date.ToString("yyyy-MM-dd / hh:mm")</span>
                         <br />
                         <strong>@answer.User</strong>
 
                     </div>
                 </div>
-
+                <br /><br /><br />
+                <hr />
 }
-                    <br /><br /><br />
-                    <hr />
+
 
                     <h4>Your Answer</h4>
                     <form method="post">

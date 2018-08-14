@@ -12,9 +12,10 @@ using Tech_In.Models.Model;
 namespace Tech_In.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180814064801_qtest")]
+    partial class qtest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -421,8 +422,6 @@ namespace Tech_In.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<bool>("IsAnswer");
-
-                    b.Property<int?>("UserAnswerId");
 
                     b.Property<string>("UserId");
 

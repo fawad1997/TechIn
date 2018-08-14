@@ -15,6 +15,7 @@ namespace Tech_In.Models.ViewModels.QuestionViewModels
         public string Description { get; set; }
 
         public int QuestionId { get; set; }
+        public int Votes { get; set; }
 
         public string User { get; set; }
         [DataType(DataType.Date)]

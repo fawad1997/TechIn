@@ -53,7 +53,7 @@ namespace Tech_In.Controllers
                                                {
                                                    Description = HttpUtility.HtmlDecode(x.Description),
                                                    UserQAnswerId = x.UserQAnswerId,
-                                                   Date = x.PostTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                                                   Date = x.PostTime,
                                                    User = x.ApplicationUser.UserName
                                                }).ToList(),
                                                Comment = c.UserQAComment.Select(z => new QACommentsViewModel
@@ -100,6 +100,7 @@ namespace Tech_In.Controllers
                              Description = HttpUtility.HtmlDecode(x.Description),
                              UserQAnswerId = x.UserQAnswerId,
                              Date = x.PostTime,
+                             Votes = _context.UserQAVoting.Where(y=> y.UserAnswerId==x.UserQAnswerId).Sum(z=>z.Value),
                              User = _context.UserPersonalDetail.Where(y => y.UserId == x.ApplicationUser.Id).Select(z => z.FirstName).SingleOrDefault()
                          }).ToList(),
                          Comment = c.UserQAComment.Select(z => new QACommentsViewModel
@@ -236,7 +237,7 @@ namespace Tech_In.Controllers
 
             return View("Detail", vm.NewQuestionVM);
         }
-        public async Task<IActionResult> UpVote(int id,Boolean isQuestion)
+        public async Task<IActionResult> UpVote(int id,Boolean isQuestion,int ans)
         {
             var user = await _userManager.GetCurrentUser(HttpContext);
             if (isQuestion)
@@ -256,6 +257,37 @@ namespace Tech_In.Controllers
                         Value = +1,
                         IsAnswer = false,
                         UserQuestionId = question.UserQuestionId,
+                        UserAnswerId = null,
+                        Visibility = true,
+                        UserId = user.Id
+                    });
+                    TempData["Msg"] = "Thank you for your feedback!";
+                    TempData["Color"] = "success";
+                }
+                else
+                {
+                    TempData["Msg"] = "You have already casted your vote!";
+                    TempData["Color"] = "error";
+                }
+            }
+            else
+            {//If Answer
+                var isAlreadyVoted = _context.UserQAVoting.FirstOrDefault(x => x.UserAnswerId == ans && x.UserId == user.Id);
+                var isVotingOwnAnswer = _context.UserQAnswer.FirstOrDefault(x => x.UserQAnswerId == ans && x.UserId == user.Id);
+                if (isVotingOwnAnswer != null)
+                {
+                    TempData["Msg"] = "You can't vote your own answer!";
+                    TempData["Color"] = "error";
+                }
+                else if (isAlreadyVoted == null)
+                {
+                    var answer = _context.UserQAnswer.FirstOrDefault(c => c.UserQAnswerId == ans);
+                    _context.UserQAVoting.Add(new UserQAVoting()
+                    {
+                        Value = +1,
+                        IsAnswer = true,
+                        UserQuestionId = null,
+                        UserAnswerId = answer.UserQAnswerId,
                         Visibility = true,
                         UserId = user.Id
                     });
@@ -271,18 +303,69 @@ namespace Tech_In.Controllers
             _context.SaveChanges();
             return RedirectToAction($"QuestionDetail", new { id = id });
         }
-        public async Task<IActionResult> DownVote(int id)
+        public async Task<IActionResult> DownVote(int id, Boolean isQuestion, int ans)
         {
             var user = await _userManager.GetCurrentUser(HttpContext);
-            var question = _context.UserQuestion.FirstOrDefault(c => c.UserQuestionId == id);
-            _context.UserQAVoting.Add(new UserQAVoting()
+            if (isQuestion)
             {
-                Value = -1,
-                IsAnswer = false,
-                UserQuestionId = question.UserQuestionId,
-                Visibility = true,
-                
-            });
+                var isAlreadyVoted = _context.UserQAVoting.FirstOrDefault(x => x.UserQuestionId == id && x.UserId == user.Id);
+                var isVotingOwnQuestion = _context.UserQuestion.FirstOrDefault(x => x.UserQuestionId == id && x.UserId == user.Id);
+                if (isVotingOwnQuestion != null)
+                {
+                    TempData["Msg"] = "You can't vote your own question!";
+                    TempData["Color"] = "error";
+                }
+                else if (isAlreadyVoted == null)
+                {
+                    var question = _context.UserQuestion.FirstOrDefault(c => c.UserQuestionId == id);
+                    _context.UserQAVoting.Add(new UserQAVoting()
+                    {
+                        Value = -1,
+                        IsAnswer = false,
+                        UserQuestionId = question.UserQuestionId,
+                        UserAnswerId = null,
+                        Visibility = true,
+                        UserId = user.Id
+                    });
+                    TempData["Msg"] = "Thank you for your feedback!";
+                    TempData["Color"] = "success";
+                }
+                else
+                {
+                    TempData["Msg"] = "You have already casted your vote!";
+                    TempData["Color"] = "error";
+                }
+            }
+            else
+            {//If Answer
+                var isAlreadyVoted = _context.UserQAVoting.FirstOrDefault(x => x.UserAnswerId == ans && x.UserId == user.Id);
+                var isVotingOwnAnswer = _context.UserQAnswer.FirstOrDefault(x => x.UserQAnswerId == ans && x.UserId == user.Id);
+                if (isVotingOwnAnswer != null)
+                {
+                    TempData["Msg"] = "You can't vote your own answer!";
+                    TempData["Color"] = "error";
+                }
+                else if (isAlreadyVoted == null)
+                {
+                    var answer = _context.UserQAnswer.FirstOrDefault(c => c.UserQAnswerId == ans);
+                    _context.UserQAVoting.Add(new UserQAVoting()
+                    {
+                        Value = -1,
+                        IsAnswer = true,
+                        UserQuestionId = null,
+                        UserAnswerId = answer.UserQAnswerId,
+                        Visibility = true,
+                        UserId = user.Id
+                    });
+                    TempData["Msg"] = "Thank you for your feedback!";
+                    TempData["Color"] = "success";
+                }
+                else
+                {
+                    TempData["Msg"] = "You have already casted your vote!";
+                    TempData["Color"] = "error";
+                }
+            }
             _context.SaveChanges();
             return RedirectToAction($"QuestionDetail", new { id = id });
         }

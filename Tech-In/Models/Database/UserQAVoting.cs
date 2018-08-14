@@ -19,8 +19,9 @@ namespace Tech_In.Models.Database
         public Boolean IsAnswer { get; set; }
 
         public Nullable<int> UserQuestionId { get; set; }
+        public Nullable<int> UserAnswerId { get; set; }
 
-        
+
         //ApNetUser
         public string UserId { get; set; }
         [ForeignKey("UserId")]
