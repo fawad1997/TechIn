@@ -13,6 +13,6 @@ namespace Tech_In.Models.ViewModels.QuestionViewModels
         [MinLength(1),MaxLength(20)]
         public string SkillName { get; set; }
 
-        public List<NewQuestionVM> NewQuestion { set; get; }
+     
     }
 }

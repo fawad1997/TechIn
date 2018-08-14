@@ -85,7 +85,9 @@ namespace Tech_In.Controllers
 
                                                    UserId = z.ApplicationUser.Id,
                                                }).ToList(),
-                                           }).FirstOrDefault();
+              
+                             }).FirstOrDefault();
+                @ViewBag.UName = HttpContext.Session.GetString("Name");
                 ViewBag.QuestionList = QuestionList;
                 return View();
             }
@@ -93,7 +95,7 @@ namespace Tech_In.Controllers
             {
                 return RedirectToAction("CompleteProfile", "Home");
             }
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
+           
         }
 
         public async Task<IActionResult> QuestionDetail(int id)
@@ -110,9 +112,13 @@ namespace Tech_In.Controllers
                      {
                          Title = c.Title,
                          Description = HttpUtility.HtmlDecode(c.Description),
+                         //Tags=_context.QuestionSkill.Where(qs=> qs.QuestionSkillId==id).Select(d=> new QuestionTagViewModel { SkillName = d.SkillTag.SkillName }).ToList(),
                          PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.FirstName).SingleOrDefault(),
                          UserPic = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.ProfileImage).SingleOrDefault(),
                          PostTime = c.PostTime,
+                         Tags = c.Tag.Select(t => new QuestionTagViewModel
+                         { SkillName = t.SkillTag.SkillName
+                         }).ToList(),
                          Answers = c.UserQAnswer.Select(x => new QAnswerViewModel
                          {  
                              Description = HttpUtility.HtmlDecode(x.Description),

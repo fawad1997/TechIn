@@ -67,11 +67,15 @@
                             <!-- blog tags -->
                             <div class="blog-tags col-lg-9 col-md-9 col-xs-8">
                                 <div class="widget-tags" style="width:auto;">
-                                    <a href="#">Web</a>
+                                    @*<a href="#">Web</a>
                                     <a href="#">Design</a>
                                     <a href="#">Graphic</a>
                                     <a href="#">Marketing</a>
-                                    <a href="#">Development</a>
+                                    <a href="#">Development</a>*@
+                                    @foreach(var Tags in ViewBag.QuestionList.Tags)
+                                    {
+                                         <a>@Tags.SkillName</a>                                            
+                                    }
                                 </div>
                                 @*<input name='tags' readonly value='@ViewBag.QuestionList.Tags'>*@
                             </div>
