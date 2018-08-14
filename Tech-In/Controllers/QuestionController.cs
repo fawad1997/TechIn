@@ -168,42 +168,53 @@ namespace Tech_In.Controllers
 
         
         [HttpPost]
-        public async Task<IActionResult> PostQuestion(NewQuestionVM vm)
+        public async Task<IActionResult> PostQuestion(NewQuestionVM vm,string tags)
         {
             @ViewBag.UName = HttpContext.Session.GetString("Name");
             if (ModelState.IsValid)
             {
-                var user = await _userManager.GetCurrentUser(HttpContext);
-                //List<SkillTag> list = new List<SkillTag>();
-
-                //foreach (var tag in vm.Tags)
-                //{
-                //    var _dbTag = _context.SkillTag.FirstOrDefault(c => c.SkillName.ToLower() == tag.SkillName.ToLower());
-                //    if (_dbTag == null)
-                //    {
-                //        _context.SkillTag.Add(new SkillTag()
-                //        {
-                //            SkillName = tag.SkillName,
-                //            ApplicationUser = user,
-                //            ApprovedStatus = true,
-                //            TimeApproved = DateTime.UtcNow,
-                //        });
-                //        _context.SaveChanges();
-                //        _dbTag = _context.SkillTag.FirstOrDefault(c => c.SkillName.ToLower() == tag.SkillName.ToLower());
-
-                //    }
-                //    if(_dbTag != null)
-                //        list.Add(_dbTag);
-                //}
+                var user = await _userManager.GetCurrentUser(HttpContext); 
                 UserQuestion userQuestion = new UserQuestion();
                 userQuestion.Title = vm.Title;
                 userQuestion.PostTime = DateTime.Now;
                 userQuestion.Description = HttpUtility.HtmlEncode(vm.Description);
                 userQuestion.UserId = user.Id;
-
-                //userQuestion.Tag = list;
                 _context.UserQuestion.Add(userQuestion);
                 _context.SaveChanges();
+                string[] tagArray = tags.Split(',');
+                foreach (string tag in tagArray)
+                {
+                    var tagFromDB = _context.SkillTag.Where(x => x.SkillName == tag.ToLower()).SingleOrDefault();
+                    if (tagFromDB == null)
+                    {
+                        SkillTag sktag = new SkillTag
+                        {
+                            ApprovedStatus = false,
+                            SkillName = tag.ToLower(),
+                            TimeApproved = DateTime.Now,
+                            UserId = user.Id
+                        };
+                        _context.SkillTag.Add(sktag);
+                        _context.SaveChanges();
+                        QuestionSkill qs = new QuestionSkill
+                        {
+                            SkillTagId = sktag.SkillTagId,
+                            UserQuestionId = userQuestion.UserQuestionId
+                        };
+                        _context.QuestionSkill.Add(qs);
+                        _context.SaveChanges();
+                    }
+                    else
+                    {
+                        QuestionSkill qs = new QuestionSkill
+                        {
+                            SkillTagId = tagFromDB.SkillTagId,
+                            UserQuestionId = userQuestion.UserQuestionId
+                        };
+                        _context.QuestionSkill.Add(qs);
+                        _context.SaveChanges();
+                    }
+                }
 
                 return RedirectToAction($"QuestionDetail", new { id = _context.UserQuestion.OrderByDescending(c => c.UserQuestionId).FirstOrDefault().UserQuestionId });
             }
