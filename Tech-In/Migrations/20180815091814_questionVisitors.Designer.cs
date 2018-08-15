@@ -12,9 +12,10 @@ using Tech_In.Models.Model;
 namespace Tech_In.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180815091814_questionVisitors")]
+    partial class questionVisitors
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -232,28 +233,6 @@ namespace Tech_In.Migrations
                     b.HasIndex("UserQuestionId");
 
                     b.ToTable("QuestionSkill");
-                });
-
-            modelBuilder.Entity("Tech_In.Models.Database.QuestionVisitor", b =>
-                {
-                    b.Property<int>("QuestionVisitorId")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("IsLoggedIn");
-
-                    b.Property<int>("QuestionId");
-
-                    b.Property<string>("UserId");
-
-                    b.Property<string>("UserIp");
-
-                    b.HasKey("QuestionVisitorId");
-
-                    b.HasIndex("QuestionId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("QuestionVisitor");
                 });
 
             modelBuilder.Entity("Tech_In.Models.Database.SkillTag", b =>
@@ -684,18 +663,6 @@ namespace Tech_In.Migrations
                         .WithMany("Tag")
                         .HasForeignKey("UserQuestionId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("Tech_In.Models.Database.QuestionVisitor", b =>
-                {
-                    b.HasOne("Tech_In.Models.Database.UserQuestion", "Question")
-                        .WithMany()
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Tech_In.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("Tech_In.Models.Database.SkillTag", b =>

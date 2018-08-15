@@ -38,6 +38,7 @@ namespace Tech_In.Data
         public DbSet<UserQuestion> UserQuestion { get; set; }
         public DbSet<UserSkill> UserSkill { get; set; }
         public DbSet<QuestionSkill> QuestionSkill { get; set; }
+        public DbSet<QuestionVisitor> QuestionVisitor { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)

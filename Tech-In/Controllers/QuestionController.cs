@@ -20,10 +20,12 @@ namespace Tech_In.Controllers
     {
         private readonly ApplicationDbContext _context;
         private UserManager<ApplicationUser> _userManager;
-        public QuestionController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        private IHttpContextAccessor _accessor;
+        public QuestionController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IHttpContextAccessor accessor)
         {
             _context = context;
             _userManager = userManager;
+            _accessor = accessor;
         }
         public async Task<IActionResult> Index(string sortOrder,string currentFilter,string searchString,int? page)
         {
@@ -54,60 +56,13 @@ namespace Tech_In.Controllers
            
             //return View(questionList);
         }
-
-        public async Task<IActionResult> Detail(int id)
-        {
-            //Check User Profile is complete or not
-            var user = await _userManager.GetCurrentUser(HttpContext);
-            var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
-            if (userPersonalRow != null)
-            {
-                var QuestionList = _context.UserQuestion.Where(x => x.ApplicationUser.Id == user.Id && x.UserQuestionId == id)
-                                           .Select(c => new NewQuestionVM
-                                           {
-                                               Title = c.Title,
-                                               Description = HttpUtility.HtmlDecode(c.Description),
-                                               Answers = c.UserQAnswer.Select(x => new QAnswerViewModel
-                                               {
-                                                   Description = HttpUtility.HtmlDecode(x.Description),
-                                                   UserQAnswerId = x.UserQAnswerId,
-                                                   Date = x.PostTime,
-                                                   User = x.ApplicationUser.UserName
-                                               }).ToList(),
-                                               Comment = c.UserQAComment.Select(z => new QACommentsViewModel
-                                               {
-                                                   UserQuestionId = z.UserQuestionId,
-                                                   UserQAnswerId = z.UserQAnswerId,
-                                                   Description = z.Description,
-                                                   IsAnswer = z.IsAnswer,
-                                                   Visibility = z.Visibility,
-                                                   UserQACommentID = z.UserQACommentID,
-
-                                                   UserId = z.ApplicationUser.Id,
-                                               }).ToList(),
-              
-                             }).FirstOrDefault();
-                @ViewBag.UName = HttpContext.Session.GetString("Name");
-                ViewBag.QuestionList = QuestionList;
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("CompleteProfile", "Home");
-            }
-           
-        }
-
+        
         public async Task<IActionResult> QuestionDetail(int id)
         {
             @ViewBag.UName = HttpContext.Session.GetString("Name");
-            //Check User Profile is complete or not
             ViewBag.QuestionId = id;
             var user = await _userManager.GetCurrentUser(HttpContext);
-            var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
-            if (userPersonalRow != null)
-            {
-                var QuestionList = _context.UserQuestion.Where(x => x.UserQuestionId == id)
+            var QuestionList = _context.UserQuestion.Where(x => x.UserQuestionId == id)
                      .Select(c => new NewQuestionVM
                      {
                          Title = c.Title,
@@ -116,15 +71,17 @@ namespace Tech_In.Controllers
                          PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.FirstName).SingleOrDefault(),
                          UserPic = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.ProfileImage).SingleOrDefault(),
                          PostTime = c.PostTime,
+                         Visitors = _context.QuestionVisitor.Where(cont=> cont.QuestionId == id).Count(),
                          Tags = c.Tag.Select(t => new QuestionTagViewModel
-                         { SkillName = t.SkillTag.SkillName
+                         {
+                             SkillName = t.SkillTag.SkillName
                          }).ToList(),
                          Answers = c.UserQAnswer.Select(x => new QAnswerViewModel
-                         {  
+                         {
                              Description = HttpUtility.HtmlDecode(x.Description),
                              UserQAnswerId = x.UserQAnswerId,
                              Date = x.PostTime,
-                             Votes = _context.UserQAVoting.Where(y=> y.UserAnswerId==x.UserQAnswerId).Sum(z=>z.Value),
+                             Votes = _context.UserQAVoting.Where(y => y.UserAnswerId == x.UserQAnswerId).Sum(z => z.Value),
                              User = _context.UserPersonalDetail.Where(y => y.UserId == x.ApplicationUser.Id).Select(z => z.FirstName).SingleOrDefault()
                          }).ToList(),
                          Comment = c.UserQAComment.Select(z => new QACommentsViewModel
@@ -142,6 +99,45 @@ namespace Tech_In.Controllers
                          Voting = c.UserQAVoting.Sum(x => x.Value)
 
                      }).SingleOrDefault();
+            if (QuestionList != null)
+            {
+                if (user != null)
+                {
+                    var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
+                    if (userPersonalRow == null)
+                    {
+                        return RedirectToAction("CompleteProfile", "Home");
+                    }
+                    //If Registered Visitor Counter
+                    QuestionVisitor isVisited = _context.QuestionVisitor.Where(qv => qv.UserId == user.Id && qv.QuestionId == id).SingleOrDefault();
+                    if (isVisited == null)
+                    {
+                        _context.QuestionVisitor.Add(new QuestionVisitor
+                        {
+                            QuestionId = id,
+                            UserId = user.Id,
+                            IsLoggedIn = true,
+                            UserIp = null
+                        });
+                        _context.SaveChanges();
+                    }
+                }
+                else
+                {//If Anonomus Visitor Counter
+                    string currentUserIp = _accessor.HttpContext.Connection.RemoteIpAddress.ToString();
+                    QuestionVisitor isVisited = _context.QuestionVisitor.Where(qv => qv.UserIp == currentUserIp && qv.QuestionId == id).SingleOrDefault();
+                    if(isVisited == null)
+                    {
+                        _context.QuestionVisitor.Add(new QuestionVisitor
+                        {
+                            QuestionId = id,
+                            UserId = null,
+                            IsLoggedIn = false,
+                            UserIp = currentUserIp
+                        });
+                        _context.SaveChanges();
+                    }
+                }
                 ViewBag.QuestionList = QuestionList;
                 if (TempData["Msg"] != null)
                 {
@@ -151,9 +147,7 @@ namespace Tech_In.Controllers
                 return View("Detail");
             }
             else
-            {
-                return RedirectToAction("CompleteProfile", "Home");
-            }
+                return NotFound();
         }
 
 

@@ -23,7 +23,7 @@ namespace Tech_In.Models.ViewModels.QuestionViewModels
         public string UserPic { get; set; }
         [DisplayFormat(DataFormatString = "{0:yyyy-mm-dd}", ApplyFormatInEditMode = true)]
         public DateTime PostTime { get; set; }
-
+        public int Visitors { get; set; }
         [Required]
         public List<QuestionTagViewModel> Tags { get; set; }
 
