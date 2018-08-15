@@ -23,17 +23,20 @@ namespace Tech_In.Controllers
         private readonly ApplicationDbContext _context;
         private UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
-
-        public UserController(ApplicationDbContext context, UserManager<ApplicationUser> userManager,IMapper mapper)
+        private IHttpContextAccessor _accessor;
+        public UserController(ApplicationDbContext context, UserManager<ApplicationUser> userManager,IMapper mapper,IHttpContextAccessor accessor)
         {
             _context = context;
             _userManager = userManager;
             _mapper = mapper;
+            _accessor = accessor;
         }
 
 
         public async Task<IActionResult> Index()
         {
+            string ip = _accessor.HttpContext.Connection.RemoteIpAddress.ToString();
+            return Content(""+ip);
             //Check User Profile is complete or not
             var user = await _userManager.GetCurrentUser(HttpContext);
             var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
