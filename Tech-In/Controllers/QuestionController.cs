@@ -72,6 +72,7 @@ namespace Tech_In.Controllers
                          UserPic = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.ProfileImage).SingleOrDefault(),
                          PostTime = c.PostTime,
                          Visitors = _context.QuestionVisitor.Where(cont=> cont.QuestionId == id).Count(),
+                         HasVerifiedAns = c.HasVerifiedAns,
                          Tags = c.Tag.Select(t => new QuestionTagViewModel
                          {
                              SkillName = t.SkillTag.SkillName
@@ -81,6 +82,7 @@ namespace Tech_In.Controllers
                              Description = HttpUtility.HtmlDecode(x.Description),
                              UserQAnswerId = x.UserQAnswerId,
                              Date = x.PostTime,
+                             IsVerified = x.IsVerified,
                              Votes = _context.UserQAVoting.Where(y => y.UserAnswerId == x.UserQAnswerId).Sum(z => z.Value),
                              User = _context.UserPersonalDetail.Where(y => y.UserId == x.ApplicationUser.Id).Select(z => z.FirstName).SingleOrDefault()
                          }).ToList(),
@@ -121,6 +123,19 @@ namespace Tech_In.Controllers
                         });
                         _context.SaveChanges();
                     }
+                    if (!QuestionList.HasVerifiedAns)
+                    {
+                        var isUserPostedQuestion = _context.UserQuestion.Where(a => a.UserId == user.Id && a.UserQuestionId == id).SingleOrDefault();
+                        if (isUserPostedQuestion != null)
+                        {
+                            ViewBag.ShowTick = true;
+                        }
+                        else
+                        {
+                            ViewBag.ShowTick = false;
+                        }
+                    }else
+                        ViewBag.ShowTick = false;
                 }
                 else
                 {//If Anonomus Visitor Counter
@@ -417,7 +432,21 @@ namespace Tech_In.Controllers
                 _context.SaveChanges();
                 return RedirectToAction($"QuestionDetail", new { id = vm.QACommentsViewModel.UserQuestionId });
             }
-            return View("Detail", vm.QAnswerViewModel);
+            return NotFound();
+        }
+
+        public async Task<IActionResult> VerifyAnswer(int ansId,int questionId)
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            UserQuestion question= _context.UserQuestion.Where(x => x.UserQuestionId == questionId && x.UserId == user.Id).SingleOrDefault();
+            UserQAnswer answer = _context.UserQAnswer.Where(y => y.UserQAnswerId == ansId).SingleOrDefault();
+            if(question!=null && answer != null)
+            {
+                question.HasVerifiedAns = true;
+                answer.IsVerified = true;
+                _context.SaveChanges();
+            }
+            return RedirectToAction($"QuestionDetail", new { id = questionId });
         }
 
     }

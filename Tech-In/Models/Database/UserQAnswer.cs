@@ -19,6 +19,7 @@ namespace Tech_In.Models.Database
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-mm-dd}", ApplyFormatInEditMode = true)]
         public DateTime PostTime { get; set; }
+        public Boolean IsVerified { get; set; }
 
         public int UserQuestionId { get; set; }
 

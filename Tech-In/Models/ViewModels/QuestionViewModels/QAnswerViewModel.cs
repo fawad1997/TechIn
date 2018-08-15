@@ -16,7 +16,7 @@ namespace Tech_In.Models.ViewModels.QuestionViewModels
 
         public int QuestionId { get; set; }
         public int Votes { get; set; }
-
+        public Boolean IsVerified { get; set; }
         public string User { get; set; }
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-mm-dd}", ApplyFormatInEditMode = true)]

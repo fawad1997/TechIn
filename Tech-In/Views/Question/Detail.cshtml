@@ -25,6 +25,17 @@
         }
     }
 }
+<style>
+    #verifyAns {
+        color: gainsboro;
+    }
+    #verifyAns:hover{
+        color:green;
+    }
+    #verifyAnsGreen{
+        color:green;
+    }
+</style>
 <!-- Blog -->
 <div id="blog" class="section">
 
@@ -67,15 +78,10 @@
                             <!-- blog tags -->
                             <div class="blog-tags col-lg-9 col-md-9 col-xs-8">
                                 <div class="widget-tags" style="width:auto;">
-                                    @*<a href="#">Web</a>
-                                    <a href="#">Design</a>
-                                    <a href="#">Graphic</a>
-                                    <a href="#">Marketing</a>
-                                    <a href="#">Development</a>*@
-                                    @foreach(var Tags in ViewBag.QuestionList.Tags)
-                                    {
-                                         <a>@Tags.SkillName</a>                                            
-                                    }
+                                    @foreach (var Tags in ViewBag.QuestionList.Tags)
+                    {
+                        <a href="#">@Tags.SkillName</a>
+    }
                                 </div>
                                 @*<input name='tags' readonly value='@ViewBag.QuestionList.Tags'>*@
                             </div>
@@ -102,18 +108,26 @@
                         </div><!--Row-->
                     </div>
                     <hr width=100% color="black" />
+                    <!--Comments -->
+                    @foreach (var comment in ViewBag.QuestionList.Comment)
+    {
+               <div class="row">
+                   <div class="col-sm-11 float-right">
+                       <strong><a> @comment.PostedBy</a> :</strong> @comment.Description
+                   </div>
+                </div>
+}
                     <button class="btn-link" id="showComment">add a comment</button>
                     <form id="commentForm" style="display:none;" method="post">
                         <div class="row">
                             <div class="col-sm-10">
                                 <input asp-for="QACommentsViewModel.UserQuestionId" value="@ViewBag.QuestionId" type="hidden" />
-                                <input asp-for="QACommentsViewModel.Description" placeholder="Use comments to ask for more information or suggest improvements. Avoid answering questions in comments." required />
+                                <input minlength=10 pattern=".{10,}" required asp-for="QACommentsViewModel.Description" placeholder="Use comments to ask for more information or suggest improvements. Avoid answering questions in comments." required />
                             </div>
                             <div class="col-sm-2">
                                 <button asp-controller="Question" asp-action="PostComment" onclick="document.getElementById('cmt').style.display=" block" class="btn">Add Comment</button>
                             </div>
                         </div>
-
 
                     </form>
                     @* Display Add Comment Form *@
@@ -123,22 +137,8 @@
                         });
                     </script>
 
-                    <!--Comments -->
-                    @foreach (var comment in ViewBag.QuestionList.Comment)
-    {<div class="row">
-                    <div class="col-xs-6 col-md-8">
-                        @comment.Description;
-                    </div>
-                    <div class="col-xs-6 col-md-4">
-                        <div class="grey-back float-right">
-                            <br />
-                            <strong>@comment.PostedBy</strong>
-                        </div>
-                    </div>
-                </div>
-}
                     <hr width=100% color="black" />
-                    <h4>Answers (1)</h4>
+                    <h4>Answers (@ViewBag.QuestionList.Answers.Count)</h4>
                     <hr width=100% color="black" />
                     @foreach (var answer in ViewBag.QuestionList.Answers)
     {
@@ -157,6 +157,21 @@
                                 <br /><br />
                                 <div class="row">
                                     <a href="/Question/DownVote/@ViewBag.QuestionId?isQuestion=false&ans=@answer.UserQAnswerId" id="triangle-down"></a>
+                                </div>
+                                <div class="row">
+                                    @if (ViewBag.ShowTick)
+    {
+                                <a id="verifyAns" href="/Question/VerifyAnswer?ansId=@answer.UserQAnswerId&questionId=@ViewBag.QuestionId">
+                                    <i class="fa fa-check fa-3x" aria-hidden="true"></i>
+                                </a>
+}
+else if (@answer.IsVerified)
+{
+                                <a id="verifyAnsGreen" href="#">
+                                    <i class="fa fa-check fa-3x" aria-hidden="true"></i>
+                                </a>
+
+}
                                 </div>
                             </form>
                         </center>
@@ -232,11 +247,10 @@ else
             <div class="widget">
                 <h3 class="title">Tags</h3>
                 <div class="widget-tags">
-                    <a href="#">Web</a>
-                    <a href="#">Design</a>
-                    <a href="#">Graphic</a>
-                    <a href="#">Marketing</a>
-                    <a href="#">Development</a>
+                    @foreach (var Tags in ViewBag.QuestionList.Tags)
+    {
+                <a href="#">@Tags.SkillName</a>
+    }
                 </div>
             </div>
             <!-- /Tags -->
