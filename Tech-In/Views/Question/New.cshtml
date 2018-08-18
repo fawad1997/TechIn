@@ -13,7 +13,7 @@
                         <strong>Title:</strong>
                     </div>
                     <div class="col-xs-10 col-lg-11">
-                        <input asp-for="Title" type="text" class="fr-form" placeholder="What's your programming question? Be specific." />
+                        <input required minlength=10 asp-for="Title" type="text" class="fr-form" placeholder="What's your programming question? Be specific." />
                         <span asp-validation-for="Title" style="color:red"></span>
                     </div>
                 </div>
@@ -25,7 +25,7 @@
                 <hr />
                 <div class="form-group">
                     <strong>Tags </strong>
-                    <input name="tags" type="text" class="fr-form" value="css,html,javascript,css" placeholder="atleast one tag, such as 'java', maximum 5." />
+                    <input required name="tags" type="text" class="fr-form" value="" placeholder="atleast one tag, such as 'java', maximum 5." />
 
                 </div>
                 <button asp-controller="Question" asp-action="PostQuestion" class="main-btn">Ask a Question</button>

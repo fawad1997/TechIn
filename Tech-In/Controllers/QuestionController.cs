@@ -98,7 +98,7 @@ namespace Tech_In.Controllers
                              IsVerified = x.IsVerified,
                              Votes = _context.UserQAVoting.Where(y => y.UserAnswerId == x.UserQAnswerId).Sum(z => z.Value),
                              User = _context.UserPersonalDetail.Where(y => y.UserId == x.ApplicationUser.Id).Select(z => z.FirstName).SingleOrDefault()
-                         }).ToList(),
+                         }).OrderByDescending(ord=>ord.IsVerified).ThenBy(ordasc =>ordasc.UserQAnswerId).ToList(),
                          Comment = c.UserQAComment.Select(z => new QACommentsViewModel
                          {
                              UserQuestionId = z.UserQuestionId,
@@ -458,6 +458,8 @@ namespace Tech_In.Controllers
                 question.HasVerifiedAns = true;
                 answer.IsVerified = true;
                 _context.SaveChanges();
+                TempData["Msg"] = "Answer has been verified!";
+                TempData["Color"] = "success";
             }
             return RedirectToAction($"QuestionDetail", new { id = questionId });
         }
