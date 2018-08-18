@@ -1,5 +1,4 @@
 ﻿@model Tech_In.Extensions.PaginatedList<UserQuestion>
-
 @{
     ViewData["Title"] = "Questions | TechIn";
 }
@@ -24,36 +23,62 @@
                         <br />
 
                         @foreach (var question in Model)
-              {
-                    <div class="row">
-                        <hr />
-                        <div class="col-xs-1 grey-back">
-                            <span>
-                                <strong>0</strong><br />Votes
-                            </span>
-                        </div>
-                        <div class="col-xs-1 grey-back">
-                            <span>
-                                <strong>0</strong><br />Answers
-                            </span>
-                        </div>
-                        <div class="col-xs-9">
-                            <h3 class="font-size16 margin-bottom6"><a href="/Question/QuestionDetail/@question.UserQuestionId">@question.Title</a></h3>
-                            <span class="widget-tags-sm">
-                                @*@foreach (var Tags in ViewBag.QuestionList.Tags)
-    {
-                            <a>@Tags.SkillName</a>
-}*@
-                            </span>
-                            <p class="inline small-font margintop6 float-right"><i class="fa fa-clock-o"></i> @question.PostTime <a><i class="fa fa-user"></i></a></p>
-                        </div>
-                    </div>
-                    <hr />
+                        {
+                            <div class="row">
+                                <hr />
+                                <div class="col-xs-1 grey-back">
+                                    <span>
+                                        @*@foreach (var vote in question.UserQAVoting)
+                                                 {
+                                            <strong>@vote.Value</strong><br />
+                                                 }*@
+                                        <label>Vote</label>
+                                    </span>
+                                </div>
+                                @if (question.HasVerifiedAns)
+                                {
+                                    <div class="col-xs-1 grey-back answer-back">
+                                        <span>
 
-}
+                                            <strong></strong><br />Answer
+                                        </span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-xs-1 grey-back">
+                                        <span>
+                                            <strong>0</strong><br />Answers
+                                        </span>
+                                    </div>
+                                }
+                                <div class="col-xs-9">
+                                    <h3 class="font-size16 margin-bottom6"><a href="/Question/QuestionDetail/@question.UserQuestionId">@question.Title</a></h3>
+                                    @*<span class="widget-tags-sm">
+                                        @if (question.Tag != null)
+                                        {
+                                            
+                                        @foreach (var item in question.Tag)
+                                        {
+                                            if (question.UserQuestionId == item.UserQuestionId)
+                                            {
+                                    <a>
+                                        @item.SkillTag.SkillName
+                                    </a>
+                                            }
+
+                                        }
+                                        }
+                                    </span>*@
+                                    <p class="inline small-font margintop6 float-right"><i class="fa fa-clock-o"></i> @question.PostTime <a><i class="fa fa-user"></i></a></p>
+                                </div>
+                            </div>
+                            <hr />
+
+                        }
                         @{
-                          var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-                          var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+                            var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+                            var nextDisabled = !Model.HasNextPage ? "disabled" : "";
                         }
 
                         <a asp-action="Index"
@@ -234,19 +259,19 @@
             <!-- Search -->
             <div class="widget">
                 @*<div class="widget-search">
-            <input class="search-input" id="searchText" type="text" placeholder="search questions">
-            <button class="search-btn" id="searchButton" type="button">
-                <i class="fa fa-search"></i>
-            </button>
+                        <input class="search-input" id="searchText" type="text" placeholder="search questions">
+                        <button class="search-btn" id="searchButton" type="button">
+                            <i class="fa fa-search"></i>
+                        </button>
 
-        </div>*@
+                    </div>*@
                 <form asp-action="Index" method="get">
                     <div class="form-actions no-color">
                         <div class="widget-search">
-                             <input type="text" placeholder="search questions" name="SearchString" value="@ViewData["currentFilter"]" />
+                            <input type="text" placeholder="search questions" name="SearchString" value="@ViewData["currentFilter"]" />
                             <button type="submit" id="searchButton" value="Search" class="search-btn">  <i class="fa fa-search"></i> </button>
                         </div>
-                        </div>
+                    </div>
                 </form>
             </div>
             <script>
@@ -257,7 +282,7 @@
                             window.location.href = "/Question/SearchDetails?text=" + text;
                         }
                     });
-                 });
+                });
             </script>
             <!-- /Search -->
 

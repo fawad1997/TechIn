@@ -27,23 +27,36 @@ namespace Tech_In.Controllers
             _userManager = userManager;
             _accessor = accessor;
         }
-        public async Task<IActionResult> Index(string sortOrder,string currentFilter,string searchString,int? page)
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? page)
         {
             ViewData["CurrentSort"] = sortOrder;
             ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
-           
             ViewData["CurrentFilter"] = searchString;
 
             //Check User Profile is complete or not 
             var user = await _userManager.GetCurrentUser(HttpContext);
             var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
-            //var questionList = _context.UserQuestion.OrderByDescending(x => x.UserQuestionId).ToList();
-            var questions = from q in _context.UserQuestion select q;
+            var questions = from q in _context.UserQuestion.OrderByDescending(x => x.UserQuestionId) select q;
+            var Question = (from o in _context.SkillTag
+                            join c in _context.QuestionSkill on o.SkillTagId equals c.SkillTagId
+                            join p in _context.UserQuestion on c.UserQuestionId equals p.UserQuestionId
+                            where o.SkillName == c.SkillTag.SkillName
+                            select new
+                            {
+                                c.SkillTag.SkillName
+                            });
+            
+            //var asd= (from w in _context.SkillTag 
+            //         join d in _context.QuestionSkill on w.SkillTagId equals d.SkillTagId 
+            //         join n in _context.UserQuestion on d.UserQuestionId equals n.UserQuestionId
+            //         select w.SkillName).ToList();
+           
             if (!String.IsNullOrEmpty(searchString))
             {
                 questions = questions.Where(s => s.Description.Contains(searchString)
                                 || s.Title.Contains(searchString));
+
             }
             if (userPersonalRow == null)
             {
@@ -53,10 +66,10 @@ namespace Tech_In.Controllers
             int pageSize = 4;
             return View(await PaginatedList<UserQuestion>.CreateAsync(questions.AsNoTracking(), page ?? 1, pageSize));
 
-           
+
             //return View(questionList);
         }
-        
+
         public async Task<IActionResult> QuestionDetail(int id)
         {
             @ViewBag.UName = HttpContext.Session.GetString("Name");
@@ -448,6 +461,29 @@ namespace Tech_In.Controllers
             }
             return RedirectToAction($"QuestionDetail", new { id = questionId });
         }
+
+        //[HttpPost]
+        //public async Task<IActionResult> SearchTag(string text)
+        //{
+        //    @ViewBag.UName = HttpContext.Session.GetString("Name");
+           
+        //    //Check User Profile is complete or not
+        //    var user = await _userManager.GetCurrentUser(HttpContext);
+        //    var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
+        //    if (userPersonalRow != null)
+        //    {
+        //        //var QuestionList = _context.UserQuestion.Where(x => x.Description.ToLower().Contains(text) || x.Title.ToLower().Contains(text)).Select(c => new UserQuestion { ApplicationUser = c.ApplicationUser, PostTime = c.PostTime, Tag = c.Tag, UserQuestionId = c.UserQuestionId, UserId = c.UserId, Title = c.Title, Description = HttpUtility.HtmlDecode(c.Description) }).ToList();
+        //        //var result = _context.QuestionSkill.Where(a => a.SkillTag.SkillName.Contains(text)).Select(f => new QuestionSkill { SkillTag = f.SkillTag, QuestionSkillId = f.QuestionSkillId, SkillTagId = f.SkillTagId, UserQuestionId = f.UserQuestionId ,UserQuestion=f.UserQuestion });
+        //        var res = _context.UserQuestion.Where(q => q.Tag.ToString().Contains(text)).Select(f => new UserQuestion { Title = f.Title, Tag = f.Tag, Description = HttpUtility.HtmlDecode(f.Description), ApplicationUser=f.ApplicationUser,PostTime=f.PostTime, }).ToList();
+        //        return View("Index", res);
+
+        //    }
+        //    else
+        //    {
+        //        return RedirectToAction("CompleteProfile", "Home");
+        //    }
+        //}
+
 
     }
 }
