@@ -31,8 +31,7 @@ namespace Tech_In.Controllers
             _mapper = mapper;
             //_accessor = accessor;
         }
-
-
+        
         public async Task<IActionResult> Index()
         {
             //string ip = _accessor.HttpContext.Connection.RemoteIpAddress.ToString();
