@@ -27,49 +27,99 @@ namespace Tech_In.Controllers
             _userManager = userManager;
             _accessor = accessor;
         }
-        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? page)
-        {
-            ViewData["CurrentSort"] = sortOrder;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
-            ViewData["CurrentFilter"] = searchString;
+        //public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? page)
+        //{
+        //    ViewData["CurrentSort"] = sortOrder;
+        //    ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+        //    ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+        //    ViewData["CurrentFilter"] = searchString;
 
-            //Check User Profile is complete or not 
+        //    //Check User Profile is complete or not 
+        //    var user = await _userManager.GetCurrentUser(HttpContext);
+        //    var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
+        //    var questions = from q in _context.UserQuestion.OrderByDescending(x => x.UserQuestionId) select q;
+        //    var Question = (from o in _context.SkillTag
+        //                    join c in _context.QuestionSkill on o.SkillTagId equals c.SkillTagId
+        //                    join p in _context.UserQuestion on c.UserQuestionId equals p.UserQuestionId
+        //                    where o.SkillName == c.SkillTag.SkillName
+        //                    select new
+        //                    {
+        //                        c.SkillTag.SkillName
+        //                    });
+        //    var QuestionList = _context.UserQuestion
+        //            .Select(c => new NewQuestionVM
+        //            {
+        //                Title = c.Title,
+        //                PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.FirstName).SingleOrDefault(),
+        //                UserPic = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.ProfileImage).SingleOrDefault(),
+        //                PostTime = c.PostTime,
+        //                HasVerifiedAns = c.HasVerifiedAns,
+        //                Tags = c.Tag.Select(t => new QuestionTagViewModel
+        //                {
+        //                    SkillName = t.SkillTag.SkillName
+        //                }).ToList(),
+        //                Voting = c.UserQAVoting.Sum(x => x.Value)
+
+        //            });
+
+
+        //    //var asd= (from w in _context.SkillTag 
+        //    //         join d in _context.QuestionSkill on w.SkillTagId equals d.SkillTagId 
+        //    //         join n in _context.UserQuestion on d.UserQuestionId equals n.UserQuestionId
+        //    //         select w.SkillName).ToList();
+
+        //    if (!String.IsNullOrEmpty(searchString))
+        //    {
+        //        questions = questions.Where(s => s.Description.Contains(searchString)
+        //                        || s.Title.Contains(searchString));
+
+        //    }
+        //    if (userPersonalRow == null)
+        //    {
+        //        return RedirectToAction("CompleteProfile", "Home");
+        //    }
+        //    @ViewBag.UName = HttpContext.Session.GetString("Name");
+        //    int pageSize = 4;
+        //    return View(await PaginatedList<UserQuestion>.CreateAsync(QuestionList.AsNoTracking(), page ?? 1, pageSize));
+
+
+        //    //return View(questionList);
+        //}
+
+
+        public async Task<IActionResult> Index()
+        {
+           
+          
+            //Check User Profile is complete or not
             var user = await _userManager.GetCurrentUser(HttpContext);
             var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
-            var questions = from q in _context.UserQuestion.OrderByDescending(x => x.UserQuestionId) select q;
-            var Question = (from o in _context.SkillTag
-                            join c in _context.QuestionSkill on o.SkillTagId equals c.SkillTagId
-                            join p in _context.UserQuestion on c.UserQuestionId equals p.UserQuestionId
-                            where o.SkillName == c.SkillTag.SkillName
-                            select new
-                            {
-                                c.SkillTag.SkillName
-                            });
-            
-            //var asd= (from w in _context.SkillTag 
-            //         join d in _context.QuestionSkill on w.SkillTagId equals d.SkillTagId 
-            //         join n in _context.UserQuestion on d.UserQuestionId equals n.UserQuestionId
-            //         select w.SkillName).ToList();
-           
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                questions = questions.Where(s => s.Description.Contains(searchString)
-                                || s.Title.Contains(searchString));
+            var questionList = _context.UserQuestion
+                    .Select(c => new NewQuestionVM
+                    {
+                        UserQuestionId = c.UserQuestionId,
+                        Title = c.Title,
+                        PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.FirstName).SingleOrDefault(),
+                        UserPic = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.ProfileImage).SingleOrDefault(),
+                        PostTime = c.PostTime,
+                        HasVerifiedAns = c.HasVerifiedAns,
+                        Visitors= _context.QuestionVisitor.Where(f=> f.QuestionId==c.UserQuestionId).Count(),
+                        Tags = c.Tag.Select(t => new QuestionTagViewModel
+                        {
+                            SkillName = t.SkillTag.SkillName
+                        }).ToList(),
+                        Voting = c.UserQAVoting.Sum(x => x.Value)
 
-            }
+                    }).ToList();
+            
             if (userPersonalRow == null)
             {
                 return RedirectToAction("CompleteProfile", "Home");
             }
+
             @ViewBag.UName = HttpContext.Session.GetString("Name");
-            int pageSize = 4;
-            return View(await PaginatedList<UserQuestion>.CreateAsync(questions.AsNoTracking(), page ?? 1, pageSize));
-
-
-            //return View(questionList);
+            return View(questionList);
         }
-
         public async Task<IActionResult> QuestionDetail(int id)
         {
             @ViewBag.UName = HttpContext.Session.GetString("Name");
@@ -259,6 +309,7 @@ namespace Tech_In.Controllers
                         };
                         _context.QuestionSkill.Add(qs);
                         _context.SaveChanges();
+
                     }
                 }
 
