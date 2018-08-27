@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -202,6 +203,7 @@ namespace Tech_In.Controllers
                 }
                 else
                 {//If Anonomus Visitor Counter
+                    ViewBag.ShowTick = false;
                     string currentUserIp = _accessor.HttpContext.Connection.RemoteIpAddress.ToString();
                     QuestionVisitor isVisited = _context.QuestionVisitor.Where(qv => qv.UserIp == currentUserIp && qv.QuestionId == id).SingleOrDefault();
                     if(isVisited == null)
@@ -248,6 +250,7 @@ namespace Tech_In.Controllers
             }
         }
 
+        [Authorize]
         public async Task<IActionResult> New()
         {
             //Check User Profile is complete or not
@@ -262,7 +265,7 @@ namespace Tech_In.Controllers
 
         }
 
-        
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> PostQuestion(NewQuestionVM vm,string tags)
         {
@@ -318,14 +321,15 @@ namespace Tech_In.Controllers
 
             return View("New", vm);
         }
-        public async Task<IActionResult> ViewQuestion()
-        {
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
-            var user = await _userManager.GetCurrentUser(HttpContext);
-            List<NewQuestionVM> QuestionList = _context.UserQuestion.Where(x => x.UserId == user.Id).Select(c => new NewQuestionVM { Title = c.Title, Description = c.Description }).ToList();
-            ViewBag.QuestionList = QuestionList;
-            return View("Detail");
-        }
+        //public async Task<IActionResult> ViewQuestion()
+        //{
+        //    @ViewBag.UName = HttpContext.Session.GetString("Name");
+        //    var user = await _userManager.GetCurrentUser(HttpContext);
+        //    List<NewQuestionVM> QuestionList = _context.UserQuestion.Where(x => x.UserId == user.Id).Select(c => new NewQuestionVM { Title = c.Title, Description = c.Description }).ToList();
+        //    ViewBag.QuestionList = QuestionList;
+        //    return View("Detail");
+        //}
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> PostAnswer(CommonViewModel vm)
         {
@@ -345,6 +349,7 @@ namespace Tech_In.Controllers
 
             return View("Detail", vm.NewQuestionVM);
         }
+        [Authorize]
         public async Task<IActionResult> UpVote(int id,Boolean isQuestion,int ans)
         {
             var user = await _userManager.GetCurrentUser(HttpContext);
@@ -411,6 +416,7 @@ namespace Tech_In.Controllers
             _context.SaveChanges();
             return RedirectToAction($"QuestionDetail", new { id = id });
         }
+        [Authorize]
         public async Task<IActionResult> DownVote(int id, Boolean isQuestion, int ans)
         {
             var user = await _userManager.GetCurrentUser(HttpContext);
@@ -478,6 +484,7 @@ namespace Tech_In.Controllers
             return RedirectToAction($"QuestionDetail", new { id = id });
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> PostComment(CommonViewModel vm)
         {
@@ -498,7 +505,7 @@ namespace Tech_In.Controllers
             }
             return NotFound();
         }
-
+        [Authorize]
         public async Task<IActionResult> VerifyAnswer(int ansId,int questionId)
         {
             var user = await _userManager.GetCurrentUser(HttpContext);
