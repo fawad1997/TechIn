@@ -240,8 +240,25 @@ namespace Tech_In.Controllers
             var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
             if (userPersonalRow != null)
             {
-                var QuestionList = _context.UserQuestion.Where(x => x.Description.ToLower().Contains(text) || x.Title.ToLower().Contains(text)).Select(c => new UserQuestion { ApplicationUser = c.ApplicationUser, PostTime = c.PostTime, Tag = c.Tag, UserQuestionId = c.UserQuestionId, UserId = c.UserId, Title = c.Title, Description = HttpUtility.HtmlDecode(c.Description) }).ToList();
-                return View("Index", QuestionList);
+                //var QuestionList = _context.UserQuestion.Where(x => x.Description.ToLower().Contains(text) || x.Title.ToLower().Contains(text)).Select(c => new UserQuestion { ApplicationUser = c.ApplicationUser, PostTime = c.PostTime, Tag = c.Tag, UserQuestionId = c.UserQuestionId, UserId = c.UserId, Title = c.Title, Description = HttpUtility.HtmlDecode(c.Description) }).ToList();
+                var questionList = _context.UserQuestion.Where(x => x.Description.ToLower().Contains(text) || x.Title.ToLower().Contains(text))
+                 .Select(c => new NewQuestionVM
+                 {
+                     UserQuestionId = c.UserQuestionId,
+                     Title = c.Title,
+                     PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.FirstName).SingleOrDefault(),
+                     UserPic = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.ProfileImage).SingleOrDefault(),
+                     PostTime = c.PostTime,
+                     HasVerifiedAns = c.HasVerifiedAns,
+                     Visitors = _context.QuestionVisitor.Where(f => f.QuestionId == c.UserQuestionId).Count(),
+                     Tags = c.Tag.Select(t => new QuestionTagViewModel
+                     {
+                         SkillName = t.SkillTag.SkillName
+                     }).ToList(),
+                     Voting = c.UserQAVoting.Sum(x => x.Value)
+
+                 }).ToList();
+                return View("Index", questionList);
                 
             }
             else
@@ -522,20 +539,35 @@ namespace Tech_In.Controllers
             return RedirectToAction($"QuestionDetail", new { id = questionId });
         }
 
-        //[HttpPost]
+
         //public async Task<IActionResult> SearchTag(string text)
         //{
         //    @ViewBag.UName = HttpContext.Session.GetString("Name");
-           
+        //    text = text.ToLower();
         //    //Check User Profile is complete or not
         //    var user = await _userManager.GetCurrentUser(HttpContext);
         //    var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
         //    if (userPersonalRow != null)
         //    {
         //        //var QuestionList = _context.UserQuestion.Where(x => x.Description.ToLower().Contains(text) || x.Title.ToLower().Contains(text)).Select(c => new UserQuestion { ApplicationUser = c.ApplicationUser, PostTime = c.PostTime, Tag = c.Tag, UserQuestionId = c.UserQuestionId, UserId = c.UserId, Title = c.Title, Description = HttpUtility.HtmlDecode(c.Description) }).ToList();
-        //        //var result = _context.QuestionSkill.Where(a => a.SkillTag.SkillName.Contains(text)).Select(f => new QuestionSkill { SkillTag = f.SkillTag, QuestionSkillId = f.QuestionSkillId, SkillTagId = f.SkillTagId, UserQuestionId = f.UserQuestionId ,UserQuestion=f.UserQuestion });
-        //        var res = _context.UserQuestion.Where(q => q.Tag.ToString().Contains(text)).Select(f => new UserQuestion { Title = f.Title, Tag = f.Tag, Description = HttpUtility.HtmlDecode(f.Description), ApplicationUser=f.ApplicationUser,PostTime=f.PostTime, }).ToList();
-        //        return View("Index", res);
+        //        var questionList = _context.UserQuestion.Where(x => x.Tag.Contains(text.ToString()))
+        //         .Select(c => new NewQuestionVM
+        //         {
+        //             UserQuestionId = c.UserQuestionId,
+        //             Title = c.Title,
+        //             PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.FirstName).SingleOrDefault(),
+        //             UserPic = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.ProfileImage).SingleOrDefault(),
+        //             PostTime = c.PostTime,
+        //             HasVerifiedAns = c.HasVerifiedAns,
+        //             Visitors = _context.QuestionVisitor.Where(f => f.QuestionId == c.UserQuestionId).Count(),
+        //             Tags = c.Tag.Select(t => new QuestionTagViewModel
+        //             {
+        //                 SkillName = t.SkillTag.SkillName
+        //             }).ToList(),
+        //             Voting = c.UserQAVoting.Sum(x => x.Value)
+
+        //         }).ToList();
+        //        return View("Index", questionList);
 
         //    }
         //    else
@@ -544,6 +576,69 @@ namespace Tech_In.Controllers
         //    }
         //}
 
+        public async Task<IActionResult> MyPostedQuestion()
+        {
 
+
+            //Check User Profile is complete or not
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
+            var questionList = _context.UserQuestion.Where(u=> u.UserId == user.Id)
+                    .Select(c => new NewQuestionVM
+                    {
+                        UserQuestionId = c.UserQuestionId,
+                        Title = c.Title,
+                        PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.FirstName).SingleOrDefault(),
+                        UserPic = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.ProfileImage).SingleOrDefault(),
+                        PostTime = c.PostTime,
+                        HasVerifiedAns = c.HasVerifiedAns,
+                        Visitors = _context.QuestionVisitor.Where(f => f.QuestionId == c.UserQuestionId).Count(),
+                        Tags = c.Tag.Select(t => new QuestionTagViewModel
+                        {
+                            SkillName = t.SkillTag.SkillName
+                        }).ToList(),
+                        Voting = c.UserQAVoting.Sum(x => x.Value)
+
+                    }).ToList();
+
+            if (userPersonalRow == null)
+            {
+                return RedirectToAction("CompleteProfile", "Home");
+            }
+
+            @ViewBag.UName = HttpContext.Session.GetString("Name");
+            return View(questionList);
+        }
+        
+        public async Task<IActionResult> EditQuestion(int Id)
+        {
+            NewQuestionVM vm = new NewQuestionVM();
+            if (Id > 0)
+            {
+                string userId = HttpContext.Session.GetString("UserId");
+
+                UserQuestion userQuestion = _context.UserQuestion.SingleOrDefault(x => x.UserQuestionId == Id && x.UserId == userId);
+                vm.Title = userQuestion.Title;
+                vm.Description = userQuestion.Description;
+                 
+             }
+            return View("Detail");
+        }
+
+        public async Task<JsonResult> DeleteQuestion(int Id)
+        {
+            string userId = HttpContext.Session.GetString("UserId");
+            bool result = false;
+            UserQuestion userQuestion = _context.UserQuestion.SingleOrDefault(x => x.UserQuestionId == Id && x.UserId == userId);
+            if (userQuestion != null)
+            {
+                _context.Remove(userQuestion);
+                _context.SaveChanges();
+                result = true;
+            }
+
+            return Json(result);
+        }
+        
     }
 }

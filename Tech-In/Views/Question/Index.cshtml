@@ -58,7 +58,7 @@ else
                                 <span class="widget-tags-sm">
                                     @foreach (var tag in question.Tags)
             {
-                        <a href="#">@tag.SkillName</a>
+                        <a href="/Question/SearchTag/@tag.SkillName">@tag.SkillName</a>
 }
                                 </span>
                                 <p class="inline small-font margintop6 float-right"><i class="fa fa-clock-o"></i> @question.PostTime <a><i class="fa fa-user">@question.PostedBy</i></a></p>

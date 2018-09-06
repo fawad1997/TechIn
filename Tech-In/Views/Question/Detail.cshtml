@@ -81,9 +81,9 @@
                             <div class="blog-tags col-lg-9 col-md-9 col-xs-8">
                                 <div class="widget-tags" style="width:auto;">
                                     @foreach (var Tags in ViewBag.QuestionList.Tags)
-                                    {
-                                        <a href="#">@Tags.SkillName</a>
-                                    }
+                    {
+                        <a href="#">@Tags.SkillName</a>
+    }
                                 </div>
                                 @*<input name='tags' readonly value='@ViewBag.QuestionList.Tags'>*@
                             </div>
@@ -91,13 +91,13 @@
                             <div style="margin-top:30px; text-align:left;" class="grey-back float-right col-lg-3 col-md-3 col-xs-4">
                                 <div class="row">
                                     @if (@ViewBag.QuestionList.UserPic == null)
-                                    {
-                                        <img class="pull-left" style="height:40px;width:40px; margin-left:8%;margin-right:1%;" src="~/images/noimg.svg" />
-                                    }
-                                    else
-                                    {
-                                        <img class="pull-left" style="height:40px;width:40px; margin-left:8%;margin-right:1%;" src="@ViewBag.QuestionList.UserPic" />
-                                    }
+                    {
+                        <img class="pull-left" style="height:40px;width:40px; margin-left:8%;margin-right:1%;" src="~/images/noimg.svg" />
+    }
+    else
+    {
+                <img class="pull-left" style="height:40px;width:40px; margin-left:8%;margin-right:1%;" src="@ViewBag.QuestionList.UserPic" />
+}
 
                                     <span><i class="fa fa-clock-o"></i> @ViewBag.QuestionList.PostTime.ToString("yyyy-mm-dd")</span>
                                     <br />
@@ -112,13 +112,13 @@
                     <hr width=100% color="black" />
                     <!--Comments -->
                     @foreach (var comment in ViewBag.QuestionList.Comment)
-                    {
-                        <div class="row">
-                            <div class="col-sm-11 float-right">
-                                <strong><a> @comment.PostedBy</a> :</strong> @comment.Description
-                            </div>
-                        </div>
-                    }
+    {
+                <div class="row">
+                    <div class="col-sm-11 float-right">
+                        <strong><a> @comment.PostedBy</a> :</strong> @comment.Description
+                    </div>
+                </div>
+}
                     <button class="btn-link" id="showComment">add a comment</button>
                     <form id="commentForm" style="display:none;" method="post">
                         <div class="row">
@@ -143,65 +143,65 @@
                     <h4>Answers (@ViewBag.QuestionList.Answers.Count)</h4>
                     <hr width=100% color="black" />
                     @foreach (var answer in ViewBag.QuestionList.Answers)
+    {
+                <div class="row">
+                    @* Left Question Vote *@
+                    <div class="col-xs-2 col-md-1">
+                        <center>
+                            <form method="post">
+                                <div class="row">
+                                    <a href="/Question/UpVote/@ViewBag.QuestionId?isQuestion=false&ans=@answer.UserQAnswerId" id="triangle-up"></a>
+                                </div>
+                                <br /><br />
+                                <div class="row">
+                                    <strong class="lg-font">@(answer.Votes != null ? answer.Votes : 0)</strong>
+                                </div>
+                                <br /><br />
+                                <div class="row">
+                                    <a href="/Question/DownVote/@ViewBag.QuestionId?isQuestion=false&ans=@answer.UserQAnswerId" id="triangle-down"></a>
+                                </div>
+                                <div class="row">
+                                    @if (ViewBag.ShowTick)
                     {
-                        <div class="row">
-                            @* Left Question Vote *@
-                            <div class="col-xs-2 col-md-1">
-                                <center>
-                                    <form method="post">
-                                        <div class="row">
-                                            <a href="/Question/UpVote/@ViewBag.QuestionId?isQuestion=false&ans=@answer.UserQAnswerId" id="triangle-up"></a>
-                                        </div>
-                                        <br /><br />
-                                        <div class="row">
-                                            <strong class="lg-font">@(answer.Votes != null ? answer.Votes : 0)</strong>
-                                        </div>
-                                        <br /><br />
-                                        <div class="row">
-                                            <a href="/Question/DownVote/@ViewBag.QuestionId?isQuestion=false&ans=@answer.UserQAnswerId" id="triangle-down"></a>
-                                        </div>
-                                        <div class="row">
-                                            @if (ViewBag.ShowTick)
-                                            {
-                                                <a id="verifyAns" href="/Question/VerifyAnswer?ansId=@answer.UserQAnswerId&questionId=@ViewBag.QuestionId">
-                                                    <i class="fa fa-check fa-3x" aria-hidden="true"></i>
-                                                </a>
-                                            }
-                                            else if (@answer.IsVerified)
-                                            {
-                                                <a id="verifyAnsGreen" href="#">
-                                                    <i class="fa fa-check fa-3x" aria-hidden="true"></i>
-                                                </a>
+                        <a id="verifyAns" href="/Question/VerifyAnswer?ansId=@answer.UserQAnswerId&questionId=@ViewBag.QuestionId">
+                            <i class="fa fa-check fa-3x" aria-hidden="true"></i>
+                        </a>
+    }
+    else if (@answer.IsVerified)
+    {
+                <a id="verifyAnsGreen" href="#">
+                    <i class="fa fa-check fa-3x" aria-hidden="true"></i>
+                </a>
 
-                                            }
-                                        </div>
-                                    </form>
-                                </center>
-                            </div>
-                            <div class="col-xs-10 col-md-11" style="word-wrap: break-word;">
-                                @Html.Raw(answer.Description)
-                            </div>
-                        </div>
-                        <div style="text-align:left;" class="grey-back float-right col-lg-4 col-md-4 col-xs-5">
-                            <div class="row">
-                                @if (@ViewBag.QuestionList.UserPic == null)
-                                {
-                                    <img class="pull-left" style="height:40px;width:40px; margin-left:8%;margin-right:1%;" src="~/images/noimg.svg" />
-                                }
-                                else
-                                {
-                                    <img class="pull-left" style="height:40px;width:40px; margin-left:8%;margin-right:1%;" src="@ViewBag.QuestionList.UserPic" />
-                                }
+}
+                                </div>
+                            </form>
+                        </center>
+                    </div>
+                    <div class="col-xs-10 col-md-11" style="word-wrap: break-word;">
+                        @Html.Raw(answer.Description)
+                    </div>
+                </div>
+                <div style="text-align:left;" class="grey-back float-right col-lg-4 col-md-4 col-xs-5">
+                    <div class="row">
+                        @if (@ViewBag.QuestionList.UserPic == null)
+        {
+                <img class="pull-left" style="height:40px;width:40px; margin-left:8%;margin-right:1%;" src="~/images/noimg.svg" />
+}
+else
+{
+                <img class="pull-left" style="height:40px;width:40px; margin-left:8%;margin-right:1%;" src="@ViewBag.QuestionList.UserPic" />
+}
 
-                                <span><i class="fa fa-clock-o"></i>  @answer.Date.ToString("yyyy-MM-dd / hh:mm")</span>
-                                <br />
-                                <strong>@answer.User</strong>
+                        <span><i class="fa fa-clock-o"></i>  @answer.Date.ToString("yyyy-MM-dd / hh:mm")</span>
+                        <br />
+                        <strong>@answer.User</strong>
 
-                            </div>
-                        </div>
-                        <br /><br /><br />
-                        <hr />
-                    }
+                    </div>
+                </div>
+                <br /><br /><br />
+                <hr />
+}
 
 
                     <h4>Your Answer</h4>
