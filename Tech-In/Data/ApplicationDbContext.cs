@@ -39,7 +39,14 @@ namespace Tech_In.Data
         public DbSet<UserSkill> UserSkill { get; set; }
         public DbSet<QuestionSkill> QuestionSkill { get; set; }
         public DbSet<QuestionVisitor> QuestionVisitor { get; set; }
-
+        //Article Module
+        public DbSet<Article> Article { get; set; }
+        public DbSet<ArticleComment> ArticleComment { get; set; }
+        public DbSet<ArticleVisitor> ArticleVisitor { get; set; }
+        public DbSet<ArticleTag> ArticleTag { get; set; }
+        public DbSet<Category> Category { get; set; }
+        public DbSet<ArticleCategory> ArticleCategory { get; set; }
+        public DbSet<AIUserInterest> AIUserInterest { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

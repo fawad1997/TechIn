@@ -216,6 +216,166 @@ namespace Tech_In.Migrations
                     b.ToTable("Country");
                 });
 
+            modelBuilder.Entity("Tech_In.Models.Database.AIUserInterest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("Count");
+
+                    b.Property<int>("TagId");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TagId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AIUserInterest");
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.Article", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ArticleBody")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(MAX)");
+
+                    b.Property<string>("ArticleImg");
+
+                    b.Property<DateTime>("CreateTime");
+
+                    b.Property<int>("OriginalId");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(8);
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(150);
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Article");
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.ArticleCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("ArticleId");
+
+                    b.Property<int>("CategoryId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArticleId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("ArticleCategory");
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.ArticleComment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("ArticleId");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasMaxLength(300);
+
+                    b.Property<DateTime>("CreateTime");
+
+                    b.Property<int>("OriginalId");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(8);
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArticleId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ArticleComment");
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.ArticleTag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("ArticleId");
+
+                    b.Property<int>("TagId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArticleId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("ArticleTag");
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.ArticleVisitor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("ArticleId");
+
+                    b.Property<bool>("IsLoggedIn");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(300);
+
+                    b.Property<string>("UserIp")
+                        .HasMaxLength(100);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArticleId");
+
+                    b.ToTable("ArticleVisitor");
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("ActiveStatus");
+
+                    b.Property<string>("AddedBy");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AddedBy");
+
+                    b.ToTable("Category");
+                });
+
             modelBuilder.Entity("Tech_In.Models.Database.QuestionSkill", b =>
                 {
                     b.Property<int>("QuestionSkillId")
@@ -673,6 +833,78 @@ namespace Tech_In.Migrations
                         .WithMany("Cities")
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.AIUserInterest", b =>
+                {
+                    b.HasOne("Tech_In.Models.Database.SkillTag", "TagRef")
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Tech_In.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.Article", b =>
+                {
+                    b.HasOne("Tech_In.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.ArticleCategory", b =>
+                {
+                    b.HasOne("Tech_In.Models.Database.Article", "ArticleRef")
+                        .WithMany()
+                        .HasForeignKey("ArticleId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Tech_In.Models.Database.Category", "CategoryRef")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.ArticleComment", b =>
+                {
+                    b.HasOne("Tech_In.Models.Database.Article", "ArticleRef")
+                        .WithMany()
+                        .HasForeignKey("ArticleId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Tech_In.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.ArticleTag", b =>
+                {
+                    b.HasOne("Tech_In.Models.Database.Article", "ArticleRef")
+                        .WithMany()
+                        .HasForeignKey("ArticleId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Tech_In.Models.Database.SkillTag", "TagRef")
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.ArticleVisitor", b =>
+                {
+                    b.HasOne("Tech_In.Models.Database.Article", "ArticleRef")
+                        .WithMany()
+                        .HasForeignKey("ArticleId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.Category", b =>
+                {
+                    b.HasOne("Tech_In.Models.ApplicationUser", "UserRef")
+                        .WithMany()
+                        .HasForeignKey("AddedBy");
                 });
 
             modelBuilder.Entity("Tech_In.Models.Database.QuestionSkill", b =>

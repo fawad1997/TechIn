@@ -1,22 +1,18 @@
-﻿
+﻿@model Tech_In.Models.ViewModels.ArticleViewModels.NewArticleVM
 @{
     ViewData["Title"] = "ArticleSingle";
 }
-
 <!-- Blog -->
 <div id="blog" class="section md-padding">
-
     <!-- Container -->
     <div class="container">
-
         <!-- Row -->
         <div class="row">
-
             <!-- Main -->
             <main id="main" class="col-md-9">
                 <div class="blog">
                     <div class="blog-img">
-                        <img class="img-responsive" src="~/images/blog-post.jpg" alt="">
+                        <img class="img-responsive" style="height:450px;width:100%;" src="@Model.ArticleImg" alt="">
                     </div>
                     <div class="blog-content">
                         <ul class="blog-meta">
@@ -30,14 +26,11 @@
                                 <i class="fa fa-comments"></i>57
                             </li>
                         </ul>
-                        <h3>Publish article on TechIn</h3>
+                        <h3>@Model.Title</h3>
                         <p>
-                            Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem
-                            ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum.
-                            Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi.
+                            @Html.Raw(Model.ArticleBody)
                         </p>
                     </div>
-
                     <!-- blog tags -->
                     <div class="blog-tags">
                         <h5>Tags :</h5>
@@ -87,7 +80,6 @@
                         </div>
                     </div>
                     <!-- /blog author -->
-
                     <div id="froala-editor">
                         <p>The buttons below will destroy and init the rich text editor again.</p>
                     </div>
@@ -95,7 +87,6 @@
                         <a id="btn-destroy" href="#" class="btn r-btn highlight text-small">Destroy</a>
                         <a id="btn-init" href="#" class="btn r-btn text-small">Init</a>
                     </p>
-
 
                     <script>
                         $(function () {
@@ -124,7 +115,6 @@
                     <!-- blog comments -->
                     <div class="blog-comments">
                         <h3 class="title">(1) Comments</h3>
-
                         <!-- comment -->
                         <div class="media">
                             <div class="media-left">
@@ -146,7 +136,6 @@
                             </div>
                         </div>
                         <!-- /comment -->
-
                     </div>
                     <!-- /blog comments -->
                     <!-- reply form -->
@@ -163,7 +152,6 @@
             <!-- /Main -->
             <!-- Aside -->
             <aside id="aside" class="col-md-3">
-
                 <!-- Search -->
                 <div class="widget">
                     <div class="widget-search">
@@ -196,7 +184,6 @@
                 <!-- Posts sidebar -->
                 <div class="widget">
                     <h3 class="title">Populare Posts</h3>
-
                     <!-- single post -->
                     <div class="widget-post">
                         <a href="#">
@@ -227,7 +214,6 @@
                         </ul>
                     </div>
                     <!-- /single post -->
-
                 </div>
                 <!-- /Posts sidebar -->
                 <!-- Tags -->
@@ -242,15 +228,11 @@
                     </div>
                 </div>
                 <!-- /Tags -->
-
             </aside>
             <!-- /Aside -->
-
         </div>
         <!-- /Row -->
-
     </div>
     <!-- /Container -->
-
 </div>
 <!-- /Blog -->
