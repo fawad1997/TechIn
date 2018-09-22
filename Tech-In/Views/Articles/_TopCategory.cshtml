@@ -1,0 +1,17 @@
+﻿@model List<Tech_In.Models.ViewModels.ArticleViewModels.TopCategoryVM>
+@{
+    Layout = null;
+}
+
+<div class="widget">
+    <h3 class="title">Top Categories</h3>
+    <div class="widget-category">
+        @foreach (var category in Model)
+    {
+        <a href="/articles/searchbycategory/@category.CategoryId">
+            @category.CategoryName
+            <span>(@category.Count)</span>
+        </a>
+}
+    </div>
+</div>

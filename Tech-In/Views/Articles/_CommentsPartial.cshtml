@@ -1,0 +1,40 @@
+﻿@model List<Tech_In.Models.ViewModels.ArticleViewModels.CommentVM>
+@{
+    Layout = null;
+}
+@*
+
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+<div class="blog-comments">
+    <h3 class="title">(@Model.Count) Comments</h3>
+    @foreach (var singleComment in Model)
+    {
+
+        <!-- comment -->
+        <div class="media">
+            <div class="media-left col-xs-2">
+                <img style="height:70px;" class="media-object" src="@singleComment.UserImg" alt="">
+            </div>
+            <div class="media-right">
+                <div class="media-body">
+                    <h4 class="media-heading">
+                        <a style="color: black;text-decoration: none;" href="/User/@singleComment.UserId">@singleComment.UserName</a>
+
+                        <span class="time">@singleComment.GetPastTime()</span>
+        @*<a href="#" class="reply">
+            Reply
+            <i class="fa fa-reply"></i>
+        </a>*@
+                    </h4>
+                    <p>
+                        @singleComment.Comment
+                    </p>
+                </div>
+            </div>
+
+        </div>
+        <!-- /comment -->
+
+    }
+</div>

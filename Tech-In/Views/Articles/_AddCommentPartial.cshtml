@@ -1,0 +1,12 @@
+﻿@model Tech_In.Models.ViewModels.ArticleViewModels.AddCommentVM
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+<div class="reply-form">
+    <h3 class="title">Leave a reply</h3>
+    <form asp-controller="Articles" asp-action="AddComment">
+        <input asp-for="ArticleId" type="hidden" value="@Model.ArticleId" />
+        <textarea asp-for="Comment" placeholder="Add Your Commment"></textarea>
+        <button type="submit" class="main-btn">Submit</button>
+    </form>
+</div>

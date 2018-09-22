@@ -1,0 +1,23 @@
+﻿@model List<Tech_In.Models.ViewModels.ArticleViewModels.PopularPostVM>
+@{
+    Layout = null;
+}
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+<div class="widget">
+    <h3 class="title">Populare Posts</h3>
+    <!-- single post -->
+    @foreach (var post in Model)
+    {
+        <div class="widget-post">
+            <a href="/Article/@post.ArticleId/@post.ArticleTitle">
+                <img style="height:60px;width:85px;" src="@post.ArticleImage" alt=""> @post.ArticleTitle
+            </a>
+            <ul class="blog-meta">
+                <li>@post.CreateTime.ToString("MMM dd, yyyy")</li>
+            </ul>
+        </div>
+    }
+    <!-- /single post -->
+</div>

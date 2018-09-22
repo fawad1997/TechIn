@@ -15,6 +15,8 @@ namespace Tech_In.Extensions
         {
             CreateMap<UserEducation, EducationVM>().ReverseMap();
             CreateMap<Article, NewArticleVM>().ReverseMap();
+            CreateMap<Article, SingleArticleVM>().ReverseMap();
+            CreateMap<ArticleComment, CommentVM>().ReverseMap();
         }
     }
 }

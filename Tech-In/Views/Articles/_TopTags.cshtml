@@ -1,0 +1,16 @@
+﻿@model List<Tech_In.Models.ViewModels.ArticleViewModels.TopTagVM>
+@{
+    Layout = null;
+}
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+<div class="widget">
+    <h3 class="title">Top Tags</h3>
+    <div class="widget-tags">
+        @foreach (var tag in Model)
+    {
+        <a href="/Articles/SearchByTag/@tag.Id">@tag.TagName (@tag.Count)</a>
+}
+    </div>
+</div>

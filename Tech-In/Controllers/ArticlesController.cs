@@ -40,13 +40,9 @@ namespace Tech_In.Controllers
         {
             return View();
         }
-
-        public IActionResult ArticleSingle()
-        {
-            return View();
-        }
-        [HttpGet("article/{id}/{title}", Name = "Display")]
-        public IActionResult Display(int id,string title)
+        
+        [HttpGet("Article/{id}/{title}", Name = "ArticleSingle")]
+        public IActionResult ArticleSingle(int id,string title)
         {
             var article = _context.Article.Where(x => x.Id == id).SingleOrDefault();
             if (article == null)
@@ -58,9 +54,25 @@ namespace Tech_In.Controllers
             {
                 // If the title is null, empty or does not match the friendly title, return a 301 Permanent
                 // Redirect to the correct friendly URL.
-                return this.RedirectToRoutePermanent("Display", new { id = id, title = friendlyTitle });
+                return this.RedirectToRoutePermanent("ArticleSingle", new { id = id, title = friendlyTitle });
             }
-            var articleVM = _mapper.Map<NewArticleVM>(article);
+            var articleVM = _mapper.Map<SingleArticleVM>(article);
+            //Get Article Tags Ids
+            var arttags = _context.ArticleTag.Where(tg => tg.ArticleId == article.Id).ToList();
+            articleVM.Tags = new List<SkillTag>();
+            foreach(var arttag in arttags)
+            {
+                var singleTag = _context.SkillTag.Where(sktag => sktag.SkillTagId == arttag.TagId).SingleOrDefault();
+                articleVM.Tags.Add(singleTag);
+            }
+            //Author
+            var author = _context.UserPersonalDetail.Where(usr => usr.UserId == article.UserId).SingleOrDefault();
+            articleVM.AuthorId = article.UserId;
+            articleVM.AuthorImg = author.ProfileImage;
+            articleVM.AuthorName = author.FirstName + " " + author.LastName;
+            articleVM.AuthorSummary = author.Summary;
+            articleVM.CommentsCount = _context.ArticleComment.Where(cmt => cmt.ArticleId == article.Id).Count();
+            articleVM.VisitorsCount = _context.ArticleVisitor.Where(av => av.ArticleId == article.Id).Count();
             return View("ArticleSingle",articleVM);
         }
         [Authorize]
@@ -127,7 +139,7 @@ namespace Tech_In.Controllers
                 _context.ArticleCategory.Add(articleCategory);
                 article.OriginalId = article.Id;
                 _context.SaveChanges();
-                return RedirectToAction($"Display", new { id = article.Id,title = article.Title});
+                return RedirectToAction($"ArticleSingle", new { id = article.Id,title = article.Title});
             }
             return View(vm);
         }
@@ -188,6 +200,147 @@ namespace Tech_In.Controllers
                 }
             }
             return BadRequest();
+        }
+
+        [Authorize]
+        public async Task<IActionResult> AddComment(AddCommentVM vm)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetCurrentUser(HttpContext);
+                var comment = new ArticleComment {
+                    ArticleId = vm.ArticleId,
+                    Comment = vm.Comment,
+                    CreateTime = DateTime.Now,
+                    Status = "active",
+                    OriginalId = 0,
+                    UserId = user.Id
+                };
+                _context.ArticleComment.Add(comment);
+                _context.SaveChanges();
+            }
+            return View("ArticleSingle");
+        }
+        [HttpPost]
+        public IActionResult Comments(int articleId)
+        {
+            var comments = _context.ArticleComment.Where(art => art.ArticleId == articleId).Select(x => new CommentVM { Comment = x.Comment, CreateTime = x.CreateTime, Id = x.Id, Status = x.Status, UserId = x.UserId }).ToList();
+            foreach(var cmt in comments)
+            {
+                var commentAuthor = _context.UserPersonalDetail.Where(y => y.UserId == cmt.UserId).SingleOrDefault();
+                cmt.UserImg = commentAuthor.ProfileImage;
+                cmt.UserName = commentAuthor.FirstName + " " + commentAuthor.LastName;
+            }
+            //return Json(new { success = true, response = comments });
+            return View("_CommentsPartial",comments);
+        }
+        public async Task<IActionResult> ArticleViews(int articleId)
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            if (user != null)
+            {
+                var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
+                if (userPersonalRow == null)
+                {
+                    return RedirectToAction("CompleteProfile", "Home");
+                }
+                //If Registered Visitor Counter
+                ArticleVisitor isVisited = _context.ArticleVisitor.Where(qv => qv.UserId == user.Id && qv.ArticleId == articleId).SingleOrDefault();
+                if (isVisited == null)
+                {
+                    _context.ArticleVisitor.Add(new ArticleVisitor
+                    {
+                        ArticleId = articleId,
+                        UserId = user.Id,
+                        IsLoggedIn = true,
+                        UserIp = null
+                    });
+                    _context.SaveChanges();
+                }
+                var articleTags = _context.ArticleTag.Where(at => at.ArticleId == articleId).ToList();
+                foreach(var tag in articleTags)
+                {
+                    var userInterestedTag = _context.AIUserInterest.Where(uit => uit.TagId == tag.TagId).SingleOrDefault();
+                    if (userInterestedTag == null)
+                    {
+                        AIUserInterest userLikeTag = new AIUserInterest
+                        {
+                            TagId = tag.TagId,
+                            UserId = user.Id,
+                            Count = 1
+                        };
+                        _context.AIUserInterest.Add(userLikeTag);
+                    }
+                    else
+                    {
+                        userInterestedTag.Count = userInterestedTag.Count + 1;
+                    }
+                    _context.SaveChanges();
+                }
+            }
+            else
+            {//If Anonomus Visitor Counter
+                string currentUserIp = _accessor.HttpContext.Connection.RemoteIpAddress.ToString();
+                ArticleVisitor isVisited = _context.ArticleVisitor.Where(qv => qv.UserIp == currentUserIp && qv.ArticleId == articleId).SingleOrDefault();
+                if (isVisited == null)
+                {
+                    _context.ArticleVisitor.Add(new ArticleVisitor
+                    {
+                        ArticleId = articleId,
+                        UserId = null,
+                        IsLoggedIn = false,
+                        UserIp = currentUserIp
+                    });
+                    _context.SaveChanges();
+                }
+            }//If Anonomus Visitor Ends Here
+            return Ok();
+        }
+
+        public IActionResult TopCategories()
+        {
+            var topCatg = _context.ArticleCategory.GroupBy(o => new { o.CategoryId }).Select(g => new TopCategoryVM
+            {
+                CategoryId = g.Key.CategoryId,
+                Count = g.Count()
+            }).OrderByDescending(o=>o.Count).Take(5).ToList();
+            foreach(var category in topCatg)
+            {
+                category.CategoryName = _context.Category.Where(x => x.Id == category.CategoryId).Select(y=>y.Title).SingleOrDefault();
+            }
+            return View("_TopCategory",topCatg);
+        }
+
+        public IActionResult PopularPosts()
+        {
+            var topPosts = _context.ArticleVisitor.GroupBy(o => new { o.ArticleId }).Select(m => new PopularPostVM
+            {
+                ArticleId = m.Key.ArticleId,
+                VisitorCount = m.Count()
+            }).OrderByDescending(o => o.VisitorCount).Take(3).ToList();
+            foreach(var post in topPosts)
+            {
+                var article = _context.Article.Where(x => x.Id == post.ArticleId).SingleOrDefault();
+                post.ArticleImage = article.ArticleImg;
+                post.ArticleTitle = article.Title;
+                post.CreateTime = article.CreateTime;
+            }
+            return View("_PopularPosts",topPosts);
+        }
+
+        public IActionResult TopTags()
+        {
+            var topTags = _context.ArticleTag.GroupBy(o => new { o.TagId }).Select(m => new TopTagVM
+            {
+                Id = m.Key.TagId,
+                Count = m.Count()
+            }).OrderByDescending(o => o.Count).Take(5).ToList();
+            foreach(var tagCountID in topTags)
+            {
+                var tag = _context.SkillTag.Where(x => x.SkillTagId == tagCountID.Id).SingleOrDefault();
+                tagCountID.TagName = tag.SkillName;
+            }
+            return View("_TopTags",topTags);
         }
     }
 }
