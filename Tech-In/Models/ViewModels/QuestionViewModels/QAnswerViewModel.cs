@@ -18,6 +18,8 @@ namespace Tech_In.Models.ViewModels.QuestionViewModels
         public int Votes { get; set; }
         public Boolean IsVerified { get; set; }
         public string User { get; set; }
+
+        public ICollection<NewQuestionVM> UserQuestion { get; set; }
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-mm-dd}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }

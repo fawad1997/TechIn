@@ -22,7 +22,6 @@ namespace Tech_In.Models.Database
         public Boolean IsVerified { get; set; }
 
         public int UserQuestionId { get; set; }
-
         
         //ApNetUser
         public string UserId { get; set; }

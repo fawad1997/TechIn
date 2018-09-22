@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -13,6 +14,7 @@ using Tech_In.Models;
 using Tech_In.Models.Database;
 using Tech_In.Models.Model;
 using Tech_In.Models.ViewModels.ProfileViewModels;
+using Tech_In.Models.ViewModels.QuestionViewModels;
 using Tech_In.Services;
 
 namespace Tech_In.Controllers
@@ -71,6 +73,52 @@ namespace Tech_In.Controllers
 
             PVM.PublicationVMListJP = _context.UserPublication.Where(x => x.UserId == user.Id && x.ConferenceOrJournal==false).Select(c => new PublicationVM { Title = c.Title, PublishYear = c.PublishYear, Description = c.Description, ConferenceOrJournal = c.ConferenceOrJournal, UserPublicationId = c.UserPublicationId });
             PVM.PublicationVMListCP = _context.UserPublication.Where(x => x.UserId == user.Id && x.ConferenceOrJournal == true).Select(c => new PublicationVM { Title = c.Title, PublishYear = c.PublishYear, Description = c.Description, ConferenceOrJournal = c.ConferenceOrJournal, UserPublicationId = c.UserPublicationId });
+
+            //Question
+            var questionList = _context.UserQuestion.Where(u => u.UserId == user.Id).Select(c => new NewQuestionVM{
+                UserQuestionId = c.UserQuestionId,
+                Title = c.Title,
+                PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.FirstName).SingleOrDefault(),
+                UserPic = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.ProfileImage).SingleOrDefault(),
+                PostTime = c.PostTime,
+                HasVerifiedAns = c.HasVerifiedAns,
+                Visitors = _context.QuestionVisitor.Where(f => f.QuestionId == c.UserQuestionId).Count(),
+                Tags = c.Tag.Select(t => new QuestionTagViewModel{SkillName = t.SkillTag.SkillName }).ToList(),
+                Voting = c.UserQAVoting.Sum(x => x.Value)
+            }).ToList();
+            var comments = _context.UserQAComment.Where(q => q.UserId == user.Id).Select(s => new QACommentsViewModel 
+            {
+                Description = s.Description,
+                
+                UserQuestionId = s.UserQuestionId,
+                IsAnswer= s.IsAnswer,
+                PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == s.UserId).Select(z => z.FirstName).SingleOrDefault(),
+                UserId = user.Id,
+            }).ToList();
+
+            var answers = _context.UserQAnswer.Where(f => f.UserId == user.Id).Select(k => new QAnswerViewModel
+            {
+                Description = HttpUtility.HtmlDecode(k.Description),
+                Date =k.PostTime,
+                IsVerified =k.IsVerified,
+                User = user.Id,
+                UserQAnswerId =k.UserQAnswerId,
+                UserQuestion = _context.UserQuestion.Where(g=> g.UserQuestionId == k.UserQuestionId).Select(j=> new NewQuestionVM
+                {
+                    UserQuestionId = j.UserQuestionId,
+                    Title = j.Title,
+                    PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == j.UserId).Select(z => z.FirstName).SingleOrDefault(),
+                    UserPic = _context.UserPersonalDetail.Where(aa => aa.UserId == j.UserId).Select(z => z.ProfileImage).SingleOrDefault(),
+                    PostTime = j.PostTime,
+                    HasVerifiedAns = j.HasVerifiedAns,
+                    Visitors = _context.QuestionVisitor.Where(f => f.QuestionId == j.UserQuestionId).Count(),
+                    Tags = j.Tag.Select(t => new QuestionTagViewModel { SkillName = t.SkillTag.SkillName }).ToList()
+                }).ToList(),
+            }).ToList();
+
+            ViewBag.answer = answers;
+            ViewBag.comment = comments;
+            ViewBag.question = questionList;
             @ViewBag.UName = HttpContext.Session.GetString("Name");
             return View(PVM);
         }
