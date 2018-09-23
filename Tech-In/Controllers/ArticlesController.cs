@@ -65,26 +65,12 @@ namespace Tech_In.Controllers
                                   CommentsCount = _context.ArticleComment.Where(cmt => cmt.ArticleId == art.OriginalId).Count()
                               }
                               ).Take(10);
-            //var article = _context.Article.Where(stat=>stat.Status=="active");
             if (!String.IsNullOrEmpty(search))
             {
                 articel = articel.Where(s => s.Title.Contains(search));
             }
-            //var articleVM = new List<SingleArticleVM>();
-            //articleVM = _mapper.Map<List<SingleArticleVM>>(article);
-            //foreach(var singleVM in articleVM)
-            //{
-            //    //Author
-            //    var author = _context.UserPersonalDetail.Where(usr => usr.UserId == singleVM.AuthorId).SingleOrDefault();
-            //    singleVM.AuthorImg = author.ProfileImage;
-            //    singleVM.AuthorName = author.FirstName + " " + author.LastName;
-            //    singleVM.CommentsCount = _context.ArticleComment.Where(cmt => cmt.ArticleId == singleVM.OriginalId).Count();
-            //    singleVM.VisitorsCount = _context.ArticleVisitor.Where(av => av.ArticleId == singleVM.OriginalId).Count();
-            //    singleVM.ArticleBody = singleVM.ArticleBody.Substring(0, 40);
-            //}
             int pageSize = 10;
             return View(new ArticleListVM { Articles = await PaginatedList<SingleArticleVM>.CreateAsync(articel.AsQueryable(), page ?? 1, pageSize) });
-            //return View(articleVM);
         }
         
         [HttpGet("Article/{id}/{title}", Name = "ArticleSingle")]
@@ -368,6 +354,72 @@ namespace Tech_In.Controllers
             return View("_ArticleEditHistory",vm);
         }
 
+        public async Task<IActionResult> SearchByTag(int Id,string search,int? page)
+        {
+            ViewData["CurrentFilter"] = search;
+            if (search != null)
+            {
+                page = 1;
+            }
+            var articel = (from tg in _context.ArticleTag
+                           join art in _context.Article on tg.ArticleId equals art.Id
+                           join u in _context.UserPersonalDetail on art.UserId equals u.UserId
+                           where tg.TagId.Equals(Id) && art.Status.Contains("active")
+                           orderby art.Id descending
+                           select new SingleArticleVM
+                           {
+                               Id = art.Id,
+                               AuthorId = u.UserId,
+                               Title = art.Title,
+                               ArticleBody = art.ArticleBody.Substring(0, 40),
+                               ArticleImg = art.ArticleImg,
+                               CreateTime = art.CreateTime,
+                               AuthorName = u.FirstName + " " + u.LastName,
+                               VisitorsCount = _context.ArticleVisitor.Where(av => av.ArticleId == art.OriginalId).Count(),
+                               CommentsCount = _context.ArticleComment.Where(cmt => cmt.ArticleId == art.OriginalId).Count()
+                           }
+                              ).Take(10);
+            if (!String.IsNullOrEmpty(search))
+            {
+                articel = articel.Where(s => s.Title.Contains(search));
+            }
+            int pageSize = 10;
+            return View("Index",new ArticleListVM { Articles = await PaginatedList<SingleArticleVM>.CreateAsync(articel.AsQueryable(), page ?? 1, pageSize) });
+        }
+
+        public async Task<IActionResult> SearchByCategory(int Id, string search, int? page)
+        {
+            ViewData["CurrentFilter"] = search;
+            if (search != null)
+            {
+                page = 1;
+            }
+            var articel = (from ct in _context.ArticleCategory
+                           join art in _context.Article on ct.ArticleId equals art.Id
+                           join u in _context.UserPersonalDetail on art.UserId equals u.UserId
+                           where ct.CategoryId.Equals(Id) && art.Status.Contains("active")
+                           orderby art.Id descending
+                           select new SingleArticleVM
+                           {
+                               Id = art.Id,
+                               AuthorId = u.UserId,
+                               Title = art.Title,
+                               ArticleBody = art.ArticleBody.Substring(0, 40),
+                               ArticleImg = art.ArticleImg,
+                               CreateTime = art.CreateTime,
+                               AuthorName = u.FirstName + " " + u.LastName,
+                               VisitorsCount = _context.ArticleVisitor.Where(av => av.ArticleId == art.OriginalId).Count(),
+                               CommentsCount = _context.ArticleComment.Where(cmt => cmt.ArticleId == art.OriginalId).Count()
+                           }
+                              ).Take(10);
+            if (!String.IsNullOrEmpty(search))
+            {
+                articel = articel.Where(s => s.Title.Contains(search));
+            }
+            int pageSize = 10;
+            return View("Index", new ArticleListVM { Articles = await PaginatedList<SingleArticleVM>.CreateAsync(articel.AsQueryable(), page ?? 1, pageSize) });
+        }
+
         [Authorize]
         public async Task<IActionResult> AddComment(AddCommentVM vm)
         {
@@ -508,6 +560,27 @@ namespace Tech_In.Controllers
                 tagCountID.TagName = tag.SkillName;
             }
             return View("_TopTags",topTags);
+        }
+        public async Task<IActionResult> AIUserInterests()
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            if (user == null)
+                return NotFound();
+            try
+            {
+                var userInterestedTag = _context.AIUserInterest.OrderByDescending(x => x.Count).FirstOrDefault();
+                var articleID = _context.ArticleTag.Where(a => a.TagId == userInterestedTag.TagId).Take(3).ToList();
+                List<SingleArticleVM> articles = new List<SingleArticleVM>();
+                foreach (var art in articleID)
+                {
+                    articles.Add(_context.Article.Where(b => b.Id == art.ArticleId).Select(c => new SingleArticleVM { ArticleImg = c.ArticleImg, Title = c.Title, Id = c.Id }).FirstOrDefault());
+                }
+                return View("_AIUserInterestedArticles", articles);
+            }
+            catch(Exception e)
+            {
+                return NotFound();
+            }
         }
     }
 }

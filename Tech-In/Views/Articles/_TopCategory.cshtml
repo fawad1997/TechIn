@@ -8,7 +8,7 @@
     <div class="widget-category">
         @foreach (var category in Model)
     {
-        <a href="/articles/searchbycategory/@category.CategoryId">
+        <a href="/Articles/SearchByCategory/@category.CategoryId">
             @category.CategoryName
             <span>(@category.Count)</span>
         </a>

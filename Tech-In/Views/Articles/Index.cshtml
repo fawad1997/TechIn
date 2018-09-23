@@ -9,37 +9,40 @@
         <!-- Row -->
         <div class="row">
             <div class="col-md-9">
-                @foreach (var singleArticle in Model.Articles)
-        {
-                <div style="margin-bottom:2%;" class="row">
-                    <div class="blog">
-                        <div class="blog-img col-sm-4">
-                            <img style="height:147px;width:262px;" src="@singleArticle.ArticleImg" alt="">
+
+                <div id="aiuserinterest"></div>
+                <!-- /Category -->
+            @foreach (var singleArticle in Model.Articles)
+{
+            <div style="margin-bottom:2%;" class="row">
+                <div class="blog">
+                    <div class="blog-img col-sm-4">
+                        <img style="height:147px;width:262px;" src="@singleArticle.ArticleImg" alt="">
+                    </div>
+                    <div class="col-sm-8">
+                        <h3 style="margin-bottom:0px;"><a style="color: black;text-decoration: none;" href="/Article/@singleArticle.Id/@singleArticle.Title">@singleArticle.Title </a></h3>
+                        <ul style="margin-bottom:4px;" class="blog-meta">
+                            <li>
+                                <i class="fa fa-user" title="Author"></i>@singleArticle.AuthorName
+                            </li>
+                            <li>
+                                <i class="fa fa-clock-o" title="Create Time"></i>@singleArticle.CreateTime.ToString("dd MMM")
+                            </li>
+                            <li>
+                                <i class="fa fa-comments" title="Comments"></i>@singleArticle.CommentsCount
+                            </li>
+                            <li>
+                                <i class="fa fa-eye" title="Article Visitors"></i>@singleArticle.VisitorsCount
+                            </li>
+                        </ul>
+                        <div style="word-wrap: break-word;">
+                            @Html.Raw(singleArticle.ArticleBody)...
                         </div>
-                        <div class="col-sm-8">
-                            <h3 style="margin-bottom:0px;"><a style="color: black;text-decoration: none;" href="/Article/@singleArticle.Id/@singleArticle.Title">@singleArticle.Title </a></h3>
-                            <ul style="margin-bottom:4px;" class="blog-meta">
-                                <li>
-                                    <i class="fa fa-user" title="Author"></i>@singleArticle.AuthorName
-                                </li>
-                                <li>
-                                    <i class="fa fa-clock-o" title="Create Time"></i>@singleArticle.CreateTime.ToString("dd MMM")
-                                </li>
-                                <li>
-                                    <i class="fa fa-comments" title="Comments"></i>@singleArticle.CommentsCount
-                                </li>
-                                <li>
-                                    <i class="fa fa-eye" title="Article Visitors"></i>@singleArticle.VisitorsCount
-                                </li>
-                            </ul>
-                            <div style="word-wrap: break-word;">
-                                @Html.Raw(singleArticle.ArticleBody)...
-                            </div>
-                            <a href="/Article/@singleArticle.Id/@singleArticle.Title">Read more</a>
-                        </div>
+                        <a href="/Article/@singleArticle.Id/@singleArticle.Title">Read more</a>
                     </div>
                 </div>
-        }
+            </div>
+}
             </div>
             <!-- Aside -->
             <aside id="aside" class="col-md-3">
@@ -98,5 +101,10 @@
         $("#categorytop").load("/articles/topcategories");
         $("#popularposts").load("/articles/popularposts");
         $("#toptags").load("/articles/toptags");
+
+
+        setTimeout(function () {
+            $("#aiuserinterest").load("articles/aiuserinterests");
+        }, 300);
     })
 </script>

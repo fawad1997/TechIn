@@ -1,0 +1,21 @@
+﻿@model List<Tech_In.Models.ViewModels.ArticleViewModels.SingleArticleVM>
+@{ 
+    Layout = null;
+}
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+<h3>You may also like</h3>
+<div class="row">
+    @foreach (var art in Model)
+    {
+        <div class="col-xs-4">
+            <div class="widget-post">
+                <a href="/Article/@art.Id/@art.Title">
+                    <img class="img-thumbnail" style="height:120px;width:250px;" src="@art.ArticleImg" alt=""> <span>@art.Title</span>
+                </a>
+            </div>
+        </div>
+    }
+</div>
+<hr />
