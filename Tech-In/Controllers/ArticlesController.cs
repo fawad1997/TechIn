@@ -42,12 +42,17 @@ namespace Tech_In.Controllers
         }
         
         [HttpGet("Article/{id}/{title}", Name = "ArticleSingle")]
-        public IActionResult ArticleSingle(int id,string title)
+        public async Task<IActionResult> ArticleSingle(int id,string title)
         {
             var article = _context.Article.Where(x => x.Id == id).SingleOrDefault();
+            var user = await _userManager.GetCurrentUser(HttpContext);
             if (article == null)
             {
                 return NotFound();
+            }
+            if(article.Status == "history")
+            {
+                article = _context.Article.Where(re => re.OriginalId == article.OriginalId && re.Status == "active").SingleOrDefault();
             }
             string friendlyTitle = FriendlyUrlHelper.GetFriendlyTitle(article.Title);
             if (!string.Equals(friendlyTitle, title, StringComparison.Ordinal))
@@ -57,6 +62,10 @@ namespace Tech_In.Controllers
                 return this.RedirectToRoutePermanent("ArticleSingle", new { id = id, title = friendlyTitle });
             }
             var articleVM = _mapper.Map<SingleArticleVM>(article);
+            if (article.Id != article.OriginalId)
+                articleVM.IsEdited = true;
+            else
+                articleVM.IsEdited = false;
             //Get Article Tags Ids
             var arttags = _context.ArticleTag.Where(tg => tg.ArticleId == article.Id).ToList();
             articleVM.Tags = new List<SkillTag>();
@@ -71,8 +80,12 @@ namespace Tech_In.Controllers
             articleVM.AuthorImg = author.ProfileImage;
             articleVM.AuthorName = author.FirstName + " " + author.LastName;
             articleVM.AuthorSummary = author.Summary;
-            articleVM.CommentsCount = _context.ArticleComment.Where(cmt => cmt.ArticleId == article.Id).Count();
-            articleVM.VisitorsCount = _context.ArticleVisitor.Where(av => av.ArticleId == article.Id).Count();
+            articleVM.CommentsCount = _context.ArticleComment.Where(cmt => cmt.ArticleId == article.OriginalId).Count();
+            articleVM.VisitorsCount = _context.ArticleVisitor.Where(av => av.ArticleId == article.OriginalId).Count();
+            if (articleVM.AuthorId == user.Id)
+                articleVM.IsArticleAuthor = true;
+            else
+                articleVM.IsArticleAuthor = false;
             return View("ArticleSingle",articleVM);
         }
         [Authorize]
@@ -130,7 +143,7 @@ namespace Tech_In.Controllers
                         _context.SaveChanges();
 
                     }
-                }//Forwach for tags
+                }//Foreach for tags
                 ArticleCategory articleCategory = new ArticleCategory
                 {
                     ArticleId = article.Id,
@@ -203,6 +216,113 @@ namespace Tech_In.Controllers
         }
 
         [Authorize]
+        public async Task<IActionResult> Edit(int Id)
+        {
+            var article = _context.Article.Where(x => x.Id == Id).SingleOrDefault();
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            if (article == null)
+            {
+                return NotFound();
+            }
+            NewArticleVM articleVM = _mapper.Map<NewArticleVM>(article);
+            List<Category> categories = _context.Category.ToList();
+            var tags = _context.ArticleTag.Where(a => a.ArticleId == articleVM.Id).ToList();
+            string tagName = null;
+            foreach (var tag in tags)
+            {
+                tagName += _context.SkillTag.Where(b => b.SkillTagId == tag.TagId).Select(c => c.SkillName).SingleOrDefault();
+                tagName += ", ";
+            }
+            ViewBag.Tag = tagName;
+            ViewBag.Categories = new SelectList(categories, "Id", "Title");
+            return View(articleVM);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> UpdateArticle(NewArticleVM vm)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetCurrentUser(HttpContext);
+                var oldArticle = _context.Article.Where(olda => olda.Id == vm.Id).SingleOrDefault();
+                if (user.Id != oldArticle.UserId)
+                    return BadRequest();
+                oldArticle.Status = "history";
+                vm.Id = 0;
+                var article = _mapper.Map<Article>(vm);
+                article.CreateTime = DateTime.Now;
+                article.Status = "active";
+                article.OriginalId = oldArticle.OriginalId;
+                article.UserId = user.Id;
+                _context.Article.Add(article);
+                _context.SaveChanges();
+                string[] tagArray = vm.Tags.Split(',');
+                foreach (string tag in tagArray)
+                {
+                    var tagFromDB = _context.SkillTag.Where(x => x.SkillName == tag.ToLower()).SingleOrDefault();
+                    if (tagFromDB == null)
+                    {
+                        SkillTag sktag = new SkillTag
+                        {
+                            ApprovedStatus = false,
+                            SkillName = tag.ToLower(),
+                            TimeApproved = DateTime.Now,
+                            UserId = user.Id
+                        };
+                        _context.SkillTag.Add(sktag);
+                        _context.SaveChanges();
+                        ArticleTag articleTag = new ArticleTag
+                        {
+                            TagId = sktag.SkillTagId,
+                            ArticleId = article.Id
+                        };
+                        _context.ArticleTag.Add(articleTag);
+                        _context.SaveChanges();
+                    }
+                    else
+                    {
+                        ArticleTag articleTag = new ArticleTag
+                        {
+                            TagId = tagFromDB.SkillTagId,
+                            ArticleId = article.Id
+                        };
+                        _context.ArticleTag.Add(articleTag);
+                        _context.SaveChanges();
+
+                    }
+                }//Foreach for tags
+                ArticleCategory articleCategory = new ArticleCategory
+                {
+                    ArticleId = article.Id,
+                    CategoryId = vm.CategoryId
+                };
+                _context.ArticleCategory.Add(articleCategory);
+                _context.SaveChanges();
+                return RedirectToAction($"ArticleSingle", new { id = article.Id, title = article.Title });
+            }
+            return View(vm);
+        }
+
+        public IActionResult ArticleEditHistory(int articleId)
+        {
+            var historyList = _context.Article.Where(x => x.OriginalId == articleId).ToList();
+            var vm = _mapper.Map<List<Article>, List<SingleArticleVM>>(historyList);
+            foreach(var singleEdit in vm)
+            {
+                //Get Article Tags Ids
+                var arttags = _context.ArticleTag.Where(tg => tg.ArticleId == singleEdit.Id).ToList();
+                singleEdit.Tags = new List<SkillTag>();
+                foreach (var arttag in arttags)
+                {
+                    var singleTag = _context.SkillTag.Where(sktag => sktag.SkillTagId == arttag.TagId).SingleOrDefault();
+                    singleEdit.Tags.Add(singleTag);
+                }
+            }
+            return View("_ArticleEditHistory",vm);
+        }
+
+        [Authorize]
         public async Task<IActionResult> AddComment(AddCommentVM vm)
         {
             if (ModelState.IsValid)
@@ -218,8 +338,9 @@ namespace Tech_In.Controllers
                 };
                 _context.ArticleComment.Add(comment);
                 _context.SaveChanges();
+                return Json(new { success = true });
             }
-            return View("ArticleSingle");
+            return Json(new { success = false });
         }
         [HttpPost]
         public IActionResult Comments(int articleId)
@@ -320,7 +441,7 @@ namespace Tech_In.Controllers
             }).OrderByDescending(o => o.VisitorCount).Take(3).ToList();
             foreach(var post in topPosts)
             {
-                var article = _context.Article.Where(x => x.Id == post.ArticleId).SingleOrDefault();
+                var article = _context.Article.Where(x => x.OriginalId == post.ArticleId).OrderByDescending(y=>y.Id).FirstOrDefault();
                 post.ArticleImage = article.ArticleImg;
                 post.ArticleTitle = article.Title;
                 post.CreateTime = article.CreateTime;

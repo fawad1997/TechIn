@@ -7,10 +7,10 @@
 *@
 <div class="widget">
     <h3 class="title">Top Tags</h3>
-    <div class="widget-tags">
+    <div class="widget-tags blog-tags">
         @foreach (var tag in Model)
     {
-        <a href="/Articles/SearchByTag/@tag.Id">@tag.TagName (@tag.Count)</a>
+        <a href="/Articles/SearchByTag/@tag.Id"><i class="fa fa-tag"></i> @tag.TagName (@tag.Count)</a>
 }
     </div>
 </div>

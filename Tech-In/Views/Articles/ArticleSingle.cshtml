@@ -2,6 +2,8 @@
 @{
     ViewData["Title"] = "ArticleSingle";
 }
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 <!-- Blog -->
 <div id="blog" class="section md-padding">
     <!-- Container -->
@@ -17,7 +19,7 @@
                     <div class="blog-content">
                         <ul class="blog-meta">
                             <li>
-                                <i class="fa fa-user"  title="Author"></i>@Model.AuthorName
+                                <i class="fa fa-user" title="Author"></i>@Model.AuthorName
                             </li>
                             <li>
                                 <i class="fa fa-clock-o" title="Time Article Posted"></i>@Model.CreateTime.ToString("MMM dd,yyyy hh:mm tt")
@@ -28,6 +30,41 @@
                             <li>
                                 <i class="fa fa-eye" title="Article Visitors"></i>@Model.VisitorsCount
                             </li>
+                            @if (Model.IsEdited)
+                    {
+                        <li class="pull-right">
+                            <button class="btn-link" id="editHistory" style="color: gray;text-decoration: none;"><i class="fa fa-clock-o" title="Edit History"></i>edit history</button>
+                        </li>
+
+                        <!-- Modal -->
+                        <div class="modal fade bs-example-modal-lg" id="ahistoryModal" role="dialog">
+                            <div class="modal-dialog modal-lg">
+
+                                <!-- Modal content-->
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title">Edit History</h4>
+                                    </div>
+                                    <div id="editHistryLoad" class="modal-body">
+                                        <div class="cent" id="loaderDivv" style="display:block; height:50px; width:50px;">
+                                            <img src="~/images/load.gif" />
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+            }
+                            @if (Model.IsArticleAuthor)
+                    {
+                        <li class="pull-right">
+                            <a href="/Articles/Edit/@Model.Id" style="color: gray;text-decoration: none;">edit</a>
+                        </li>
+            }
                         </ul>
                         <h3>@Model.Title</h3>
                         <div style="word-wrap: break-word;">
@@ -39,11 +76,11 @@
                     <div class="blog-tags">
                         <h5>Tags :</h5>
                         @foreach (var tag in Model.Tags)
-    {
+                {
                     <a href="/Articles/SearchByTag/@tag.SkillTagId">
                         <i class="fa fa-tag"></i>@tag.SkillName
                     </a>
-}
+        }
                     </div>
                     <!-- blog tags -->
                     <!-- blog author -->
@@ -56,25 +93,31 @@
                                 <div class="media-heading">
                                     <h3><a style="color: black;text-decoration: none;" href="/User/@Model.AuthorId">@Model.AuthorName</a></h3>
                                 </div>
-                                <p>@if (Model.AuthorSummary != null)
-                                {
-                                    @Model.AuthorSummary
-                                }
-                                else { 
-                                    @:No Informaton Found about author!
-                                }</p>
+                                <p>
+                                    @if (Model.AuthorSummary != null)
+                            {
+                                @Model.AuthorSummary
+                    }
+                    else
+                    {
+                        @:No Informaton Found about author!
+}
+                                </p>
                             </div>
                         </div>
                     </div>
                     <!-- /blog author -->
-                    @*@Html.Partial("Comments");*@
                     <!-- blog comments -->
                     <div id="comments">
 
                     </div>
                     <!-- /blog comments -->
                     <!-- reply form -->
-                        @Html.Partial("_AddCommentPartial",new Tech_In.Models.ViewModels.ArticleViewModels.AddCommentVM { ArticleId=Model.Id });
+
+                    @if (SignInManager.IsSignedIn(User))
+            {
+                @Html.Partial("_AddCommentPartial", new Tech_In.Models.ViewModels.ArticleViewModels.AddCommentVM { ArticleId = Model.OriginalId });
+    }
                     <!-- /reply form -->
                 </div>
             </main>
@@ -103,14 +146,14 @@
             </aside>
             <!-- /Aside -->
         </div>
-        <!-- /Row -->
-    </div>
-    <!-- /Container -->
+    <!-- /Row -->
+</div>
+<!-- /Container -->
 </div>
 <!-- /Blog -->
 <script>
     $(document).ready(function () {
-        var articleid = @Model.Id;
+        var articleid = @Model.OriginalId;
         //Load Comments Section after page load
         $("#comments").load("/articles/comments",
             { articleId: articleid });
@@ -127,6 +170,11 @@
             success: function () {
                 console.log("View Counted");
             }
+        });
+        $("#editHistory").click(function () {
+            $("#editHistryLoad").load("/articles/articleedithistory",
+                { articleId: articleid });
+            $("#ahistoryModal").modal("show");
         });
     });
 </script>

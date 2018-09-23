@@ -4,9 +4,44 @@
 *@
 <div class="reply-form">
     <h3 class="title">Leave a reply</h3>
-    <form asp-controller="Articles" asp-action="AddComment">
+    <form id="addcomt">
         <input asp-for="ArticleId" type="hidden" value="@Model.ArticleId" />
-        <textarea asp-for="Comment" placeholder="Add Your Commment"></textarea>
-        <button type="submit" class="main-btn">Submit</button>
+        <textarea asp-for="Comment" required maxlength="300" minlength="3" placeholder="Add Your Commment"></textarea>
+        <span id="cmterror" class="text-danger col-xs-12"></span>
+        <button id="addcmtbtn" type="button" class="main-btn">Submit</button>
     </form>
 </div>
+
+<div class="cent" id="loaderDiv">
+    <img src="~/images/load.gif" />
+</div>
+<script>
+    $("#addcmtbtn").click(function () {
+        $("#loaderDiv").show();
+        if ($('#Comment').val().length < 3) {
+            $('#cmterror').text('Comment length must be minimum 3 characters');
+            $("#loaderDiv").hide();
+            return;
+        }
+        var cmtFormData = $("#addcomt").serialize();
+        console.log(cmtFormData);
+        $.ajax({
+            type: "POST",
+            url: "/articles/addcomment",
+            data: cmtFormData,
+            success: function (response) {
+                if (response.success) {
+                    $("#comments").fadeOut('slow').load("/articles/comments",
+                        { articleId: @Model.ArticleId }).fadeIn('slow');
+                    $('#cmterror').text('');
+                    $("#loaderDiv").hide();
+                    $('#Comment').val("");
+                } else {
+                    $('#cmterror').text('Unable to add comment! Something went wrong!');
+                    $("#loaderDiv").hide();
+                }
+            }
+        });
+
+    });
+</script>

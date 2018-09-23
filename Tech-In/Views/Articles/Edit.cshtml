@@ -1,0 +1,179 @@
+﻿@model Tech_In.Models.ViewModels.ArticleViewModels.NewArticleVM
+
+@{
+    ViewData["Title"] = "Edit";
+}
+<div class="container">
+    <h4>Edit Article</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-8">
+            <form enctype="multipart/form-data" asp-action="UpdateArticle">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input value="@Model.Id" asp-for="Id" style="display:none" />
+                <div class="form-group">
+                    <label asp-for="Title" class="control-label"></label>
+                    <input value="@Model.Title" required minlength=5 maxlength="150" asp-for="Title" type="text" class="fr-form" placeholder="Article Title" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 form-group">
+                        <label asp-for="CategoryId" class="control-label"></label>
+                        <div class="form-group">
+                            @if (ViewBag.Categories != null)
+                            {
+                                @Html.DropDownListFor(model => model.CategoryId, ViewBag.Categories as SelectList, "--select--", new { @class = "form-control", required = "required" })
+                            }
+                        </div>
+                        <span asp-validation-for="CategoryId" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-6 form-group">
+                        <label asp-for="ArticleImg" class="control-label"></label>
+                        <input type="file" class="form-control" />
+                        <input asp-for="ArticleImg" type="hidden" />
+                        <span asp-validation-for="ArticleImg" class="text-danger"></span>
+                        <span id="imgError" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <span class="text-danger">Image height and width should be greater than 400x700 and should not exceed 10Mb.</span>
+                </div>
+                <div id="imgDisp" class="form-group">
+                    <img src="@Model.ArticleImg" id="dispImg" style="height:350px; width:100%;" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="ArticleBody" class="control-label"></label>
+                    <textarea asp-for="ArticleBody" class="fr-form"></textarea>
+                    <span asp-validation-for="ArticleBody" class="text-danger"></span>
+                </div>
+                <hr />
+                <div class="form-group">
+                    <strong>Tags </strong>
+                    <input required name="tags" type="text" class="fr-form" value="@ViewBag.Tag" placeholder="Atleast one tag, such as 'java', maximum 5." />
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="main-btn">Update Article</button>
+                </div>
+            </form>
+        </div><!--Col-md-8 ends-->
+        <div class="col-md-4">
+            <!-- Category -->
+            <div class="widget">
+                <h3 class="title">Category</h3>
+                <div class="widget-category">
+                    <a href="#">
+                        Web Design
+                        <span>(7)</span>
+                    </a>
+                    <a href="#">
+                        Marketing
+                        <span>(142)</span>
+                    </a>
+                    <a href="#">
+                        Web Development
+                        <span>(74)</span>
+                    </a>
+                </div>
+            </div>
+            <!-- /Category -->
+            <hr />
+            <!-- Posts sidebar -->
+            <div class="widget">
+                <h3 class="title">Populare Posts</h3>
+                <!-- single post -->
+                <div class="widget-post">
+                    <a href="#">
+                        <img src="~/images/post1.jpg" alt=""> Blog title goes here
+                    </a>
+                    <ul class="blog-meta">
+                        <li>Oct 18, 2017</li>
+                    </ul>
+                </div>
+                <!-- /single post -->
+                <!-- single post -->
+                <div class="widget-post">
+                    <a href="#">
+                        <img src="~/images/post2.jpg" alt=""> Blog title goes here
+                    </a>
+                    <ul class="blog-meta">
+                        <li>Oct 18, 2017</li>
+                    </ul>
+                </div>
+                <!-- /single post -->
+                <!-- single post -->
+                <div class="widget-post">
+                    <a href="#">
+                        <img src="~/images/post3.jpg" alt=""> Blog title goes here
+                    </a>
+                    <ul class="blog-meta">
+                        <li>Oct 18, 2017</li>
+                    </ul>
+                </div>
+                <!-- /single post -->
+            </div>
+            <!-- /Posts sidebar -->
+        </div><!--col-md-4 ends-->
+    </div>
+    <div>
+        <a asp-action="Index">Back to List</a>
+    </div>
+
+</div><!--Container Ends-->
+<!-- Initialize Tagify for both Input and Textaera -->
+<script>
+
+</script>
+
+<script src="https://cloud.tinymce.com/stable/tinymce.min.js"></script>
+<script>
+    $(document).ready(function () {
+        let onchange = function () {
+            let _this = $(this)[0];
+            let f = new FormData();
+            f.append('File', _this.files[0]);
+
+            let onSuccess = function (model) {
+                if (model.success) {
+                    $('#ArticleImg').val(model.response.source);
+                    $("#dispImg").prop('src', model.response.source);
+                    $("#imgDisp").css('display', 'block');
+                    //console.log(model);
+                } else {
+                    $('#imgError').text(model.response);
+                }
+            };
+
+            $.ajax({
+                method: 'post',
+                url: '/articles/checkimg',
+                data: f,
+                processData: false,
+                contentType: false,
+                error: function (response) {
+                    alert("error")
+                }
+            }).done(onSuccess);
+            //alert('1');
+        };
+        $(document).on('change', 'input[type=file]', onchange);
+
+        tinymce.init({
+            selector: 'textarea',
+            height: 500,
+            menubar: false,
+            plugins: [
+                'advlist autolink lists link image charmap print preview anchor textcolor',
+                'searchreplace visualblocks code fullscreen',
+                'insertdatetime media table contextmenu paste code help wordcount'
+            ],
+            toolbar: 'insert | undo redo |  formatselect | bold italic backcolor  | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+            content_css: [
+                '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+                '//www.tinymce.com/css/codepen.min.css']
+        });
+    });
+    var input = document.querySelector('input[name=tags]'),
+        tagify = new Tagify(input);
+
+
+</script>

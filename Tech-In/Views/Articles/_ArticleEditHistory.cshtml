@@ -1,0 +1,44 @@
+﻿@model List<Tech_In.Models.ViewModels.ArticleViewModels.SingleArticleVM>
+@{ 
+    Layout = null;
+}
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+<!-- Main -->
+<main id="main">
+    @foreach (var singeleArticle in Model)
+    {
+        <div class="blog">
+            <div class="blog-img">
+                <img class="img-responsive" style="height:450px;width:100%;" src="@singeleArticle.ArticleImg" alt="">
+            </div>
+            <div class="blog-content">
+                <ul class="blog-meta">
+                    <li>
+                        <i class="fa fa-clock-o" title="Time Article Posted"></i>@singeleArticle.CreateTime.ToString("MMM dd,yyyy hh:mm tt")
+                    </li>
+
+                </ul>
+                <h3>@singeleArticle.Title</h3>
+                <div style="word-wrap: break-word;">
+                    @Html.Raw(singeleArticle.ArticleBody)
+                </div>
+
+            </div>
+            <!-- blog tags -->
+            <div class="blog-tags">
+                <h5>Tags :</h5>
+                @foreach (var tag in singeleArticle.Tags)
+                {
+                    <a href="/Articles/SearchByTag/@tag.SkillTagId">
+                        <i class="fa fa-tag"></i>@tag.SkillName
+                    </a>
+                }
+            </div>
+            <!-- blog tags -->
+        </div>
+        <hr />
+    }
+</main>
+<!-- /Main -->

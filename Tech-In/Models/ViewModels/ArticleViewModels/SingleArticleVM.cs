@@ -10,6 +10,7 @@ namespace Tech_In.Models.ViewModels.ArticleViewModels
     public class SingleArticleVM
     {
         public int Id { get; set; }
+        public int OriginalId { get; set; }
         [StringLength(maximumLength: 150, MinimumLength = 5), Required]
         public string Title { get; set; }
         [Display(Name = "Category :"), Required]
@@ -26,5 +27,7 @@ namespace Tech_In.Models.ViewModels.ArticleViewModels
         public string AuthorSummary { get; set; }
         public int CommentsCount { get; set; }
         public int VisitorsCount { get; set; }
+        public Boolean IsArticleAuthor { get; set; }
+        public Boolean IsEdited { get; set; }
     }
 }
