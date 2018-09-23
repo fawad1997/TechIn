@@ -1,184 +1,102 @@
-﻿
+﻿@model Tech_In.Models.ViewModels.ArticleViewModels.ArticleListVM
 @{
-    ViewData["Title"] = "Index";
-}
-
+                ViewData["Title"] = "Index";
+            }
 <!-- Blog -->
 <div id="blog" class="section md-padding">
-
     <!-- Container -->
     <div class="container">
-
         <!-- Row -->
         <div class="row">
             <div class="col-md-9">
+                @foreach (var singleArticle in Model.Articles)
+        {
                 <div style="margin-bottom:2%;" class="row">
                     <div class="blog">
                         <div class="blog-img col-sm-4">
-                            <img class="img-responsive" src="~/images/blog1.jpg" alt="">
+                            <img style="height:147px;width:262px;" src="@singleArticle.ArticleImg" alt="">
                         </div>
                         <div class="col-sm-8">
-                            <h3 style="margin-bottom:0px;">Publish article on TechIn</h3>
+                            <h3 style="margin-bottom:0px;"><a style="color: black;text-decoration: none;" href="/Article/@singleArticle.Id/@singleArticle.Title">@singleArticle.Title </a></h3>
                             <ul style="margin-bottom:4px;" class="blog-meta">
                                 <li>
-                                    <i class="fa fa-user"></i>Fawad Bin Tariq
+                                    <i class="fa fa-user" title="Author"></i>@singleArticle.AuthorName
                                 </li>
                                 <li>
-                                    <i class="fa fa-clock-o"></i>18 Oct
+                                    <i class="fa fa-clock-o" title="Create Time"></i>@singleArticle.CreateTime.ToString("dd MMM")
                                 </li>
                                 <li>
-                                    <i class="fa fa-comments"></i>57
+                                    <i class="fa fa-comments" title="Comments"></i>@singleArticle.CommentsCount
+                                </li>
+                                <li>
+                                    <i class="fa fa-eye" title="Article Visitors"></i>@singleArticle.VisitorsCount
                                 </li>
                             </ul>
-                            <p>
-                                TechIn allows it users to publish their own articles, Users can earn money but publishing valueable articles on TechIn.
-                            </p>
-                            <a asp-controller="Articles" asp-action="ArticleSingle">Read more</a>
+                            <div style="word-wrap: break-word;">
+                                @Html.Raw(singleArticle.ArticleBody)...
+                            </div>
+                            <a href="/Article/@singleArticle.Id/@singleArticle.Title">Read more</a>
                         </div>
                     </div>
                 </div>
-                <div style="margin-bottom:2%;" class="row">
-                    <div class="blog">
-                        <div class="blog-img col-sm-4">
-                            <img class="img-responsive" src="~/images/blog1.jpg" alt="">
-                        </div>
-                        <div class="col-sm-8">
-                            <h3 style="margin-bottom:0px;">Publish article on TechIn</h3>
-                            <ul style="margin-bottom:4px;" class="blog-meta">
-                                <li>
-                                    <i class="fa fa-user"></i>Fawad Bin Tariq
-                                </li>
-                                <li>
-                                    <i class="fa fa-clock-o"></i>18 Oct
-                                </li>
-                                <li>
-                                    <i class="fa fa-comments"></i>57
-                                </li>
-                            </ul>
-                            <p>
-                                TechIn allows it users to publish their own articles, Users can earn money but publishing valueable articles on TechIn.
-                            </p>
-                            <a asp-controller="Articles" asp-action="ArticleSingle">Read more</a>
-                        </div>
-                    </div>
-                </div>
-                <div style="margin-bottom:2%;" class="row">
-                    <div class="blog">
-                        <div class="blog-img col-sm-4">
-                            <img class="img-responsive" src="~/images/blog1.jpg" alt="">
-                        </div>
-                        <div class="col-sm-8">
-                            <h3 style="margin-bottom:0px;">Publish article on TechIn</h3>
-                            <ul style="margin-bottom:4px;" class="blog-meta">
-                                <li>
-                                    <i class="fa fa-user"></i>Fawad Bin Tariq
-                                </li>
-                                <li>
-                                    <i class="fa fa-clock-o"></i>18 Oct
-                                </li>
-                                <li>
-                                    <i class="fa fa-comments"></i>57
-                                </li>
-                            </ul>
-                            <p>
-                                TechIn allows it users to publish their own articles, Users can earn money but publishing valueable articles on TechIn.
-                            </p>
-                            <a asp-controller="Articles" asp-action="ArticleSingle"><u>Read More</u></a>
-                        </div>
-                    </div>
-                </div>
+        }
             </div>
-
             <!-- Aside -->
             <aside id="aside" class="col-md-3">
-
+                <button onclick="location.href='@Url.Action("New", "Articles")'" class="main-btn btn-block">Publish Your Article</button>
                 <!-- Search -->
                 <div class="widget">
                     <div class="widget-search">
-                        <input class="search-input" type="text" placeholder="search articles">
-                        <button class="search-btn" type="button">
-                            <i class="fa fa-search"></i>
-                        </button>
+                        <form asp-action="Index">
+                            <input class="search-input" name="search" value="@ViewData["currentFilter"]" type="text" placeholder="search articles">
+                            <button class="search-btn" type="submit">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
                 <!-- /Search -->
                 <!-- Category -->
-                <div class="widget">
-                    <h3 class="title">Category</h3>
-                    <div class="widget-category">
-                        <a href="#">
-                            Web Design
-                            <span>(7)</span>
-                        </a>
-                        <a href="#">
-                            Marketing
-                            <span>(142)</span>
-                        </a>
-                        <a href="#">
-                            Web Development
-                            <span>(74)</span>
-                        </a>
-                    </div>
-                </div>
+                <div id="categorytop"></div>
                 <!-- /Category -->
                 <!-- Posts sidebar -->
-                <div class="widget">
-                    <h3 class="title">Populare Posts</h3>
-
-                    <!-- single post -->
-                    <div class="widget-post">
-                        <a href="#">
-                            <img src="~/images/post1.jpg" alt=""> Blog title goes here
-                        </a>
-                        <ul class="blog-meta">
-                            <li>Oct 18, 2017</li>
-                        </ul>
-                    </div>
-                    <!-- /single post -->
-                    <!-- single post -->
-                    <div class="widget-post">
-                        <a href="#">
-                            <img src="~/images/post2.jpg" alt=""> Blog title goes here
-                        </a>
-                        <ul class="blog-meta">
-                            <li>Oct 18, 2017</li>
-                        </ul>
-                    </div>
-                    <!-- /single post -->
-                    <!-- single post -->
-                    <div class="widget-post">
-                        <a href="#">
-                            <img src="~/images/post3.jpg" alt=""> Blog title goes here
-                        </a>
-                        <ul class="blog-meta">
-                            <li>Oct 18, 2017</li>
-                        </ul>
-                    </div>
-                    <!-- /single post -->
-
-                </div>
+                <div id="popularposts"></div>
                 <!-- /Posts sidebar -->
                 <!-- Tags -->
-                <div class="widget">
-                    <h3 class="title">Tags</h3>
-                    <div class="widget-tags">
-                        <a href="#">Web</a>
-                        <a href="#">Design</a>
-                        <a href="#">Graphic</a>
-                        <a href="#">Marketing</a>
-                        <a href="#">Development</a>
-                    </div>
-                </div>
+                <div id="toptags"></div>
                 <!-- /Tags -->
-
             </aside>
             <!-- /Aside -->
-
         </div>
         <!-- /Row -->
 
+        @{
+        var prevDisabled = !Model.Articles.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.Articles.HasNextPage ? "disabled" : "";
+}
+
+        <a asp-action="Index"
+           asp-route-sortOrder="@ViewData["CurrentSort"]"
+           asp-route-page="@(Model.Articles.PageIndex - 1)"
+           asp-route-currentFilter="@ViewData["CurrentFilter"]"
+           class="btn btn-default @prevDisabled">
+            Previous
+        </a>
+        <a asp-action="Index"
+           asp-route-sortOrder="@ViewData["CurrentSort"]"
+           asp-route-page="@(Model.Articles.PageIndex + 1)"
+           asp-route-currentFilter="@ViewData["CurrentFilter"]"
+           class="btn btn-default @nextDisabled">
+            Next
+        </a>
     </div>
     <!-- /Container -->
-
 </div>
 <!-- /Blog -->
+<script>
+    $(document).ready(function () {
+        $("#categorytop").load("/articles/topcategories");
+        $("#popularposts").load("/articles/popularposts");
+        $("#toptags").load("/articles/toptags");
+    })
+</script>

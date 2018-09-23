@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using SixLabors.ImageSharp;
 using Tech_In.Data;
 using Tech_In.Extensions;
@@ -36,9 +37,54 @@ namespace Tech_In.Controllers
             _environment = environment;
             _mapper = mapper;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index(string currentFilter, string search,int? page)
         {
-            return View();
+            ViewData["CurrentFilter"] = search;
+            if (search != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                search = currentFilter;
+            }
+            var articel = (from art in _context.Article
+                              join u in _context.UserPersonalDetail on art.UserId equals u.UserId
+                              where art.Status.Contains("active")
+                              orderby art.Id descending
+                              select new SingleArticleVM
+                              {
+                                  Id = art.Id,
+                                  AuthorId = u.UserId,
+                                  Title = art.Title,
+                                  ArticleBody = art.ArticleBody.Substring(0, 40),
+                                  ArticleImg = art.ArticleImg,
+                                  CreateTime = art.CreateTime,
+                                  AuthorName = u.FirstName +" "+u.LastName,
+                                  VisitorsCount = _context.ArticleVisitor.Where(av => av.ArticleId == art.OriginalId).Count(),
+                                  CommentsCount = _context.ArticleComment.Where(cmt => cmt.ArticleId == art.OriginalId).Count()
+                              }
+                              ).Take(10);
+            //var article = _context.Article.Where(stat=>stat.Status=="active");
+            if (!String.IsNullOrEmpty(search))
+            {
+                articel = articel.Where(s => s.Title.Contains(search));
+            }
+            //var articleVM = new List<SingleArticleVM>();
+            //articleVM = _mapper.Map<List<SingleArticleVM>>(article);
+            //foreach(var singleVM in articleVM)
+            //{
+            //    //Author
+            //    var author = _context.UserPersonalDetail.Where(usr => usr.UserId == singleVM.AuthorId).SingleOrDefault();
+            //    singleVM.AuthorImg = author.ProfileImage;
+            //    singleVM.AuthorName = author.FirstName + " " + author.LastName;
+            //    singleVM.CommentsCount = _context.ArticleComment.Where(cmt => cmt.ArticleId == singleVM.OriginalId).Count();
+            //    singleVM.VisitorsCount = _context.ArticleVisitor.Where(av => av.ArticleId == singleVM.OriginalId).Count();
+            //    singleVM.ArticleBody = singleVM.ArticleBody.Substring(0, 40);
+            //}
+            int pageSize = 10;
+            return View(new ArticleListVM { Articles = await PaginatedList<SingleArticleVM>.CreateAsync(articel.AsQueryable(), page ?? 1, pageSize) });
+            //return View(articleVM);
         }
         
         [HttpGet("Article/{id}/{title}", Name = "ArticleSingle")]

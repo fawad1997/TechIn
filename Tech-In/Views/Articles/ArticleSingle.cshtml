@@ -47,6 +47,7 @@
                                         <h4 class="modal-title">Edit History</h4>
                                     </div>
                                     <div id="editHistryLoad" class="modal-body">
+                                        <br/><br /><br />
                                         <div class="cent" id="loaderDivv" style="display:block; height:50px; width:50px;">
                                             <img src="~/images/load.gif" />
                                         </div>
@@ -124,13 +125,16 @@
             <!-- /Main -->
             <!-- Aside -->
             <aside id="aside" class="col-md-3">
+                <button onclick="location.href='@Url.Action("New", "Articles")'" class="main-btn btn-block">Publish Your Article</button>
                 <!-- Search -->
                 <div class="widget">
                     <div class="widget-search">
-                        <input class="search-input" type="text" placeholder="search articles">
-                        <button class="search-btn" type="button">
-                            <i class="fa fa-search"></i>
-                        </button>
+                        <form asp-action="Index">
+                            <input class="search-input" name="search" value="@ViewData["currentFilter"]" type="text" placeholder="search articles">
+                            <button class="search-btn" type="submit">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
                 <!-- /Search -->
