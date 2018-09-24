@@ -109,7 +109,8 @@
                 processData: false,
                 contentType: false,
                 error: function (response) {
-                    alert("error")
+                    console.log(response);
+                    alert("error");
                 }
             }).done(onSuccess);
             //alert('1');
