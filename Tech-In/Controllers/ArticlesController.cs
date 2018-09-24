@@ -114,8 +114,13 @@ namespace Tech_In.Controllers
             articleVM.AuthorSummary = author.Summary;
             articleVM.CommentsCount = _context.ArticleComment.Where(cmt => cmt.ArticleId == article.OriginalId).Count();
             articleVM.VisitorsCount = _context.ArticleVisitor.Where(av => av.ArticleId == article.OriginalId).Count();
-            if (articleVM.AuthorId == user.Id)
-                articleVM.IsArticleAuthor = true;
+            if (user != null)
+            {
+                if (articleVM.AuthorId == user.Id)
+                    articleVM.IsArticleAuthor = true;
+                else
+                    articleVM.IsArticleAuthor = false;
+            }
             else
                 articleVM.IsArticleAuthor = false;
             return View("ArticleSingle",articleVM);
