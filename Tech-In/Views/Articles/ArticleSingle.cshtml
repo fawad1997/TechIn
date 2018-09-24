@@ -1,6 +1,6 @@
 ﻿@model Tech_In.Models.ViewModels.ArticleViewModels.SingleArticleVM
 @{
-    ViewData["Title"] = "ArticleSingle";
+    ViewData["Title"] = Model.Title;
 }
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
