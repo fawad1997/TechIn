@@ -568,12 +568,14 @@ namespace Tech_In.Controllers
                 return NotFound();
             try
             {
-                var userInterestedTag = _context.AIUserInterest.OrderByDescending(x => x.Count).FirstOrDefault();
+                var userInterestedTag = _context.AIUserInterest.Where(aa=>aa.UserId == user.Id).OrderByDescending(x => x.Count).FirstOrDefault();
                 var articleID = _context.ArticleTag.Where(a => a.TagId == userInterestedTag.TagId).Take(3).ToList();
                 List<SingleArticleVM> articles = new List<SingleArticleVM>();
                 foreach (var art in articleID)
                 {
-                    articles.Add(_context.Article.Where(b => b.Id == art.ArticleId).Select(c => new SingleArticleVM { ArticleImg = c.ArticleImg, Title = c.Title, Id = c.Id }).FirstOrDefault());
+                    var article = _context.Article.Where(b => b.Id == art.ArticleId && b.Status == "active").Select(c => new SingleArticleVM { ArticleImg = c.ArticleImg, Title = c.Title, Id = c.Id }).FirstOrDefault();
+                    if(article!=null)
+                        articles.Add(article);
                 }
                 return View("_AIUserInterestedArticles", articles);
             }
