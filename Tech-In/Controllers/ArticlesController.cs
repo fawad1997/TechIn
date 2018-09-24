@@ -123,7 +123,7 @@ namespace Tech_In.Controllers
         [Authorize]
         public IActionResult New()
         {
-            List<Category> categories=  _context.Category.ToList();
+            List<Category> categories=  _context.Category.OrderBy(x=>x.Title).ToList();
             ViewBag.Categories = new SelectList(categories, "Id", "Title");
             return View();
         }

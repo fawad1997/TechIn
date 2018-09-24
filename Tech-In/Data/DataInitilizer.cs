@@ -11,6 +11,7 @@ namespace Tech_In.Models.Database
         public static void Initilize(ApplicationDbContext context)
         {
             context.Database.EnsureCreated();
+            InitilizaCategory(context);
             //Populating Countries
             if (context.Country.Any())
                 return;
@@ -51,6 +52,39 @@ namespace Tech_In.Models.Database
             }.ToList();
             foreach (City city in cities)
                 context.City.Add(city);
+            context.SaveChanges();
+        }
+        public static void InitilizaCategory(ApplicationDbContext context)
+        {
+            if (context.Category.Any())
+                return;
+            var categories = new Category[]
+            {
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Algorithms"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Analytics"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Architecture software"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Artificial Intelligence"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Big Data"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Business Relationship Management"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Communication Tools"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Configuration Management"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Cost Control Software"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Databases"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Data Analysis"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Data Mining"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Enterprise Resourse Planning"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Internet of Things"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Information Security"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Information Visualization"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Legacy Systems"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="POS Systems"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Project Management"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Risk Management"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Scientific Computing"},
+                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Virtual Reality"}
+            }.ToList();
+            foreach (Category cat in categories)
+                context.Category.Add(cat);
             context.SaveChanges();
         }
     }
