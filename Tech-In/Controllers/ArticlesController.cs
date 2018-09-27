@@ -274,6 +274,45 @@ namespace Tech_In.Controllers
             ViewBag.Categories = new SelectList(categories, "Id", "Title");
             return View(articleVM);
         }
+        [Authorize]
+        public async Task<IActionResult> DeleteArticle(int Id)
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            var articles = _context.Article.Where(x => x.OriginalId == Id && x.UserId==user.Id);
+            if (articles == null)
+            {
+                return NotFound();
+            }
+            var comments = _context.ArticleComment.Where(y => y.ArticleId == Id);
+            var artViews = _context.ArticleVisitor.Where(z => z.ArticleId == Id);
+            foreach(var article in articles)
+            {
+                var tags = _context.ArticleTag.Where(a => a.ArticleId == article.Id).ToList();
+                var artCategories = _context.ArticleCategory.Where(b => b.ArticleId == article.Id).ToList();
+                foreach(var tag in tags)
+                {
+                    _context.ArticleTag.Remove(tag);
+                }
+                foreach(var artCategory in artCategories)
+                {
+                    _context.ArticleCategory.Remove(artCategory);
+                }
+            }
+            foreach(var comment in comments)
+            {
+                _context.ArticleComment.Remove(comment);
+            }
+            foreach (var visitor in artViews)
+            {
+                _context.ArticleVisitor.Remove(visitor);
+            }
+            foreach(var article in articles)
+            {
+                _context.Article.Remove(article);
+            }
+            _context.SaveChanges();
+            return RedirectToAction("Index");
+        }
 
         [HttpPost]
         [Authorize]
