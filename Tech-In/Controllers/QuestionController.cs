@@ -512,6 +512,7 @@ namespace Tech_In.Controllers
                 UserQAComment userQAComment = new UserQAComment();
                 userQAComment.Description = vm.QACommentsViewModel.Description;
                 userQAComment.UserId = user.Id;
+                userQAComment.UserQACommentID = vm.QACommentsViewModel.UserQACommentID;
                 userQAComment.UserQuestionId = vm.QACommentsViewModel.UserQuestionId;
                 userQAComment.UserQAnswerId = vm.QACommentsViewModel.UserQAnswerId;
                 userQAComment.Visibility = false;
@@ -576,173 +577,10 @@ namespace Tech_In.Controllers
         //    }
         //}
 
-        public async Task<IActionResult> MyPostedQuestion()
-        {
-
-
-            //Check User Profile is complete or not
-            var user = await _userManager.GetCurrentUser(HttpContext);
-            var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).Select(y => y.UserId).SingleOrDefault();
-            var questionList = _context.UserQuestion.Where(u=> u.UserId == user.Id)
-                    .Select(c => new NewQuestionVM
-                    {
-                        UserQuestionId = c.UserQuestionId,
-                        Title = c.Title,
-                        PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.FirstName).SingleOrDefault(),
-                        UserPic = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.ProfileImage).SingleOrDefault(),
-                        PostTime = c.PostTime,
-                        HasVerifiedAns = c.HasVerifiedAns,
-                        Visitors = _context.QuestionVisitor.Where(f => f.QuestionId == c.UserQuestionId).Count(),
-                        Tags = c.Tag.Select(t => new QuestionTagViewModel
-                        {
-                            SkillName = t.SkillTag.SkillName
-                        }).ToList(),
-                        Voting = c.UserQAVoting.Sum(x => x.Value)
-
-                    }).ToList();
-
-            if (userPersonalRow == null)
-            {
-                return RedirectToAction("CompleteProfile", "Home");
-            }
-            @ViewBag.questionList = questionList;
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
-            return RedirectToAction("Index", "User");
-        }
         
-        public async Task<IActionResult> EditQuestion(int Id)
-        {
-            NewQuestionVM vm = new NewQuestionVM();
-            if (Id > 0)
-            {
-                string userId = HttpContext.Session.GetString("UserId");
-
-                UserQuestion userQuestion = _context.UserQuestion.SingleOrDefault(x => x.UserQuestionId == Id && x.UserId == userId);
-                vm.Title = userQuestion.Title;
-                vm.Description = userQuestion.Description;
-                 
-             }
-            return View("Detail");
-        }
-
-        public async Task<JsonResult> DeleteQuestion(int Id)
-        {
-            string userId = HttpContext.Session.GetString("UserId");
-            bool result = false;
-            UserQuestion userQuestion = _context.UserQuestion.SingleOrDefault(x => x.UserQuestionId == Id && x.UserId == userId);
-            if (userQuestion != null)
-            {
-                _context.Remove(userQuestion);
-                _context.SaveChanges();
-                result = true;
-            }
-
-            return Json(result);
-        }
-
-        //public async Task<IActionResult> MyPostedComment()
-        //{
 
 
-        //    //Check User Profile is complete or not
-        //    var user = await _userManager.GetCurrentUser(HttpContext);
-        //    var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).Select( e=> e.UserId).SingleOrDefault();
-        //    var questionList = _context.UserQuestion
-        //             .Select(c => new NewQuestionVM
-        //             {
-        //                 Title = c.Title,
-        //                 Description = HttpUtility.HtmlDecode(c.Description),
-        //                 //Tags=_context.QuestionSkill.Where(qs=> qs.QuestionSkillId==id).Select(d=> new QuestionTagViewModel { SkillName = d.SkillTag.SkillName }).ToList(),
-        //                 PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.FirstName).SingleOrDefault(),
-        //                 UserPic = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.ProfileImage).SingleOrDefault(),
-        //                 PostTime = c.PostTime,
-        //                 HasVerifiedAns = c.HasVerifiedAns,
-        //                 Comment = c.UserQAComment.Where(o => o.UserId == user.Id).Select(z => new QACommentsViewModel
-        //                 {
-        //                     UserQuestionId = z.UserQuestionId,
-        //                     UserQAnswerId = z.UserQAnswerId,
-        //                     Description = z.Description,
-        //                     IsAnswer = z.IsAnswer,
-        //                     Visibility = z.Visibility,
-        //                     UserQACommentID = z.UserQACommentID,
-        //                     PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == z.UserId).Select(aaa => aaa.FirstName).SingleOrDefault(),
-        //                     UserId = z.ApplicationUser.Id,
-        //                 }).ToList(),
-        //                 Voting = c.UserQAVoting.Sum(x => x.Value)
-        //             }).ToList();
-        //    var comment = _context.UserQAComment.Where(d => d.UserId == userPersonalRow).Select(x => new QACommentsViewModel
-        //    {
-        //        UserQAnswerId = x.UserQAnswerId,
-        //        Description = x.Description,
-        //        IsAnswer = x.IsAnswer,
-        //        Visibility = x.Visibility,
-        //        UserQACommentID = x.UserQACommentID,
-        //        PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == x.UserId).Select(aaa => aaa.FirstName).SingleOrDefault(),
-        //        UserId = x.ApplicationUser.Id,
-        //    }).ToList();
-        //    if (userPersonalRow == null)
-        //    {
-        //        return RedirectToAction("CompleteProfile", "Home");
-        //    }
 
-        //    @ViewBag.UName = HttpContext.Session.GetString("Name");
-        //    return View(questionList);
-        //}
-
-    //    public async Task<IActionResult> MyPostedAnswer()
-    //    {
-
-
-    //        //Check User Profile is complete or not
-    //        var user = await _userManager.GetCurrentUser(HttpContext);
-    //        var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).Select(e=>e.UserId).SingleOrDefault();
-    //        var questionList = _context.UserQuestion
-    //                 .Select(c => new NewQuestionVM
-    //                 {
-    //                     Title = c.Title,
-    //                     Description = HttpUtility.HtmlDecode(c.Description),
-    //                     //Tags=_context.QuestionSkill.Where(qs=> qs.QuestionSkillId==id).Select(d=> new QuestionTagViewModel { SkillName = d.SkillTag.SkillName }).ToList(),
-    //                     PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.FirstName).SingleOrDefault(),
-    //                     UserPic = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.ProfileImage).SingleOrDefault(),
-    //                     PostTime = c.PostTime,
-    //                     HasVerifiedAns = c.HasVerifiedAns,
-    //                     Tags = c.Tag.Select(t => new QuestionTagViewModel
-    //                     {
-    //                         SkillName = t.SkillTag.SkillName
-    //                     }).ToList(),
-    //                     Answers = c.UserQAnswer.Where(k=>k.UserId == user.Id).Select(x => new QAnswerViewModel
-    //                     {
-    //                         Description = HttpUtility.HtmlDecode(x.Description),
-    //                         UserQAnswerId = x.UserQAnswerId,
-    //                         Date = x.PostTime,
-    //                         IsVerified = x.IsVerified,
-    //                         Votes = _context.UserQAVoting.Where(y => y.UserAnswerId == x.UserQAnswerId).Sum(z => z.Value),
-    //                         User = _context.UserPersonalDetail.Where(y => y.UserId == x.ApplicationUser.Id).Select(z => z.FirstName).SingleOrDefault()
-    //                     }).OrderByDescending(ord => ord.IsVerified).ThenBy(ordasc => ordasc.UserQAnswerId).ToList(),
-    //                     Comment = c.UserQAComment.Select(z => new QACommentsViewModel
-    //                     {
-    //                         UserQuestionId = z.UserQuestionId,
-    //                         UserQAnswerId = z.UserQAnswerId,
-    //                         Description = z.Description,
-    //                         IsAnswer = z.IsAnswer,
-    //                         Visibility = z.Visibility,
-    //                         UserQACommentID = z.UserQACommentID,
-    //                         PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == z.UserId).Select(aaa => aaa.FirstName).SingleOrDefault(),
-
-    //                         UserId = z.ApplicationUser.Id,
-    //                     }).ToList(),
-    //                     Voting = c.UserQAVoting.Sum(x => x.Value)
-
-    //                 }).ToList();
-
-    //        if (userPersonalRow == null)
-    //        {
-    //            return RedirectToAction("CompleteProfile", "Home");
-    //        }
-
-    //        @ViewBag.UName = HttpContext.Session.GetString("Name");
-    //        return View(questionList);
-    //    }
 
     }
 }

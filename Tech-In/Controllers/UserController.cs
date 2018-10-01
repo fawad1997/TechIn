@@ -86,16 +86,19 @@ namespace Tech_In.Controllers
                 Tags = c.Tag.Select(t => new QuestionTagViewModel{SkillName = t.SkillTag.SkillName }).ToList(),
                 Voting = c.UserQAVoting.Sum(x => x.Value)
             }).ToList();
-            var comments = _context.UserQAComment.Where(q => q.UserId == user.Id).Select(s => new QACommentsViewModel 
+
+            //comment
+            var comments = _context.UserQAComment.Where(q => q.UserId == user.Id).Select(s => new QACommentsViewModel
             {
                 Description = s.Description,
-                
+                UserQACommentID = s.UserQACommentID,
                 UserQuestionId = s.UserQuestionId,
                 IsAnswer= s.IsAnswer,
                 PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == s.UserId).Select(z => z.FirstName).SingleOrDefault(),
                 UserId = user.Id,
             }).ToList();
 
+            //answer
             var answers = _context.UserQAnswer.Where(f => f.UserId == user.Id).Select(k => new QAnswerViewModel
             {
                 Description = HttpUtility.HtmlDecode(k.Description),
@@ -766,6 +769,70 @@ namespace Tech_In.Controllers
             ViewBag.CitiesList = new SelectList(cities, "CityId", "CityName");
             return PartialView("CitiesPartial");
         }
-        
+
+
+        public async Task<JsonResult> DeleteQuestion(int Id)
+        {
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
+            bool result = false;
+            List<UserQAComment> com = _context.UserQAComment.Where(c => c.UserQuestionId == Id).ToList();
+            List<UserQAnswer> ans = _context.UserQAnswer.Where(a => a.UserQuestionId == Id).ToList();
+            List<UserQAVoting> vot = _context.UserQAVoting.Where(v => v.UserQuestionId == Id).ToList();
+            UserQuestion que = _context.UserQuestion.Where(x => x.UserQuestionId == Id).SingleOrDefault();
+                
+            if (que != null)
+            {
+                _context.Remove(que);
+                _context.SaveChanges();
+                result = true;
+            }
+
+            return Json(result);
+        }
+
+        public async Task<JsonResult> DeleteComment(int Id)
+        {
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
+            bool result = false;
+            UserQAComment com = _context.UserQAComment.Where(c => c.UserQACommentID == Id).SingleOrDefault();
+            
+            if (com != null)
+            {
+                _context.Remove(com);
+                _context.SaveChanges();
+                result = true;
+            }
+
+            return Json(result);
+        }
+
+        public async Task<JsonResult> DeleteAnswer(int Id)
+        {
+            string userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                userId = await SetUserId();
+            }
+            bool result = false;
+            UserQAnswer ans = _context.UserQAnswer.Where(a => a.UserQAnswerId == Id).SingleOrDefault();
+            if (ans != null)
+            {
+                _context.Remove(ans);
+                _context.SaveChanges();
+                result = true;
+            }
+
+            return Json(result);
+        }
+
+
     }
 }
