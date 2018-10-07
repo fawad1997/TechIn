@@ -1,0 +1,19 @@
+﻿
+@{
+    Layout = null;
+}
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+<div class="widget">
+    <h3 class="title">Top Tags</h3>
+    <div class="widget-tags blog-tags">
+  @foreach (var question in Model.Questions)
+  {
+        @foreach (var tag in question.Tags)
+        {
+        <a href="/Questions/SearchByTag/@tag.SkillTagId"><i class="fa fa-tag"></i> @tag.SkillName </a>
+        }
+  }
+    </div>
+</div>

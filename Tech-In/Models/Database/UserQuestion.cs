@@ -31,6 +31,8 @@ namespace Tech_In.Models.Database
 
         public ICollection<UserQAVoting> UserQAVoting { get; set; }
 
+        public ICollection<QuestionVisitor> QuestionVisitor { get; set; }
+
         //ApNetUser
         public string UserId { get; set; }
         [ForeignKey("UserId")]
