@@ -1,0 +1,43 @@
+﻿@model Tech_In.Models.ViewModels.ArticleViewModels.CommentVM
+@{
+    Layout = null;
+}
+<form id="editcmtForm">
+    <input asp-for="Id" type="hidden" value="@Model.Id" />
+    <textarea asp-for="Comment" required maxlength="300" minlength="3" placeholder="Add Your Commment"></textarea>
+    <span id="cmterror" class="text-danger col-xs-12"></span>
+    <button id="editcmtbtn" type="button" class="main-btn">Update</button>
+</form>
+<div class="cent" id="loaderDiv">
+    <img src="~/images/load.gif" />
+</div>
+<script>
+    $("#editcmtbtn").click(function () {
+        $("#loaderDiv").show();
+        if ($('#Comment').val().length < 3) {
+            $('#cmterror').text('Comment length must be minimum 3 characters');
+            $("#loaderDiv").hide();
+            return;
+        }
+        var cmtFormData = $("#editcmtForm").serialize();
+        console.log(cmtFormData);
+        $.ajax({
+            type: "POST",
+            url: "/articles/updatecomment",
+            data: cmtFormData,
+            success: function (response) {
+                if (response.success) {
+                    $("#comments").fadeOut('slow').load("/articles/comments",
+                        { articleId: @Model.ArticleId }).fadeIn('slow');
+                    $('#cmterror').text('');
+                    $("#loaderDiv").hide();
+                    $('#Comment').val(" ");
+                } else {
+                    $('#cmterror').text('Unable to add comment! Something went wrong!');
+                    $("#loaderDiv").hide();
+                }
+            }
+        });
+
+    });
+</script>

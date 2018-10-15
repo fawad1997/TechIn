@@ -62,7 +62,7 @@ namespace Tech_In.Controllers
                                   CreateTime = art.CreateTime,
                                   AuthorName = u.FirstName +" "+u.LastName,
                                   VisitorsCount = _context.ArticleVisitor.Where(av => av.ArticleId == art.OriginalId).Count(),
-                                  CommentsCount = _context.ArticleComment.Where(cmt => cmt.ArticleId == art.OriginalId).Count()
+                                  CommentsCount = _context.ArticleComment.Where(cmt => cmt.ArticleId == art.OriginalId && cmt.Status=="active").Count()
                               }
                               ).Take(10);
             if (!String.IsNullOrEmpty(search))
@@ -480,22 +480,85 @@ namespace Tech_In.Controllers
                 };
                 _context.ArticleComment.Add(comment);
                 _context.SaveChanges();
+                comment.OriginalId = comment.Id;
+                _context.SaveChanges();
                 return Json(new { success = true });
             }
             return Json(new { success = false });
         }
         [HttpPost]
-        public IActionResult Comments(int articleId)
+        public async Task<IActionResult> Comments(int articleId)
         {
-            var comments = _context.ArticleComment.Where(art => art.ArticleId == articleId).Select(x => new CommentVM { Comment = x.Comment, CreateTime = x.CreateTime, Id = x.Id, Status = x.Status, UserId = x.UserId }).ToList();
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            var comments = _context.ArticleComment.Where(art => art.ArticleId == articleId && art.Status=="active").Select(x => new CommentVM { Comment = x.Comment, CreateTime = x.CreateTime, Id = x.Id, Status = x.Status, UserId = x.UserId }).ToList();
             foreach(var cmt in comments)
             {
                 var commentAuthor = _context.UserPersonalDetail.Where(y => y.UserId == cmt.UserId).SingleOrDefault();
                 cmt.UserImg = commentAuthor.ProfileImage;
                 cmt.UserName = commentAuthor.FirstName + " " + commentAuthor.LastName;
+                cmt.IsCommentAuthor = false;
+                if (user != null)
+                {
+                    if(user.Id == commentAuthor.UserId)
+                    {
+                        cmt.IsCommentAuthor = true;
+                    }
+                }
             }
             //return Json(new { success = true, response = comments });
             return View("_CommentsPartial",comments);
+        }
+        public async Task<IActionResult> EditComment(int Id)
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            var comment = _context.ArticleComment.Where(x => x.Id == Id && x.UserId == user.Id).SingleOrDefault();
+            if (comment == null)
+            {
+                return NotFound();
+            }
+            CommentVM cmt = _mapper.Map<CommentVM>(comment);
+            return View("_EditComment",cmt);
+        }
+        public async Task<IActionResult> UpdateComment(CommentVM vm)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetCurrentUser(HttpContext);
+                var comment = _context.ArticleComment.Where(x => x.Id == vm.Id && x.UserId == user.Id).SingleOrDefault();
+                if (comment == null)
+                {
+                    return NotFound();
+                }
+                comment.Status = "history";
+                ArticleComment updatedComment = new ArticleComment
+                {
+                    OriginalId = comment.Id,
+                    ArticleId = comment.ArticleId,
+                    Comment = vm.Comment,
+                    CreateTime = DateTime.Now,
+                    Status = "active",
+                    UserId = user.Id
+                };
+                _context.ArticleComment.Add(updatedComment);
+                _context.SaveChanges();
+                return Json(new { success = true });
+            }
+            return Json(new { success = false });
+        }
+        public async Task<IActionResult> DeleteComment(int id)
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            var comments = _context.ArticleComment.Where(x => x.OriginalId == id && x.UserId == user.Id).ToList();
+            if (comments == null)
+            {
+                return NotFound();
+            }
+            foreach(var comment in comments)
+            {
+                _context.ArticleComment.Remove(comment);
+            }
+            _context.SaveChanges();
+            return Json(new { success = true });
         }
         public async Task<IActionResult> ArticleViews(int articleId)
         {
@@ -600,7 +663,7 @@ namespace Tech_In.Controllers
             }).OrderByDescending(o => o.Count).Take(5).ToList();
             foreach(var tagCountID in topTags)
             {
-                var tag = _context.SkillTag.Where(x => x.SkillTagId == tagCountID.Id).SingleOrDefault();
+                var tag = _context.SkillTag.Where(x => x.SkillTagId == tagCountID.Id).FirstOrDefault();
                 tagCountID.TagName = tag.SkillName;
             }
             return View("_TopTags",topTags);

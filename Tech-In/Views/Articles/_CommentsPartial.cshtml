@@ -22,7 +22,56 @@
                         <a style="color: black;text-decoration: none;" href="/User/@singleComment.UserId">@singleComment.UserName</a>
 
                         <span class="time"><i class="fa fa-clock-o" title="Time Posted"></i> @singleComment.GetPastTime()</span>
-        @*<a href="#" class="reply">
+                        @if (singleComment.IsCommentAuthor)
+                        {
+                            <span style="cursor:grab;" onclick="editCmtFunc(@singleComment.Id)" class="time"><i class="fa fa-pencil" title="Edit"></i> edit</span>
+                            <span style="cursor:grab;" onclick="deleteCmtFunc(@singleComment.OriginalId)" class="time"><i class="fa fa-trash" title="delete"></i> delete</span>
+
+                            <!-- Modal -->
+                            <div class="modal fade bs-example-modal-lg" id="eCmtModal" role="dialog">
+                                <div class="modal-dialog">
+
+                                    <!-- Modal content-->
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            <h4 class="modal-title">Edit Comment</h4>
+                                        </div>
+                                        <div id="editCmtBody" class="modal-body">
+                                            <br /><br /><br />
+                                            <div class="cent" id="loaderDivv" style="display:block; height:50px; width:50px;">
+                                                <img src="~/images/load.gif" />
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <!--/Modal Edit Comment-->
+                            <!-- Modal Delete Comment-->
+                            <div class="modal fade bs-example-modal-lg" id="dCmtModal" role="dialog">
+                                <div class="modal-dialog">
+                                    <!-- Modal content-->
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            <h4 class="modal-title">Delete Comment</h4>
+                                        </div>
+                                        <div id="delCmtBody" class="modal-body">
+                                            <p>Are you sure you want to delete this comment?</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--/Modal Delete Comment-->
+                        }
+                        @*<a href="#" class="reply">
             Reply
             <i class="fa fa-reply"></i>
         </a>*@
@@ -38,3 +87,14 @@
 
     }
 </div>
+
+<script>
+    var editCmtFunc = function (id) {
+        $("#editCmtBody").load("/articles/editcomment",
+            { Id: id });
+        $("#eCmtModal").modal("show");
+    }
+    var deleteCmtFunc = function (id) {
+        $("#dCmtModal").modal("show");
+    }
+</script>

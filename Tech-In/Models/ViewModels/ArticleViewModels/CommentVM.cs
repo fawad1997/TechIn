@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,12 +12,14 @@ namespace Tech_In.Models.ViewModels.ArticleViewModels
         public int OriginalId { get; set; }
         public string Status { get; set; }
         public DateTime CreateTime { get; set; }
+        [StringLength(maximumLength: 300, MinimumLength = 3), Required]
         public string Comment { get; set; }
         public int ArticleId { get; set; }
         //ApNetUser
         public string UserId { get; set; }
         public string UserName { get; set; }
         public string UserImg { get; set; }
+        public bool IsCommentAuthor { get; internal set; }
 
         public string GetPastTime()
         {
