@@ -105,13 +105,9 @@
                         </div>
                         <div class="col-xs-6">
                             <div class="form-group">
-                                <label class="control-label">Public or Private</label>
-                                <div class="checkbox">
-                                    <label>
-                                        @Html.CheckBoxFor(m => m.DOBVisibility)
-                                        Make Date of Birth Public.
-                                    </label>
-                                </div>
+                                <label class="control-label">Username<strong class="text-danger"> *</strong></label>
+                                <input asp-for="UserName" placeholder="e.g. fawad1997" class="input" />
+                                <span asp-validation-for="UserName" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
@@ -290,6 +286,21 @@
     <script>
 
         $(document).ready(function () {
+
+            $("#UserName").change(function () {
+                var username = $(this).val();
+
+                //$.ajax({
+                //    type: "POST",
+                //    url: "/User/CheckUserName?Username=" + username,
+                //    contentType: "html",
+                //    success: function (response) {
+                //        alert("SUccess");
+
+                //    }
+                //})
+                alert("The text has been changed." + username);
+            }); 
 
             $('#validateForm').bootstrapValidator({
                 feedbackIcons: {

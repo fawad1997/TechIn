@@ -100,7 +100,7 @@ namespace Tech_In.Controllers
                 userPersonal.CityId = vm.CityId;
                 userPersonal.FirstName = vm.FirstName;
                 userPersonal.LastName = vm.LastName;
-                userPersonal.IsDOBPublic = vm.DOBVisibility;
+                userPersonal.IsDOBPublic = false;
                 userPersonal.DOB = vm.DOB;
                 if (vm.Gender == 0)
                 {
