@@ -11,7 +11,6 @@ using Tech_In.Data;
 using Tech_In.Extensions;
 using Tech_In.Models;
 using Tech_In.Services;
-using SignalRChat.Hubs;
 
 namespace Tech_In
 {
@@ -86,7 +85,7 @@ namespace Tech_In
             services.AddMvc();
             services.AddDistributedMemoryCache();
             services.AddSession();
-            services.AddSignalR();
+        
 
             //Configure AutthMessageSenderOptions to get the sedGrid key
             services.Configure<AuthMessageSenderOptions>(Configuration);
@@ -97,7 +96,7 @@ namespace Tech_In
         {
             if (env.IsDevelopment())
             {
-                //app.UseBrowserLink();
+                app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
             }
@@ -117,11 +116,7 @@ namespace Tech_In
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-
-            app.UseSignalR(routes =>
-            {
-                routes.MapHub<ChatHub>("/chatHub");
-            });
+            
         }
     }
 }
