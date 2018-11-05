@@ -37,10 +37,13 @@ namespace Tech_In.Controllers
 
             //Check User Profile is complete or not 
             var user = await _userManager.GetCurrentUser(HttpContext);
-            var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
-            if (userPersonalRow == null)
+            if(user != null)
             {
-                return RedirectToAction("CompleteProfile", "Home");
+                var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
+                if (userPersonalRow == null)
+                {
+                    return RedirectToAction("CompleteProfile", "Home");
+                }
             }
             var questionList = (from question in _context.UserQuestion
                                join personalInfo in _context.UserPersonalDetail on question.UserId equals personalInfo.UserId
@@ -68,8 +71,8 @@ namespace Tech_In.Controllers
 
             }
             @ViewBag.UName = HttpContext.Session.GetString("Name");
-            int pageSize = 4;
-            return View(new QuestionListVM { Questions = await PaginatedList<NewQuestionVM>.CreateAsync(questionList.AsNoTracking(), page ?? 1, pageSize) });
+            int pageSize = 5;
+            return View(new QuestionListVM { Questions = await PaginatedList<NewQuestionVM>.CreateAsync(questionList.AsQueryable(), page ?? 1, pageSize) });
           
         }
 
