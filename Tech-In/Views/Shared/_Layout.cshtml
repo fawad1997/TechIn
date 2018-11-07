@@ -86,7 +86,7 @@
                                 <a asp-controller="Question" asp-action="Index">Questions</a>
                             </li>
                             <li>
-                                <a asp-area="" asp-controller="Articles" asp-action="Index">Article</a>
+                                <a asp-area="" asp-controller="Articles" asp-action="Index">Articles</a>
                             </li>
                             <li>
                                 <a asp-area="" asp-controller="Job" asp-action="Index">Job</a>
@@ -118,25 +118,7 @@
                                 </div>
                             </div>
                             <!--RIght Login-->
-                            <div class="col-md-5 col-sm-6 col-xs-10 custom-xs-push-1">
-                                <div class="jumbotron white-background index-sign-div">
-                                    <form class="contact-form">
-                                        <h3>Login</h3>
-                                        <label class="signup-label">Email</label>
-                                        <br />
-                                        <input aria-labelledby="Email" type="email" class="input" placeholder="you@example.com" />
-                                        <br />
-                                        <label aria-labelledby="Password" class="signup-label">Password</label>
-                                        <input type="password" class="input" placeholder="Password" />
-                                        <button class="main-btn btn-block blue-g-btn">
-                                            <b>Sign in</b>
-                                        </button>
-
-                                        <br />
-                                        <a href="#">more options...</a>
-                                    </form>
-                                </div>
-                            </div>
+                           @await Html.PartialAsync("LoginRight")
                             <!--/Right Login-->
                             <!-- /home content -->
 
@@ -176,7 +158,7 @@
                             <a asp-controller="Question" asp-action="Index">Questions</a>
                         </li>
                         <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Articles" ? "active" : "")">
-                            <a asp-area="" asp-controller="Articles" asp-action="Index">Article</a>
+                            <a asp-area="" asp-controller="Articles" asp-action="Index">Articles</a>
                         </li>
                         <li>
                             <a asp-area="" asp-controller="Job" asp-action="Index">Job</a>

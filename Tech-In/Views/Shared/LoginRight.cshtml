@@ -1,0 +1,22 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model LoginViewModel
+<div class="col-md-5 col-sm-6 col-xs-10 custom-xs-push-1">
+    <div class="jumbotron white-background index-sign-div">
+        <form asp-action="Login" asp-controller="Account" class="contact-form">
+            <h3>Login</h3>
+            <label class="signup-label">Email</label>
+            <br />
+            <input asp-for="Email" aria-labelledby="Email" type="email" class="input" placeholder="you@example.com" />
+            <span asp-validation-for="Email"></span>
+            <br />
+            <label aria-labelledby="Password" class="signup-label">Password</label>
+            <input asp-for="Password" type="password" class="input" placeholder="Password" />
+            <span asp-validation-for="Password"></span>
+            <input type="submit" value="Submit" class="main-btn btn-block blue-g-btn">
+            <br />
+            <a asp-action="Login">more options...</a>
+        </form>
+    </div>
+</div>
