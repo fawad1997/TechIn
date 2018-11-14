@@ -1,7 +1,87 @@
 ﻿
 @{
     ViewData["Title"] = "Welcome";
+    Layout = "_AuthIndexLayout";
 }
+<div class="header-wrapper sm-padding bg-grey">
+    <div class="container">
+        <h2>Welcome</h2>
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="index.html">Home</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
 
-<h2>Welcome View After Login</h2>
+        <aside class="col-md-3 hidden-sm">
+            <!-- Posts sidebar -->
+            <div id="popularposts"></div>
+            <!-- /Posts sidebar -->
+        </aside>
+        <div class="col-md-6">
+            <div class="post">
+                <div class="row">
+                    <div class="col-xs-2 col-md-2">
+                        @*@if (Model.UserPersonalVM.ProfileImage == null)
+                            {*@
+                        <img src="~/images/noimg.svg" class="post-img img-circle float-right" />
+                        @*}
+                            else
+                            {
+                                <img src="@Model.UserPersonalVM.ProfileImage" class="post-img img-circle" />
+                            }*@
 
+                    </div>
+                    <div class="col-xs-9 col-md-9">
+                        <h6 class="inline small-h">Fawad</h6>
+                        <br />
+                        <!--Edit-->
+                        <div class="right-post-icon-div">
+                            <div class="round-icon-back">
+                                <i class="fa fa-ellipsis-h"></i>
+                            </div>
+                        </div>
+                        <!--/Edit-->
+                        <p class="inline twelve-font">Student at Capital University of Science & Technology</p>
+                    </div>
+                    <div class="col-xs-12">
+                        <hr />
+                        <p class="black">
+                            I am sorry if you are seeing it. Please Ignore this message as this module is pending yet and will be done in next semester. have a nice day
+                        </p>
+                        <p>7 Likes</p>
+                        <hr />
+                        <button class="transparent-btn">
+                            <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+                            Like
+                        </button>
+                        <button class="transparent-btn">
+                            <i class="fa fa-comment-o" aria-hidden="true"></i>
+                            Comment
+                        </button>
+                        <button class="transparent-btn">
+                            <i class="fa fa-share" aria-hidden="true"></i>
+                            Share
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <aside class="col-md-3">
+            <!-- Posts sidebar -->
+            <div id="popularposts"></div>
+            <!-- /Posts sidebar -->
+        </aside>
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#popularposts").load("/articles/popularposts");
+        
+    })
+</script>

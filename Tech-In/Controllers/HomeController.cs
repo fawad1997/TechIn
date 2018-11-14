@@ -54,6 +54,7 @@ namespace Tech_In.Controllers
             return View("Welcome");
         }
 
+
         [Authorize]
         public IActionResult CompleteProfile()
         {
