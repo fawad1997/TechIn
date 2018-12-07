@@ -36,9 +36,9 @@ namespace Tech_In.Models.ViewModels.ProfileViewModels
         //[Display(Name = "Date of Birth Visibility")]
         //public Boolean DOBVisibility { get; set; }
         [Required]
-        [StringLength(14, MinimumLength = 5)]
+        [StringLength(20, MinimumLength = 2)]
         [Display(Name = "Username ")]
-        [RegularExpression(@"^[A-Za-z][A-Za-z0-9._]{5,14}$", ErrorMessage = "UserName can only start with alphabets")]
+        [RegularExpression(@"^[A-Za-z][A-Za-z0-9._]{2,20}$", ErrorMessage = "UserName can only start with alphabets")]
         public string UserName { get; set; }
 
         public Gender Gender { get; set; }

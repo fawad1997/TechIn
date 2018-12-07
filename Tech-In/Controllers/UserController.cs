@@ -832,7 +832,14 @@ namespace Tech_In.Controllers
 
             return Json(result);
         }
-
+        public async Task<JsonResult> CheckUserName(string userName)
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            var exists = _userManager.Users.ToList().Find(aa => aa.UserName.Equals(userName.ToLower()));
+            if(exists!=null)
+                return Json(new { success = false });
+            return Json(new { success = true });
+        }
 
     }
 }

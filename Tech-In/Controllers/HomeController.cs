@@ -72,6 +72,11 @@ namespace Tech_In.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetCurrentUser(HttpContext);
+                if (_userManager.Users.ToList().Find(aa => aa.UserName.Equals(vm.UserName.ToLower()))!=null)
+                {
+                    return BadRequest();
+                }
+                user.UserName = vm.UserName;
                 var file = vm.ProfileImage;
                 UserPersonalDetail userPersonal = new UserPersonalDetail();
                 if (file != null)
@@ -98,6 +103,7 @@ namespace Tech_In.Controllers
                         userPersonal.ProfileImage = $"/images/users/{fileNam}";
                     }
                 }
+                user.UserName = vm.UserName;
                 userPersonal.CityId = vm.CityId;
                 userPersonal.FirstName = vm.FirstName;
                 userPersonal.LastName = vm.LastName;
