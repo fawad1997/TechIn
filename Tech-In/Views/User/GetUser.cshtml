@@ -833,210 +833,211 @@
                             </div>
                         </div>
                         <div role="tabpanel" class="tab-pane" id="messages">
-                            <br /><br />
 
-                            <div class="container">
-                                <div class="panel-group" id="accordion">
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <h4 class="panel-title">
-                                                <a data-toggle="collapse" data-parent="#accordion" class="btn-link" id="showQuestion" href="#collapse1">my questions</a>
-                                            </h4>
-                                        </div>
-                                        <div id="collapse1" class="panel-collapse collapse in">
-                                            @* Start of Question View *@
-                                            <div class="panel-body">
+                            <div class="row">
 
-                                                <div class="row">
+                                    <div class="panel-group" id="accordion">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h4 class="panel-title">
+                                                    <a data-toggle="collapse" data-parent="#accordion" class="btn-link" id="showQuestion" href="#collapse1">my questions</a>
+                                                </h4>
+                                            </div>
+                                            <div id="collapse1" class="panel-collapse collapse in">
+                                                @* Start of Question View *@
+                                                <div class="panel-body">
+
+                                                    <div class="row">
 
 
-                                                    @foreach (var question in ViewBag.question)
-                                                    {
-                                                        <div class="well">
-                                                            <div id="rowQuestion_@question.UserQuestionId">
-                                                                <a class="btn btn-danger" onclick="ConfirmDeleteQuestion(@question.UserQuestionId)"><i class="fa fa-trash-o"></i></a>
+                                                        @foreach (var question in ViewBag.question)
+                                                        {
+                                                            <div class="well">
+                                                                <div id="rowQuestion_@question.UserQuestionId">
+                                                                    <a class="btn btn-danger" onclick="ConfirmDeleteQuestion(@question.UserQuestionId)"><i class="fa fa-trash-o"></i></a>
 
-                                                                <button type="button" class="fa fa-pencil close" aria-label="Edit"> </button>
+                                                                    <button type="button" class="fa fa-pencil close" aria-label="Edit"> </button>
 
-                                                                <div class="row">
-                                                                    <div class="col-xs-1 grey-back">
-                                                                        <span>
-                                                                            <strong>@question.Voting</strong><br />Votes
-                                                                        </span>
-                                                                    </div>
-                                                                    <div class="col-xs-9">
-                                                                        <p class="font-size16 margin-bottom6"><a href="/Question/QuestionDetail/@question.UserQuestionId">@question.Title</a></p>
-                                                                        <input type="hidden" id="hiddenQuestionId" />
+                                                                    <div class="row">
+                                                                        <div class="col-xs-1 grey-back">
+                                                                            <span>
+                                                                                <strong>@question.Voting</strong><br />Votes
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="col-xs-9">
+                                                                            <p class="font-size16 margin-bottom6"><a href="/Question/QuestionDetail/@question.UserQuestionId">@question.Title</a></p>
+                                                                            <input type="hidden" id="hiddenQuestionId" />
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    }
+                                                        }
 
-                                                </div>
-                                            </div>
-                                            @* End of Question View *@
-                                        </div>
-                                    </div>
-                                    @* Start of Question Confirm delete *@
-                                    <div class="modal fade" id="QuestionModal">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <a href="#" class="close" data-dismiss="modal">&times;</a>
-                                                    <h3 class="modal-title">Delete Question</h3>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <h4>Are you sure ? You want to delete this. </h4>
-
-                                                    <div style="text-align:center;display:none" id="loaderQuestionDiv">
-                                                        <img src="~/images/load.gif" width="150" />
                                                     </div>
-
                                                 </div>
-                                                <div class="modal-footer">
-                                                    <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
-                                                    <a href="#" class="btn btn-success" onclick="DeleteQuestion()">Confirm</a>
-                                                </div>
-
+                                                @* End of Question View *@
                                             </div>
-
                                         </div>
-
-                                    </div>
-                                    @* End of Question Confirm Delete  *@
-
-
-                                    @* Start of Answer Confirm Delete *@
-                                    <div class="modal fade" id="AnswerModal">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <a href="#" class="close" data-dismiss="modal">&times;</a>
-                                                    <h3 class="modal-title">Delete Answer</h3>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <h4>Are you sure ? You want to delete this. </h4>
-
-                                                    <div style="text-align:center;display:none" id="loaderAnswerDiv">
-                                                        <img src="~/images/load.gif" width="150" />
+                                        @* Start of Question Confirm delete *@
+                                        <div class="modal fade" id="QuestionModal">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <a href="#" class="close" data-dismiss="modal">&times;</a>
+                                                        <h3 class="modal-title">Delete Question</h3>
                                                     </div>
+                                                    <div class="modal-body">
+                                                        <h4>Are you sure ? You want to delete this. </h4>
 
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
-                                                    <a href="#" class="btn btn-success" onclick="DeleteAnswer()">Confirm</a>
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-                                    @* End of Answer Confirm Delete *@
-
-                                    <br />
-                                    @* Start of Comment View *@
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <h4 class="panel-title">
-                                                <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">my comments</a>
-                                            </h4>
-                                        </div>
-                                        <div id="collapse2" class="panel-collapse collapse">
-                                            <div class="panel-body">
-                                                @foreach (var comment in ViewBag.comment)
-                                                {
-                                                    <div class="row" id="rowComment_@comment.UserQACommentID">
-
-                                                        <a class="btn btn-danger" onclick="ConfirmDeleteComment(@comment.UserQACommentID)"><i class="fa fa-trash-o"></i></a>
-                                                        <button type="button" class="fa fa-pencil close" aria-label="Edit"> </button>
-                                                        <input type="hidden" id="hiddenCommentId" />
-                                                        <div class="row">
-                                                            <div class="col-xs-9">
-                                                                <p class="font-size16 margin-bottom6"><a href="/Question/QuestionDetail/@comment.UserQuestionId">@comment.Description</a></p>
-                                                                <hr />
-                                                            </div>
+                                                        <div style="text-align:center;display:none" id="loaderQuestionDiv">
+                                                            <img src="~/images/load.gif" width="150" />
                                                         </div>
 
                                                     </div>
-                                                }
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @* End of Comment View *@
-                                    <br />
-                                    @* Start of Comment Confirm Delete *@
-                                    <div class="modal fade" id="CommentModel">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <a href="#" class="close" data-dismiss="modal">&times;</a>
-                                                    <h3 class="modal-title">Delete Comment</h3>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <h4>Are you sure ? You want to delete this. </h4>
-
-                                                    <div style="text-align:center;display:none" id="loaderCommentDiv">
-                                                        <img src="~/images/load.gif" width="150" />
+                                                    <div class="modal-footer">
+                                                        <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                                                        <a href="#" class="btn btn-success" onclick="DeleteQuestion()">Confirm</a>
                                                     </div>
 
                                                 </div>
-                                                <div class="modal-footer">
-                                                    <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
-                                                    <a href="#" class="btn btn-success" onclick="DeleteComment()">Confirm</a>
+
+                                            </div>
+
+                                        </div>
+                                        @* End of Question Confirm Delete  *@
+
+
+                                        @* Start of Answer Confirm Delete *@
+                                        <div class="modal fade" id="AnswerModal">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <a href="#" class="close" data-dismiss="modal">&times;</a>
+                                                        <h3 class="modal-title">Delete Answer</h3>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <h4>Are you sure ? You want to delete this. </h4>
+
+                                                        <div style="text-align:center;display:none" id="loaderAnswerDiv">
+                                                            <img src="~/images/load.gif" width="150" />
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                                                        <a href="#" class="btn btn-success" onclick="DeleteAnswer()">Confirm</a>
+                                                    </div>
+
                                                 </div>
 
                                             </div>
 
                                         </div>
+                                        @* End of Answer Confirm Delete *@
 
-                                    </div>
-                                    @* End of Comment Confirm Delete *@
-
-                                    @* Start of Answer View *@
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <h4 class="panel-title">
-
-                                                <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">my answers</a>
-                                            </h4>
-                                        </div>
-
-                                        <div id="collapse3" class="panel-collapse collapse">
-                                            <div class="panel-body">
-                                                @foreach (var answer in ViewBag.answer)
-                                                {
-
-                                                    @foreach (var question in answer.UserQuestion)
+                                        <br />
+                                        @* Start of Comment View *@
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h4 class="panel-title">
+                                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">my comments</a>
+                                                </h4>
+                                            </div>
+                                            <div id="collapse2" class="panel-collapse collapse">
+                                                <div class="panel-body">
+                                                    @foreach (var comment in ViewBag.comment)
                                                     {
-                                                        <div id="rowAnswer_@answer.UserQAnswerId">
-                                                            <a class="btn btn-danger" onclick="ConfirmDeleteAnswer(@answer.UserQAnswerId)"><i class="fa fa-trash-o"></i></a>
+                                                        <div class="row" id="rowComment_@comment.UserQACommentID">
+
+                                                            <a class="btn btn-danger" onclick="ConfirmDeleteComment(@comment.UserQACommentID)"><i class="fa fa-trash-o"></i></a>
                                                             <button type="button" class="fa fa-pencil close" aria-label="Edit"> </button>
-                                                            <input type="hidden" id="hiddenAnswerId" />
+                                                            <input type="hidden" id="hiddenCommentId" />
                                                             <div class="row">
-
                                                                 <div class="col-xs-9">
-                                                                    <p class="font-size16 margin-bottom6">
-
-                                                                        <a href="/Question/QuestionDetail/@question.UserQuestionId">
-                                                                            @question.Title
-                                                                        </a>
-                                                                    </p>
+                                                                    <p class="font-size16 margin-bottom6"><a href="/Question/QuestionDetail/@comment.UserQuestionId">@comment.Description</a></p>
                                                                     <hr />
                                                                 </div>
-
                                                             </div>
+
                                                         </div>
                                                     }
-
-                                                }
-
+                                                </div>
                                             </div>
                                         </div>
+                                        @* End of Comment View *@
+                                        <br />
+                                        @* Start of Comment Confirm Delete *@
+                                        <div class="modal fade" id="CommentModel">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <a href="#" class="close" data-dismiss="modal">&times;</a>
+                                                        <h3 class="modal-title">Delete Comment</h3>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <h4>Are you sure ? You want to delete this. </h4>
+
+                                                        <div style="text-align:center;display:none" id="loaderCommentDiv">
+                                                            <img src="~/images/load.gif" width="150" />
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                                                        <a href="#" class="btn btn-success" onclick="DeleteComment()">Confirm</a>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                        @* End of Comment Confirm Delete *@
+
+                                        @* Start of Answer View *@
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h4 class="panel-title">
+
+                                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">my answers</a>
+                                                </h4>
+                                            </div>
+
+                                            <div id="collapse3" class="panel-collapse collapse">
+                                                <div class="panel-body">
+                                                    @foreach (var answer in ViewBag.answer)
+                                                    {
+
+                                                        @foreach (var question in answer.UserQuestion)
+                                                        {
+                                                            <div id="rowAnswer_@answer.UserQAnswerId">
+                                                                <a class="btn btn-danger" onclick="ConfirmDeleteAnswer(@answer.UserQAnswerId)"><i class="fa fa-trash-o"></i></a>
+                                                                <button type="button" class="fa fa-pencil close" aria-label="Edit"> </button>
+                                                                <input type="hidden" id="hiddenAnswerId" />
+                                                                <div class="row">
+
+                                                                    <div class="col-xs-9">
+                                                                        <p class="font-size16 margin-bottom6">
+
+                                                                            <a href="/Question/QuestionDetail/@question.UserQuestionId">
+                                                                                @question.Title
+                                                                            </a>
+                                                                        </p>
+                                                                        <hr />
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        }
+
+                                                    }
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @* End of Answer View *@
                                     </div>
-                                    @* End of Answer View *@
-                                </div>
+
                             </div>
                         </div>
 
@@ -1129,8 +1130,6 @@
 
             </div>
 
-
-        </div>
 
         @* Edit PersonalDetails Modal Show *@
         <div class="modal fade" id="myPD">
