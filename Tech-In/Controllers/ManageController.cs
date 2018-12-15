@@ -6,6 +6,7 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -50,70 +51,24 @@ namespace Tech_In.Controllers
         [TempData]
         public string StatusMessage { get; set; }
 
-        [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<string> OnGetSesstion()
         {
-            var user = await _userManager.GetUserAsync(User);
-            //Check User Profile is complete or not
-            var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
-            if (userPersonalRow == null)
+            const string SessionKeyName = "_Name";
+            const string SessionKeyPic = "_PPic";
+            const string SessionKeyId = "_Id";
+            const string SessionUserName = "_UserName";
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString(SessionKeyName)))
             {
-                return RedirectToAction("CompleteProfile", "Home");
+                var user = await _userManager.GetCurrentUser(HttpContext);
+                HttpContext.Session.SetString(SessionKeyName, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.FirstName).FirstOrDefault());
+                HttpContext.Session.SetString(SessionKeyPic, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.ProfileImage).FirstOrDefault());
+                HttpContext.Session.SetString(SessionKeyId, user.Id);
+                HttpContext.Session.SetString(SessionUserName, user.UserName);
             }
-            if (user == null)
-            {
-                throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
-
-            var model = new IndexViewModel
-            {
-                Username = user.UserName,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                IsEmailConfirmed = user.EmailConfirmed,
-                StatusMessage = StatusMessage
-            };
-
-            return View(model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index(IndexViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
-
-            var email = user.Email;
-            if (model.Email != email)
-            {
-                var setEmailResult = await _userManager.SetEmailAsync(user, model.Email);
-                if (!setEmailResult.Succeeded)
-                {
-                    throw new ApplicationException($"Unexpected error occurred setting email for user with ID '{user.Id}'.");
-                }
-            }
-
-            var phoneNumber = user.PhoneNumber;
-            if (model.PhoneNumber != phoneNumber)
-            {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
-                {
-                    throw new ApplicationException($"Unexpected error occurred setting phone number for user with ID '{user.Id}'.");
-                }
-            }
-
-            StatusMessage = "Your profile has been updated";
-            return RedirectToAction(nameof(Index));
+            @ViewBag.UName = HttpContext.Session.GetString(SessionKeyName);
+            @ViewBag.UserName = HttpContext.Session.GetString(SessionUserName);
+            @ViewBag.UserPic = HttpContext.Session.GetString(SessionKeyPic);
+            return HttpContext.Session.GetString(SessionKeyId);
         }
 
         [HttpPost]
@@ -137,12 +92,13 @@ namespace Tech_In.Controllers
             await _emailSender.SendEmailConfirmationAsync(email, callbackUrl, $"Please confirm your account by clicking this link: < a href = '{HtmlEncoder.Default.Encode(callbackUrl)}' > link </ a > ");
 
             StatusMessage = "Verification email sent. Please check your email.";
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(ChangePassword));
         }
 
         [HttpGet]
         public async Task<IActionResult> ChangePassword()
         {
+            await OnGetSesstion();
             var user = await _userManager.GetUserAsync(User);
             var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
             if (userPersonalRow == null)
@@ -196,6 +152,7 @@ namespace Tech_In.Controllers
         [HttpGet]
         public async Task<IActionResult> SetPassword()
         {
+            await OnGetSesstion();
             var user = await _userManager.GetUserAsync(User);
             var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
             if (userPersonalRow == null)
@@ -249,6 +206,7 @@ namespace Tech_In.Controllers
         [HttpGet]
         public async Task<IActionResult> ExternalLogins()
         {
+            await OnGetSesstion();
             var user = await _userManager.GetUserAsync(User);
             var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
             if (userPersonalRow == null)
@@ -286,6 +244,7 @@ namespace Tech_In.Controllers
         [HttpGet]
         public async Task<IActionResult> LinkLoginCallback()
         {
+            await OnGetSesstion();
             var user = await _userManager.GetUserAsync(User);
             var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
             if (userPersonalRow == null)
@@ -340,6 +299,7 @@ namespace Tech_In.Controllers
         [HttpGet]
         public async Task<IActionResult> TwoFactorAuthentication()
         {
+            await OnGetSesstion();
             var user = await _userManager.GetUserAsync(User);
             var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
             if (userPersonalRow == null)
@@ -406,6 +366,7 @@ namespace Tech_In.Controllers
         [HttpGet]
         public async Task<IActionResult> EnableAuthenticator()
         {
+            await OnGetSesstion();
             var user = await _userManager.GetUserAsync(User);
             var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
             if (userPersonalRow == null)
@@ -463,6 +424,7 @@ namespace Tech_In.Controllers
         [HttpGet]
         public async Task<IActionResult> ShowRecoveryCodes()
         {
+            await OnGetSesstion();
             var user = await _userManager.GetCurrentUser(HttpContext);
             var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
             if (userPersonalRow == null)

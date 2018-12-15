@@ -701,14 +701,18 @@ namespace Tech_In.Controllers
             const string SessionKeyName = "_Name";
             const string SessionKeyPic = "_PPic";
             const string SessionKeyId = "_Id";
+            const string SessionUserName = "_UserName";
             if (string.IsNullOrEmpty(HttpContext.Session.GetString(SessionKeyName)))
             {
                 var user = await _userManager.GetCurrentUser(HttpContext);
                 HttpContext.Session.SetString(SessionKeyName, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.FirstName).FirstOrDefault());
                 HttpContext.Session.SetString(SessionKeyPic, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.ProfileImage).FirstOrDefault());
                 HttpContext.Session.SetString(SessionKeyId, user.Id);
+                HttpContext.Session.SetString(SessionUserName, user.UserName);
             }
             @ViewBag.UName = HttpContext.Session.GetString(SessionKeyName);
+            @ViewBag.UserName = HttpContext.Session.GetString(SessionUserName);
+            @ViewBag.UserPic = HttpContext.Session.GetString(SessionKeyPic);
             return HttpContext.Session.GetString(SessionKeyId);
         }
     }

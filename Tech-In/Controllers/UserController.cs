@@ -162,22 +162,7 @@ namespace Tech_In.Controllers
             ViewBag.question = questionList;
             return View(PVM);
         }
-
-        public async Task<string> OnGetSesstion()
-        {
-            const string SessionKeyName = "_Name";
-            const string SessionKeyPic = "_PPic";
-            const string SessionKeyId = "_Id";
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString(SessionKeyName)))
-            {
-                var user = await _userManager.GetCurrentUser(HttpContext);
-                HttpContext.Session.SetString(SessionKeyName, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.FirstName).FirstOrDefault());
-                HttpContext.Session.SetString(SessionKeyPic, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.ProfileImage).FirstOrDefault());
-                HttpContext.Session.SetString(SessionKeyId, user.Id);
-            }
-            @ViewBag.UName = HttpContext.Session.GetString(SessionKeyName);
-            return HttpContext.Session.GetString(SessionKeyId);
-        }
+        
 
 
         //Personal Details
@@ -893,6 +878,26 @@ namespace Tech_In.Controllers
             if(exists!=null)
                 return Json(new { success = false });
             return Json(new { success = true });
+        }
+
+        public async Task<string> OnGetSesstion()
+        {
+            const string SessionKeyName = "_Name";
+            const string SessionKeyPic = "_PPic";
+            const string SessionKeyId = "_Id";
+            const string SessionUserName = "_UserName";
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString(SessionKeyName)))
+            {
+                var user = await _userManager.GetCurrentUser(HttpContext);
+                HttpContext.Session.SetString(SessionKeyName, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.FirstName).FirstOrDefault());
+                HttpContext.Session.SetString(SessionKeyPic, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.ProfileImage).FirstOrDefault());
+                HttpContext.Session.SetString(SessionKeyId, user.Id);
+                HttpContext.Session.SetString(SessionUserName, user.UserName);
+            }
+            @ViewBag.UName = HttpContext.Session.GetString(SessionKeyName);
+            @ViewBag.UserName = HttpContext.Session.GetString(SessionUserName);
+            @ViewBag.UserPic = HttpContext.Session.GetString(SessionKeyPic);
+            return HttpContext.Session.GetString(SessionKeyId);
         }
 
     }
