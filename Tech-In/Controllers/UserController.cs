@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Tech_In.Data;
+using Tech_In.Extensions;
 using Tech_In.Models;
 using Tech_In.Models.Database;
 using Tech_In.Models.Model;
@@ -33,13 +34,47 @@ namespace Tech_In.Controllers
             _mapper = mapper;
             //_accessor = accessor;
         }
-        
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string currentFilter, string search, int? page)
         {
-            //string ip = _accessor.HttpContext.Connection.RemoteIpAddress.ToString();
-            //return Content(""+ip);
-            //Check User Profile is complete or not
             var user = await _userManager.GetCurrentUser(HttpContext);
+            ViewData["CurrentFilter"] = search;
+            if (search != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                search = currentFilter;
+            }
+            var users = (from u in _context.UserPersonalDetail
+                         join us in _userManager.Users on u.UserId equals us.Id
+                         orderby u.FirstName
+                         select new SingleUserVM
+                         {
+                             FirstName = u.FirstName,
+                             LastName = u.LastName,
+                             ProfileImage = u.ProfileImage,
+                             UserName = us.UserName
+                         }).Take(10);
+            if (!String.IsNullOrEmpty(search))
+            {
+                users = users.Where(s => s.FirstName.Contains(search) || s.LastName.Contains(search));
+            }
+            //var users = _context.UserPersonalDetail.Select(x=> new UserListVM { FirstName = x.FirstName,LastName=x.LastName,ProfileImage = x.ProfileImage, UserName = _userManager.Users.Where(y=>y.Id==x.UserId).Select(y=>y.UserName).FirstOrDefault() }).ToList();
+            return View(new UserListVM { User = await PaginatedList<SingleUserVM>.CreateAsync(users.AsQueryable(), page ?? 1, 10) });
+        }
+
+        [HttpGet("u/{username}", Name = "GetUser")]
+        public async Task<IActionResult> GetUser(string username)
+        {
+            var user1 = await _userManager.GetCurrentUser(HttpContext);
+            
+            //Check User Profile is complete or not
+            var user = _userManager.Users.Where(x => x.UserName.Equals(username)).FirstOrDefault();
+            if (user == null)
+            {
+                return NotFound();
+            }
             var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
             if (userPersonalRow == null)
             {
@@ -49,17 +84,17 @@ namespace Tech_In.Controllers
 
             ProfileViewModal PVM = new ProfileViewModal();
 
-            PVM.UserPersonalVM = _context.UserPersonalDetail.Where(m => m.UserId == user.Id).Select(x => new UserPersonalViewModel { FirstName = x.FirstName,LastName=x.LastName,Summary=x.Summary,ProfileImage = x.ProfileImage,DOB=x.DOB, UserPersonalDetailID = x.UserPersonalDetailId, Gender = x.Gender,CityName = x.City.CityName, CountryName = x.City.Country.CountryName }).SingleOrDefault();
-            
+            PVM.UserPersonalVM = _context.UserPersonalDetail.Where(m => m.UserId == user.Id).Select(x => new UserPersonalViewModel { FirstName = x.FirstName, LastName = x.LastName, Summary = x.Summary, ProfileImage = x.ProfileImage, DOB = x.DOB, UserPersonalDetailID = x.UserPersonalDetailId, Gender = x.Gender, CityName = x.City.CityName, CountryName = x.City.Country.CountryName }).SingleOrDefault();
+
             PVM.UserPersonalVM.PhoneNo = user.PhoneNumber;
             PVM.UserPersonalVM.Email = user.Email;
 
 
 
-            List<ExperienceVM> userExperienceList = _context.UserExperience.Where(x => x.UserId == user.Id).Select(c => new ExperienceVM { Title = c.Title, UserExperienceId = c.UserExperienceId, CityId = c.CityID, CityName = c.City.CityName, CountryName=c.City.Country.CountryName,CompanyName = c.CompanyName, CurrentWorkCheck = c.CurrentWorkCheck, Description = c.Description, StartDate = c.StartDate, EndDate = c.EndDate }).ToList();
+            List<ExperienceVM> userExperienceList = _context.UserExperience.Where(x => x.UserId == user.Id).Select(c => new ExperienceVM { Title = c.Title, UserExperienceId = c.UserExperienceId, CityId = c.CityID, CityName = c.City.CityName, CountryName = c.City.Country.CountryName, CompanyName = c.CompanyName, CurrentWorkCheck = c.CurrentWorkCheck, Description = c.Description, StartDate = c.StartDate, EndDate = c.EndDate }).ToList();
             ViewBag.UserExperienceList = userExperienceList;
 
-            List<EducationVM> userEducationList = _context.UserEducation.Where(x => x.UserId == user.Id).Select(c => new EducationVM { Title = c.Title, Details = c.Details, SchoolName = c.SchoolName, StartDate = c.StartDate, EndDate = c.EndDate, CurrentStatusCheck = c.CurrentStatusCheck, CityId = c.CityId, CityName = c.City.CityName, CountryName = c.City.Country.CountryName, UserEducationID=c.UserEducationId }).ToList();
+            List<EducationVM> userEducationList = _context.UserEducation.Where(x => x.UserId == user.Id).Select(c => new EducationVM { Title = c.Title, Details = c.Details, SchoolName = c.SchoolName, StartDate = c.StartDate, EndDate = c.EndDate, CurrentStatusCheck = c.CurrentStatusCheck, CityId = c.CityId, CityName = c.City.CityName, CountryName = c.City.Country.CountryName, UserEducationID = c.UserEducationId }).ToList();
             ViewBag.UserEducationList = userEducationList;
 
             List<CertificationVM> userCertificationList = _context.UserCertification.Where(x => x.UserId == user.Id).Select(c => new CertificationVM { Name = c.Name, URL = c.URL, UserCertificationId = c.UserCertificationId, LiscenceNo = c.LiscenceNo, CertificationDate = c.CertificationDate, ExpirationDate = c.ExpirationDate }).ToList();
@@ -71,11 +106,12 @@ namespace Tech_In.Controllers
 
             PVM.LanguageSkillVMList = _context.UserLanguageSkill.Where(x => x.UserId == user.Id).Select(c => new LanguageSkillVM { LanguageSkillId = c.LanguageSkillId, SkillName = c.SkillName });
 
-            PVM.PublicationVMListJP = _context.UserPublication.Where(x => x.UserId == user.Id && x.ConferenceOrJournal==false).Select(c => new PublicationVM { Title = c.Title, PublishYear = c.PublishYear, Description = c.Description, ConferenceOrJournal = c.ConferenceOrJournal, UserPublicationId = c.UserPublicationId });
+            PVM.PublicationVMListJP = _context.UserPublication.Where(x => x.UserId == user.Id && x.ConferenceOrJournal == false).Select(c => new PublicationVM { Title = c.Title, PublishYear = c.PublishYear, Description = c.Description, ConferenceOrJournal = c.ConferenceOrJournal, UserPublicationId = c.UserPublicationId });
             PVM.PublicationVMListCP = _context.UserPublication.Where(x => x.UserId == user.Id && x.ConferenceOrJournal == true).Select(c => new PublicationVM { Title = c.Title, PublishYear = c.PublishYear, Description = c.Description, ConferenceOrJournal = c.ConferenceOrJournal, UserPublicationId = c.UserPublicationId });
 
             //Question
-            var questionList = _context.UserQuestion.Where(u => u.UserId == user.Id).Select(c => new NewQuestionVM{
+            var questionList = _context.UserQuestion.Where(u => u.UserId == user.Id).Select(c => new NewQuestionVM
+            {
                 UserQuestionId = c.UserQuestionId,
                 Title = c.Title,
                 PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.FirstName).SingleOrDefault(),
@@ -83,7 +119,7 @@ namespace Tech_In.Controllers
                 PostTime = c.PostTime,
                 HasVerifiedAns = c.HasVerifiedAns,
                 Visitors = _context.QuestionVisitor.Where(f => f.QuestionId == c.UserQuestionId).Count(),
-                Tags = c.Tag.Select(t => new QuestionTagViewModel{SkillName = t.SkillTag.SkillName }).ToList(),
+                Tags = c.Tag.Select(t => new QuestionTagViewModel { SkillName = t.SkillTag.SkillName }).ToList(),
                 Voting = c.UserQAVoting.Sum(x => x.Value)
             }).ToList();
 
@@ -93,7 +129,7 @@ namespace Tech_In.Controllers
                 Description = s.Description,
                 UserQACommentID = s.UserQACommentID,
                 UserQuestionId = s.UserQuestionId,
-                IsAnswer= s.IsAnswer,
+                IsAnswer = s.IsAnswer,
                 PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == s.UserId).Select(z => z.FirstName).SingleOrDefault(),
                 UserId = user.Id,
             }).ToList();
@@ -102,11 +138,11 @@ namespace Tech_In.Controllers
             var answers = _context.UserQAnswer.Where(f => f.UserId == user.Id).Select(k => new QAnswerViewModel
             {
                 Description = HttpUtility.HtmlDecode(k.Description),
-                Date =k.PostTime,
-                IsVerified =k.IsVerified,
+                Date = k.PostTime,
+                IsVerified = k.IsVerified,
                 User = user.Id,
-                UserQAnswerId =k.UserQAnswerId,
-                UserQuestion = _context.UserQuestion.Where(g=> g.UserQuestionId == k.UserQuestionId).Select(j=> new NewQuestionVM
+                UserQAnswerId = k.UserQAnswerId,
+                UserQuestion = _context.UserQuestion.Where(g => g.UserQuestionId == k.UserQuestionId).Select(j => new NewQuestionVM
                 {
                     UserQuestionId = j.UserQuestionId,
                     Title = j.Title,
@@ -125,6 +161,7 @@ namespace Tech_In.Controllers
             @ViewBag.UName = HttpContext.Session.GetString("Name");
             return View(PVM);
         }
+
 
         //Personal Details
         public async Task<IActionResult> UpdatePersonalDetail(int Id)
