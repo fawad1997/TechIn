@@ -83,7 +83,10 @@ namespace Tech_In.Controllers
 
 
             ProfileViewModal PVM = new ProfileViewModal();
-
+            if (user.Id == user1.Id)
+                PVM.IsCurrentUser = true;
+            else
+                PVM.IsCurrentUser = false;
             PVM.UserPersonalVM = _context.UserPersonalDetail.Where(m => m.UserId == user.Id).Select(x => new UserPersonalViewModel { FirstName = x.FirstName, LastName = x.LastName, Summary = x.Summary, ProfileImage = x.ProfileImage, DOB = x.DOB, UserPersonalDetailID = x.UserPersonalDetailId, Gender = x.Gender, CityName = x.City.CityName, CountryName = x.City.Country.CountryName }).SingleOrDefault();
 
             PVM.UserPersonalVM.PhoneNo = user.PhoneNumber;

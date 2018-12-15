@@ -28,13 +28,16 @@
 
                 </div>
                 <!--/Profile Picture-->
-                <!--Edit-->
-                <div class="right-icon-div">
-                    <div class="round-icon-back">
-                        <i class="fa fa-pencil"></i>
+                @if (Model.IsCurrentUser)
+                {
+                    <!--Edit-->
+                    <div class="right-icon-div">
+                        <div class="round-icon-back">
+                            <i class="fa fa-pencil"></i>
+                        </div>
                     </div>
-                </div>
-                <!--/Edit-->
+                    <!--/Edit-->
+                }
                 <div class="center">
                     <h1 class="profile-name">@Model.UserPersonalVM.FullName</h1>
                     @*<i class="fa fa-briefcase"></i>*@
@@ -170,13 +173,17 @@
                                         <div class="col-xs-12">
                                             <h6 class="inline small-h">Personal Information</h6>
                                             <br />
-                                            <!--Edit-->
-                                            <div class="right-post-icon-div" onclick="EditPersonalD(@Model.UserPersonalVM.UserPersonalDetailID)">
-                                                <div class="round-icon-back">
-                                                    <i class="fa fa-pencil"></i>
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <!--Edit-->
+                                                <div class="right-post-icon-div" onclick="EditPersonalD(@Model.UserPersonalVM.UserPersonalDetailID)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <!--/Edit-->
+                                                <!--/Edit-->
+                                            }
+
                                             <hr />
                                         </div>
                                         <div class="row">
@@ -228,15 +235,18 @@
                                                 <small>(2 Months)</small>
                                             </h6>
                                             <br />
-                                            <!--Add-->
-                                            <div class="right-post-icon-div" onclick="AddEditExp(0)">
-                                                <div class="round-icon-back">
-                                                    <i class="fa fa-plus"></i>
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <!--Add-->
+                                                <div class="right-post-icon-div" onclick="AddEditExp(0)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-plus"></i>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <!--/Add-->
+                                                <!--/Add-->
+                                            }
                                             <hr />
-                                        </div>
+                                            </div>
                                         <input type="hidden" id="hiddenExpId" />
                                         @if (ViewBag.UserExperienceList != null && ViewBag.UserExperienceList.Count != 0)
                                         {
@@ -248,20 +258,23 @@
                                                     </div>
                                                     <div class="col-xs-9 col-md-10">
                                                         <strong class="small-h">@item.Title</strong>
-                                                        <!--Delete-->
-                                                        <div onclick="confirmDelExp(@item.UserExperienceId)" class="delete-exp-round">
-                                                            <div class="round-icon-back-del" data-toggle="modal" data-target="#addExperienceModal">
-                                                                <i class="fa fa-trash-o"></i>
+                                                        @if (Model.IsCurrentUser)
+                                                        {
+                                                            <!--Delete-->
+                                                            <div onclick="confirmDelExp(@item.UserExperienceId)" class="delete-exp-round">
+                                                                <div class="round-icon-back-del" data-toggle="modal" data-target="#addExperienceModal">
+                                                                    <i class="fa fa-trash-o"></i>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <!--/Delete-->
-                                                        <!--Edit-->
-                                                        <div onclick="AddEditExp(@item.UserExperienceId)" class="edit-exp-round">
-                                                            <div class="round-icon-back" data-toggle="modal" data-target="#addExperienceModal">
-                                                                <i class="fa fa-pencil"></i>
+                                                            <!--/Delete-->
+                                                            <!--Edit-->
+                                                            <div onclick="AddEditExp(@item.UserExperienceId)" class="edit-exp-round">
+                                                                <div class="round-icon-back" data-toggle="modal" data-target="#addExperienceModal">
+                                                                    <i class="fa fa-pencil"></i>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <!--/Edit-->
+                                                            <!--/Edit-->
+                                                        }
                                                         <p class="xsmall-h">
                                                             @item.CompanyName, @item.CityName, @item.CountryName
                                                             <i class="fa fa-map-marker" aria-hidden="true"></i>
@@ -304,15 +317,18 @@
                                         <div class="col-xs-12">
                                             <h6 class="inline small-h">Education</h6>
                                             <br />
-                                            <!--Add-->
-                                            <div class="right-post-icon-div" onclick="viewEduModal(0)">
-                                                <div class="round-icon-back">
-                                                    <i class="fa fa-plus"></i>
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <!--Add-->
+                                                <div class="right-post-icon-div" onclick="viewEduModal(0)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-plus"></i>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <!--/Add-->
+                                                <!--/Add-->
+                                            }
                                             <hr />
-                                        </div>
+                                            </div>
                                         <input type="hidden" id="hiddenEduId" />
                                         @if (ViewBag.UserEducationList != null && ViewBag.UserEducationList.Count != 0)
                                         {
@@ -321,37 +337,40 @@
                                                 <div class="row" id="row_exp_@item.UserEducationID">
                                                     <div class="col-xs-12 margin-both-lr">
                                                         <strong class="small-h">@item.Title</strong>
-                                                        <!--Delete-->
-                                                        <div onclick="confirmDelEdu(@item.UserEducationID)" class="delete-exp-round">
-                                                            <div class="round-icon-back-del" data-toggle="modal" data-target="#addExperienceModal">
-                                                                <i class="fa fa-trash-o"></i>
+                                                        @if (Model.IsCurrentUser)
+                                                        {
+                                                            <!--Delete-->
+                                                            <div onclick="confirmDelEdu(@item.UserEducationID)" class="delete-exp-round">
+                                                                <div class="round-icon-back-del" data-toggle="modal" data-target="#addExperienceModal">
+                                                                    <i class="fa fa-trash-o"></i>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <!--/Delete-->
-                                                        <!--Edit-->
-                                                        <div class="edit-exp-round" onclick="viewEduModal(@item.UserEducationID)">
-                                                            <div class="round-icon-back">
-                                                                <i class="fa fa-pencil"></i>
+                                                            <!--/Delete-->
+                                                            <!--Edit-->
+                                                            <div class="edit-exp-round" onclick="viewEduModal(@item.UserEducationID)">
+                                                                <div class="round-icon-back">
+                                                                    <i class="fa fa-pencil"></i>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <!--/Edit-->
+                                                            <!--/Edit-->
+                                                        }
                                                         <p class="xsmall-h">
-                                                            @item.SchoolName, @item.CityName, @item.CountryName
-                                                            <i class="fa fa-map-marker" aria-hidden="true"></i>
-                                                        </p>
-                                                        <p class="black">@item.Details</p>
-                                                        <p>
-                                                            @item.StartDate.ToString("dd MMM yyyy") -
-                                                            @if (item.CurrentStatusCheck)
-                                                            {<span>Current</span> }
-                                                            else
-                                                            {
+                                                                @item.SchoolName, @item.CityName, @item.CountryName
+                                                                <i class="fa fa-map-marker" aria-hidden="true"></i>
+                                                            </p>
+                                                            <p class="black">@item.Details</p>
+                                                            <p>
+                                                                @item.StartDate.ToString("dd MMM yyyy") -
+                                                                @if (item.CurrentStatusCheck)
+                                                                {<span>Current</span> }
+                                                                else
+                                                                {
 
-                                                                @item.EndDate.ToString("dd MMM yyyy")
-                                                            }
-                                                            @*<small>1 Month</small>*@
-                                                        </p>
-                                                    </div>
+                                                                    @item.EndDate.ToString("dd MMM yyyy")
+                                                                }
+                                                                @*<small>1 Month</small>*@
+                                                            </p>
+                                                        </div>
                                                     <div class="col-xs-12">
                                                         <hr class="margin-both-lr" />
                                                     </div>
@@ -372,34 +391,34 @@
                                 <!--/Education-->
                                 <!--Skills-->
                                 @*<div class="post">
-                                        <div class="row">
-                                            <div class="col-xs-12">
-                                                <h6 class="inline small-h">Skills</h6>
-                                                <br />
-                                                <!--Add-->
-                                                <div class="right-post-icon-div" data-toggle="modal" data-target="#skillModal">
-                                                    <div class="round-icon-back">
-                                                        <i class="fa fa-plus"></i>
-                                                    </div>
-                                                </div>
-                                                <!--/Add-->
-                                                <hr />
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-xs-12 margin-both-lr">
-                                                    <div class="widget-tags">
-                                                        <a href="#">Java</a>
-                                                        <a href="#">Php</a>
-                                                        <a href="#">Web Development</a>
-                                                        <a href="#">Web Designing</a>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
-
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <h6 class="inline small-h">Skills</h6>
+                                    <br />
+                                    <!--Add-->
+                                    <div class="right-post-icon-div" data-toggle="modal" data-target="#skillModal">
+                                        <div class="round-icon-back">
+                                            <i class="fa fa-plus"></i>
                                         </div>
-                                    </div>*@
+                                    </div>
+                                    <!--/Add-->
+                                    <hr />
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12 margin-both-lr">
+                                        <div class="widget-tags">
+                                            <a href="#">Java</a>
+                                            <a href="#">Php</a>
+                                            <a href="#">Web Development</a>
+                                            <a href="#">Web Designing</a>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+                        </div>*@
                                 <!--/Skills-->
                                 <!--Certification-->
                                 <div class="post">
@@ -407,15 +426,18 @@
                                         <div class="col-xs-12">
                                             <h6 class="inline small-h">Certifications</h6>
                                             <br />
-                                            <!--Add-->
-                                            <div class="right-post-icon-div" onclick="viewCertModal(0)">
-                                                <div class="round-icon-back">
-                                                    <i class="fa fa-plus"></i>
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <!--Add-->
+                                                <div class="right-post-icon-div" onclick="viewCertModal(0)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-plus"></i>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <!--/Add-->
+                                                <!--/Add-->
+                                            }
                                             <hr />
-                                        </div>
+                                            </div>
                                         <input type="hidden" id="hiddenCertId" />
                                         @if (ViewBag.UserCertificationList != null && ViewBag.UserCertificationList.Count != 0)
                                         {
@@ -424,38 +446,41 @@
                                                 <div class="row" id="row_cert_@item.UserCertificationId">
                                                     <div class="col-xs-12 margin-both-lr">
                                                         <strong class="small-h">@item.Name</strong>
-                                                        <!--Delete-->
-                                                        <div onclick="confirmDelCert(@item.UserCertificationId)" class="delete-exp-round">
-                                                            <div class="round-icon-back-del">
-                                                                <i class="fa fa-trash-o"></i>
+                                                        @if (Model.IsCurrentUser)
+                                                        {
+                                                            <!--Delete-->
+                                                            <div onclick="confirmDelCert(@item.UserCertificationId)" class="delete-exp-round">
+                                                                <div class="round-icon-back-del">
+                                                                    <i class="fa fa-trash-o"></i>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <!--/Delete-->
-                                                        <!--Edit-->
-                                                        <div class="edit-exp-round" onclick="viewCertModal(@item.UserCertificationId)">
-                                                            <div class="round-icon-back">
-                                                                <i class="fa fa-pencil"></i>
+                                                            <!--/Delete-->
+                                                            <!--Edit-->
+                                                            <div class="edit-exp-round" onclick="viewCertModal(@item.UserCertificationId)">
+                                                                <div class="round-icon-back">
+                                                                    <i class="fa fa-pencil"></i>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <!--/Edit-->
+                                                            <!--/Edit-->
+                                                        }
                                                         @if (@item.URL != null)
-                                                        {
-                                                            <p class="xsmall-h">
-                                                                Url : @item.URL
+                                                            {
+                                                                <p class="xsmall-h">
+                                                                    Url : @item.URL
 
+                                                                </p>
+                                                            }
+
+                                                            @if (@item.LiscenceNo != null)
+                                                            {
+                                                                <p class="black">Liscence No : @item.LiscenceNo</p>
+                                                            }
+
+                                                            <p>
+                                                                Certification Date : @item.CertificationDate.ToString("dd MMM yyyy")  <br />Expiration Date : @item.ExpirationDate.ToString("dd MMM yyyy")
+                                                                @*<small>1 Month</small>*@
                                                             </p>
-                                                        }
-
-                                                        @if (@item.LiscenceNo != null)
-                                                        {
-                                                            <p class="black">Liscence No : @item.LiscenceNo</p>
-                                                        }
-
-                                                        <p>
-                                                            Certification Date : @item.CertificationDate.ToString("dd MMM yyyy")  <br />Expiration Date : @item.ExpirationDate.ToString("dd MMM yyyy")
-                                                            @*<small>1 Month</small>*@
-                                                        </p>
-                                                    </div>
+                                                        </div>
                                                     <div class="col-xs-12">
                                                         <hr class="margin-both-lr" />
                                                     </div>
@@ -479,26 +504,30 @@
                                         <div class="col-xs-12">
                                             <h6 class="inline small-h">Achievements</h6>
                                             <br />
-                                            <!--Add-->
-                                            <div class="right-post-icon-div" onclick="viewAchievModel(0)">
-                                                <div class="round-icon-back">
-                                                    <i class="fa fa-plus"></i>
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <!--Add-->
+                                                <div class="right-post-icon-div" onclick="viewAchievModel(0)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-plus"></i>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <!--/Add-->
+                                                <!--/Add-->
+                                            }
                                             <hr />
-                                        </div>
+                                            </div>
                                         <input type="hidden" id="hiddenAchievId" />
                                         @if (Model.AchievVMList != null && Model.AchievVMList.Count() != 0)
                                         {
                                             <div class="row">
                                                 @foreach (var item in Model.AchievVMList)
                                                 {
-                                                    <div class="col-xs-12 margin-both-lr" id="row_Achiev_@item.UserAchievementId">
-                                                        <ul>
-                                                            <li>&bull; @item.Description</li>
-                                                        </ul>
-
+                                                <div class="col-xs-12 margin-both-lr" id="row_Achiev_@item.UserAchievementId">
+                                                    <ul>
+                                                        <li>&bull; @item.Description</li>
+                                                    </ul>
+                                                    @if (Model.IsCurrentUser)
+                                                    {
                                                         <!--Delete-->
                                                         <div onclick="confirmDelAchiev(@item.UserAchievementId)" class="delete-exp-round">
                                                             <div class="round-icon-back-del">
@@ -513,7 +542,8 @@
                                                             </div>
                                                         </div>
                                                         <!--/Edit-->
-                                                        <div class="col-xs-12">
+                                                    }
+                                                    <div class="col-xs-12">
                                                             <hr class="margin-both-lr" />
                                                         </div>
 
@@ -538,26 +568,30 @@
                                         <div class="col-xs-12">
                                             <h6 class="inline small-h">Hobbies</h6>
                                             <br />
-                                            <!--Add-->
-                                            <div class="right-post-icon-div" onclick="viewHobbyModel(0)">
-                                                <div class="round-icon-back">
-                                                    <i class="fa fa-plus"></i>
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <!--Add-->
+                                                <div class="right-post-icon-div" onclick="viewHobbyModel(0)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-plus"></i>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <!--/Add-->
+                                                <!--/Add-->
+                                            }
                                             <hr />
-                                        </div>
+                                            </div>
                                         <input type="hidden" id="hiddenHobbyId" />
                                         @if (Model.HobbyVMList != null && Model.HobbyVMList.Count() != 0)
                                         {
                                             <div class="row">
                                                 @foreach (var item in Model.HobbyVMList)
                                                 {
-                                                    <div class="col-xs-12 margin-both-lr" id="row_Hobby_@item.UserHobbyId">
-                                                        <ul>
-                                                            <li>&bull; @item.HobbyOrIntrest</li>
-                                                        </ul>
-
+                                                <div class="col-xs-12 margin-both-lr" id="row_Hobby_@item.UserHobbyId">
+                                                    <ul>
+                                                        <li>&bull; @item.HobbyOrIntrest</li>
+                                                    </ul>
+                                                    @if (Model.IsCurrentUser)
+                                                    {
                                                         <!--Delete-->
                                                         <div onclick="confirmDelHobby(@item.UserHobbyId)" class="delete-exp-round">
                                                             <div class="round-icon-back-del">
@@ -572,7 +606,8 @@
                                                             </div>
                                                         </div>
                                                         <!--/Edit-->
-                                                        <div class="col-xs-12">
+                                                    }
+                                                    <div class="col-xs-12">
                                                             <hr class="margin-both-lr" />
                                                         </div>
 
@@ -597,26 +632,30 @@
                                         <div class="col-xs-12">
                                             <h6 class="inline small-h">Language Skills</h6>
                                             <br />
-                                            <!--Add-->
-                                            <div class="right-post-icon-div" onclick="viewLSModel(0)">
-                                                <div class="round-icon-back">
-                                                    <i class="fa fa-plus"></i>
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <!--Add-->
+                                                <div class="right-post-icon-div" onclick="viewLSModel(0)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-plus"></i>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <!--/Add-->
+                                                <!--/Add-->
+                                            }
                                             <hr />
-                                        </div>
+                                            </div>
                                         <input type="hidden" id="hiddenLSId" />
                                         @if (Model.LanguageSkillVMList != null && Model.LanguageSkillVMList.Count() != 0)
                                         {
                                             <div class="row">
                                                 @foreach (var item in Model.LanguageSkillVMList)
                                                 {
-                                                    <div class="col-xs-12 margin-both-lr" id="row_LS_@item.LanguageSkillId">
-                                                        <ul>
-                                                            <li>&bull; @item.SkillName</li>
-                                                        </ul>
-
+                                                <div class="col-xs-12 margin-both-lr" id="row_LS_@item.LanguageSkillId">
+                                                    <ul>
+                                                        <li>&bull; @item.SkillName</li>
+                                                    </ul>
+                                                    @if (Model.IsCurrentUser)
+                                                    {
                                                         <!--Delete-->
                                                         <div onclick="confirmDelLS(@item.LanguageSkillId)" class="delete-exp-round">
                                                             <div class="round-icon-back-del">
@@ -631,7 +670,8 @@
                                                             </div>
                                                         </div>
                                                         <!--/Edit-->
-                                                        <div class="col-xs-12">
+                                                    }
+                                                    <div class="col-xs-12">
                                                             <hr class="margin-both-lr" />
                                                         </div>
 
@@ -656,15 +696,18 @@
                                         <div class="col-xs-12">
                                             <h6 class="inline small-h">Journal Publications</h6>
                                             <br />
-                                            <!--Add-->
-                                            <div class="right-post-icon-div" onclick="viewJPCPModel(0)">
-                                                <div class="round-icon-back">
-                                                    <i class="fa fa-plus"></i>
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <!--Add-->
+                                                <div class="right-post-icon-div" onclick="viewJPCPModel(0)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-plus"></i>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <!--/Add-->
+                                                <!--/Add-->
+                                            }
                                             <hr />
-                                        </div>
+                                            </div>
                                         <input type="hidden" id="hiddenJPCPId" />
                                         @if (Model.PublicationVMListJP != null && Model.PublicationVMListJP.Count() != 0)
                                         {
@@ -673,31 +716,33 @@
                                                 <div class="row" id="row_publication_@item.UserPublicationId">
                                                     <div class="col-xs-12 margin-both-lr">
                                                         <strong class="small-h">@item.Title</strong>
-                                                        <!--Delete-->
-                                                        <div onclick="confirmDelJPCP(@item.UserPublicationId)" class="delete-exp-round">
-                                                            <div class="round-icon-back-del">
-                                                                <i class="fa fa-trash-o"></i>
-                                                            </div>
-                                                        </div>
-                                                        <!--/Delete-->
-                                                        <!--Edit-->
-                                                        <div class="edit-exp-round" onclick="viewJPCPModel(@item.UserPublicationId)">
-                                                            <div class="round-icon-back">
-                                                                <i class="fa fa-pencil"></i>
-                                                            </div>
-                                                        </div>
-                                                        <!--/Edit-->
-
-                                                        @if (@item.Description != null)
+                                                        @if (Model.IsCurrentUser)
                                                         {
-                                                            <p class="black">@item.Description</p>
+                                                            <!--Delete-->
+                                                            <div onclick="confirmDelJPCP(@item.UserPublicationId)" class="delete-exp-round">
+                                                                <div class="round-icon-back-del">
+                                                                    <i class="fa fa-trash-o"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Delete-->
+                                                            <!--Edit-->
+                                                            <div class="edit-exp-round" onclick="viewJPCPModel(@item.UserPublicationId)">
+                                                                <div class="round-icon-back">
+                                                                    <i class="fa fa-pencil"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Edit-->
                                                         }
+                                                            @if (@item.Description != null)
+                                                            {
+                                                                <p class="black">@item.Description</p>
+                                                            }
 
-                                                        <p>
-                                                            Publication Date : @item.PublishYear.ToString("dd MMM yyyy")
-                                                            @*<small>1 Month</small>*@
-                                                        </p>
-                                                    </div>
+                                                            <p>
+                                                                Publication Date : @item.PublishYear.ToString("dd MMM yyyy")
+                                                                @*<small>1 Month</small>*@
+                                                            </p>
+                                                        </div>
                                                     <div class="col-xs-12">
                                                         <hr class="margin-both-lr" />
                                                     </div>
@@ -721,15 +766,18 @@
                                         <div class="col-xs-12">
                                             <h6 class="inline small-h">Conference Publications</h6>
                                             <br />
-                                            <!--Add-->
-                                            <div class="right-post-icon-div" onclick="viewCPModel(0)">
-                                                <div class="round-icon-back">
-                                                    <i class="fa fa-plus"></i>
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <!--Add-->
+                                                <div class="right-post-icon-div" onclick="viewCPModel(0)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-plus"></i>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <!--/Add-->
+                                                <!--/Add-->
+                                            }
                                             <hr />
-                                        </div>
+                                            </div>
                                         @if (Model.PublicationVMListCP != null && Model.PublicationVMListCP.Count() != 0)
                                         {
                                             foreach (var item in Model.PublicationVMListCP)
@@ -737,31 +785,33 @@
                                                 <div class="row" id="row_publication_@item.UserPublicationId">
                                                     <div class="col-xs-12 margin-both-lr">
                                                         <strong class="small-h">@item.Title</strong>
-                                                        <!--Delete-->
-                                                        <div onclick="confirmDelJPCP(@item.UserPublicationId)" class="delete-exp-round">
-                                                            <div class="round-icon-back-del">
-                                                                <i class="fa fa-trash-o"></i>
-                                                            </div>
-                                                        </div>
-                                                        <!--/Delete-->
-                                                        <!--Edit-->
-                                                        <div class="edit-exp-round" onclick="viewCPModel(@item.UserPublicationId)">
-                                                            <div class="round-icon-back">
-                                                                <i class="fa fa-pencil"></i>
-                                                            </div>
-                                                        </div>
-                                                        <!--/Edit-->
-
-                                                        @if (@item.Description != null)
+                                                        @if (Model.IsCurrentUser)
                                                         {
-                                                            <p class="black">@item.Description</p>
+                                                            <!--Delete-->
+                                                            <div onclick="confirmDelJPCP(@item.UserPublicationId)" class="delete-exp-round">
+                                                                <div class="round-icon-back-del">
+                                                                    <i class="fa fa-trash-o"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Delete-->
+                                                            <!--Edit-->
+                                                            <div class="edit-exp-round" onclick="viewCPModel(@item.UserPublicationId)">
+                                                                <div class="round-icon-back">
+                                                                    <i class="fa fa-pencil"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Edit-->
                                                         }
+                                                            @if (@item.Description != null)
+                                                            {
+                                                                <p class="black">@item.Description</p>
+                                                            }
 
-                                                        <p>
-                                                            Publication Date : @item.PublishYear.ToString("dd MMM yyyy")
-                                                            @*<small>1 Month</small>*@
-                                                        </p>
-                                                    </div>
+                                                            <p>
+                                                                Publication Date : @item.PublishYear.ToString("dd MMM yyyy")
+                                                                @*<small>1 Month</small>*@
+                                                            </p>
+                                                        </div>
                                                     <div class="col-xs-12">
                                                         <hr class="margin-both-lr" />
                                                     </div>
@@ -801,27 +851,27 @@
 
 
                                                     @foreach (var question in ViewBag.question)
-                    {
-                                <div class="well">
-                                    <div id="rowQuestion_@question.UserQuestionId">
-                                        <a  class="btn btn-danger" onclick="ConfirmDeleteQuestion(@question.UserQuestionId)"><i class="fa fa-trash-o"></i></a>
+                                                    {
+                                                        <div class="well">
+                                                            <div id="rowQuestion_@question.UserQuestionId">
+                                                                <a class="btn btn-danger" onclick="ConfirmDeleteQuestion(@question.UserQuestionId)"><i class="fa fa-trash-o"></i></a>
 
-                                        <button type="button" class="fa fa-pencil close" aria-label="Edit"> </button>
+                                                                <button type="button" class="fa fa-pencil close" aria-label="Edit"> </button>
 
-                                        <div class="row">
-                                            <div class="col-xs-1 grey-back">
-                                                <span>
-                                                    <strong>@question.Voting</strong><br />Votes
-                                                </span>
-                                            </div>
-                                            <div class="col-xs-9">
-                                                <p class="font-size16 margin-bottom6"><a href="/Question/QuestionDetail/@question.UserQuestionId">@question.Title</a></p>
-                                                <input type="hidden" id="hiddenQuestionId" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-}
+                                                                <div class="row">
+                                                                    <div class="col-xs-1 grey-back">
+                                                                        <span>
+                                                                            <strong>@question.Voting</strong><br />Votes
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="col-xs-9">
+                                                                        <p class="font-size16 margin-bottom6"><a href="/Question/QuestionDetail/@question.UserQuestionId">@question.Title</a></p>
+                                                                        <input type="hidden" id="hiddenQuestionId" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
 
                                                 </div>
                                             </div>
@@ -896,21 +946,21 @@
                                         <div id="collapse2" class="panel-collapse collapse">
                                             <div class="panel-body">
                                                 @foreach (var comment in ViewBag.comment)
-                {
-                                <div class="row" id="rowComment_@comment.UserQACommentID">
-                                    
-                                        <a class="btn btn-danger" onclick="ConfirmDeleteComment(@comment.UserQACommentID)"><i class="fa fa-trash-o"></i></a>
-                                        <button type="button" class="fa fa-pencil close" aria-label="Edit"> </button>
-                                        <input type="hidden" id="hiddenCommentId" />
-                                        <div class="row">
-                                            <div class="col-xs-9">
-                                                <p class="font-size16 margin-bottom6"><a href="/Question/QuestionDetail/@comment.UserQuestionId">@comment.Description</a></p>
-                                                <hr />
-                                            </div>
-                                        </div>
-                                    
-                                </div>
-}
+                                                {
+                                                    <div class="row" id="rowComment_@comment.UserQACommentID">
+
+                                                        <a class="btn btn-danger" onclick="ConfirmDeleteComment(@comment.UserQACommentID)"><i class="fa fa-trash-o"></i></a>
+                                                        <button type="button" class="fa fa-pencil close" aria-label="Edit"> </button>
+                                                        <input type="hidden" id="hiddenCommentId" />
+                                                        <div class="row">
+                                                            <div class="col-xs-9">
+                                                                <p class="font-size16 margin-bottom6"><a href="/Question/QuestionDetail/@comment.UserQuestionId">@comment.Description</a></p>
+                                                                <hr />
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                }
                                             </div>
                                         </div>
                                     </div>
@@ -956,31 +1006,31 @@
                                         <div id="collapse3" class="panel-collapse collapse">
                                             <div class="panel-body">
                                                 @foreach (var answer in ViewBag.answer)
-                {
+                                                {
 
-                                @foreach (var question in answer.UserQuestion)
-{
-                                <div id="rowAnswer_@answer.UserQAnswerId">
-                                    <a class="btn btn-danger" onclick="ConfirmDeleteAnswer(@answer.UserQAnswerId)"><i class="fa fa-trash-o"></i></a>
-                                    <button type="button" class="fa fa-pencil close" aria-label="Edit"> </button>
-                                    <input type="hidden" id="hiddenAnswerId" />
-                                    <div class="row">
+                                                    @foreach (var question in answer.UserQuestion)
+                                                    {
+                                                        <div id="rowAnswer_@answer.UserQAnswerId">
+                                                            <a class="btn btn-danger" onclick="ConfirmDeleteAnswer(@answer.UserQAnswerId)"><i class="fa fa-trash-o"></i></a>
+                                                            <button type="button" class="fa fa-pencil close" aria-label="Edit"> </button>
+                                                            <input type="hidden" id="hiddenAnswerId" />
+                                                            <div class="row">
 
-                                        <div class="col-xs-9">
-                                            <p class="font-size16 margin-bottom6">
+                                                                <div class="col-xs-9">
+                                                                    <p class="font-size16 margin-bottom6">
 
-                                                <a href="/Question/QuestionDetail/@question.UserQuestionId">
-                                                    @question.Title
-                                                </a>
-                                            </p>
-                                            <hr />
-                                        </div>
+                                                                        <a href="/Question/QuestionDetail/@question.UserQuestionId">
+                                                                            @question.Title
+                                                                        </a>
+                                                                    </p>
+                                                                    <hr />
+                                                                </div>
 
-                                    </div>
-                                </div>
-}
+                                                            </div>
+                                                        </div>
+                                                    }
 
-}
+                                                }
 
                                             </div>
                                         </div>
@@ -996,81 +1046,81 @@
                             $("#showAnswers").click(function () {
                                 document.getElementById('answerList').style.display = "block";
                             });
-                       
+
                             $("#showComments").click(function () {
                                 document.getElementById('commentList').style.display = "block";
                             });
-                        
+
                             $("#showQuestion").click(function () {
                                 document.getElementById('questionList').style.display = "block";
                             });
                         </script>
-                   
+
                         <script>
-                                var ConfirmDeleteComment = function (commentId) {
-                                    $("#hiddenCommentId").val(commentId);
-                                    $("#CommentModel").modal('show');
+                            var ConfirmDeleteComment = function (commentId) {
+                                $("#hiddenCommentId").val(commentId);
+                                $("#CommentModel").modal('show');
 
-                                }
-                                var ConfirmDeleteAnswer = function (answerId) {
-                                    $("#hiddenAnswerId").val(answerId);
-                                    $("#AnswerModal").modal('show');
+                            }
+                            var ConfirmDeleteAnswer = function (answerId) {
+                                $("#hiddenAnswerId").val(answerId);
+                                $("#AnswerModal").modal('show');
 
-                                }
-                                var ConfirmDeleteQuestion = function (questionId) {
-                                    $("#hiddenQuestionId").val(questionId);
-                                    $("#QuestionModal").modal('show');
+                            }
+                            var ConfirmDeleteQuestion = function (questionId) {
+                                $("#hiddenQuestionId").val(questionId);
+                                $("#QuestionModal").modal('show');
 
-                                }
+                            }
 
-                            </script>
+                        </script>
                         <script>
 
-                                var DeleteComment = function () {
-                                    $("#loaderCommentDiv").show();
-                                    var commentId = $("#hiddenCommentId").val();
-                                    $.ajax({
-                                        type: "POST",
-                                        url: "/User/DeleteComment",
-                                        data: { Id: commentId },
-                                        success: function (result) {
-                                            $("#loaderCommentDiv").hide();
-                                            debugger
-                                            $("#CommentModel").modal('hide');
-                                            $("#rowComment_" + commentId).remove();
-                                        }
-                                    })
-                                }
-                                var DeleteQuestion = function () {
-                                        $("#loaderQuestionDiv").show();
-                                        var queId = $("#hiddenQuestionId").val();
-                                        $.ajax({
-                                            type: "POST",
-                                            url: "/User/DeleteQuestion",
-                                            data: { Id: queId },
-                                            success: function (result) {
-                                                $("#loaderQuestionDiv").hide();
-                                                debugger
-                                                $("#QuestionModal").modal('hide');
-                                                $("#rowQuestion_" + queId).remove();
-                                            }
-                                        })
-                                }    
-                                var DeleteAnswer = function () {
-                                        $("#loaderAnswerDiv").show();
-                                        var answerId = $("#hiddenAnswerId").val();
-                                        $.ajax({
-                                            type: "POST",
-                                            url: "/User/DeleteAnswer",
-                                            data: { Id: answerId },
-                                            success: function (result) {
-                                                $("#loaderAnswerDiv").hide();
-                                                debugger
-                                                $("#AnswerModal").modal('hide');
-                                                $("#rowAnswer_" + answerId).remove();
-                                            }
-                                        })
-                                }
+                            var DeleteComment = function () {
+                                $("#loaderCommentDiv").show();
+                                var commentId = $("#hiddenCommentId").val();
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/User/DeleteComment",
+                                    data: { Id: commentId },
+                                    success: function (result) {
+                                        $("#loaderCommentDiv").hide();
+                                        debugger
+                                        $("#CommentModel").modal('hide');
+                                        $("#rowComment_" + commentId).remove();
+                                    }
+                                })
+                            }
+                            var DeleteQuestion = function () {
+                                $("#loaderQuestionDiv").show();
+                                var queId = $("#hiddenQuestionId").val();
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/User/DeleteQuestion",
+                                    data: { Id: queId },
+                                    success: function (result) {
+                                        $("#loaderQuestionDiv").hide();
+                                        debugger
+                                        $("#QuestionModal").modal('hide');
+                                        $("#rowQuestion_" + queId).remove();
+                                    }
+                                })
+                            }
+                            var DeleteAnswer = function () {
+                                $("#loaderAnswerDiv").show();
+                                var answerId = $("#hiddenAnswerId").val();
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/User/DeleteAnswer",
+                                    data: { Id: answerId },
+                                    success: function (result) {
+                                        $("#loaderAnswerDiv").hide();
+                                        debugger
+                                        $("#AnswerModal").modal('hide');
+                                        $("#rowAnswer_" + answerId).remove();
+                                    }
+                                })
+                            }
                         </script>
 
                     </div>
