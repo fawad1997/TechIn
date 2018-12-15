@@ -36,7 +36,7 @@ namespace Tech_In.Controllers
         }
         public async Task<IActionResult> Index(string currentFilter, string search, int? page)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
+            string userloggedId = await OnGetSesstion();
             ViewData["CurrentFilter"] = search;
             if (search != null)
             {
@@ -67,8 +67,7 @@ namespace Tech_In.Controllers
         [HttpGet("u/{username}", Name = "GetUser")]
         public async Task<IActionResult> GetUser(string username)
         {
-            var user1 = await _userManager.GetCurrentUser(HttpContext);
-            
+            string userloggedId = await OnGetSesstion();
             //Check User Profile is complete or not
             var user = _userManager.Users.Where(x => x.UserName.Equals(username)).FirstOrDefault();
             if (user == null)
@@ -83,7 +82,7 @@ namespace Tech_In.Controllers
 
 
             ProfileViewModal PVM = new ProfileViewModal();
-            if (user.Id == user1.Id)
+            if (user.Id == userloggedId)
                 PVM.IsCurrentUser = true;
             else
                 PVM.IsCurrentUser = false;
@@ -161,8 +160,23 @@ namespace Tech_In.Controllers
             ViewBag.answer = answers;
             ViewBag.comment = comments;
             ViewBag.question = questionList;
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
             return View(PVM);
+        }
+
+        public async Task<string> OnGetSesstion()
+        {
+            const string SessionKeyName = "_Name";
+            const string SessionKeyPic = "_PPic";
+            const string SessionKeyId = "_Id";
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString(SessionKeyName)))
+            {
+                var user = await _userManager.GetCurrentUser(HttpContext);
+                HttpContext.Session.SetString(SessionKeyName, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.FirstName).FirstOrDefault());
+                HttpContext.Session.SetString(SessionKeyPic, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.ProfileImage).FirstOrDefault());
+                HttpContext.Session.SetString(SessionKeyId, user.Id);
+            }
+            @ViewBag.UName = HttpContext.Session.GetString(SessionKeyName);
+            return HttpContext.Session.GetString(SessionKeyId);
         }
 
 

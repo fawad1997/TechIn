@@ -35,25 +35,37 @@ namespace Tech_In.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
-            if(user == null)
+            string currentUserId = await OnGetSesstion();
+            if(currentUserId == null)
             {
                 return View();
             }
             else
             {
-                var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
+                var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == currentUserId).SingleOrDefault();
                 if (userPersonalRow == null)
                 {
                     return RedirectToAction("CompleteProfile", "Home");
                 }
             }
-
-            HttpContext.Session.SetString("Name", _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.FirstName).SingleOrDefault());
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
             return View("Welcome");
         }
 
+        public async Task<string> OnGetSesstion()
+        {
+            const string SessionKeyName = "_Name";
+            const string SessionKeyPic = "_PPic";
+            const string SessionKeyId = "_Id";
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString(SessionKeyName)))
+            {
+                var user = await _userManager.GetCurrentUser(HttpContext);
+                HttpContext.Session.SetString(SessionKeyName, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.FirstName).FirstOrDefault());
+                HttpContext.Session.SetString(SessionKeyPic, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.ProfileImage).FirstOrDefault());
+                HttpContext.Session.SetString(SessionKeyId, user.Id);
+            }
+            @ViewBag.UName = HttpContext.Session.GetString(SessionKeyName);
+            return HttpContext.Session.GetString(SessionKeyId);
+        }
 
         [Authorize]
         public IActionResult CompleteProfile()

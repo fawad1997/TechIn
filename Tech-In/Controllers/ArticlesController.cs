@@ -39,6 +39,7 @@ namespace Tech_In.Controllers
         }
         public async Task<IActionResult> Index(string currentFilter, string search,int? page)
         {
+            await OnGetSesstion();
             ViewData["CurrentFilter"] = search;
             if (search != null)
             {
@@ -77,7 +78,7 @@ namespace Tech_In.Controllers
         public async Task<IActionResult> ArticleSingle(int id,string title)
         {
             var article = _context.Article.Where(x => x.Id == id).SingleOrDefault();
-            var user = await _userManager.GetCurrentUser(HttpContext);
+            string currentUserId = await OnGetSesstion();
             if (article == null)
             {
                 return NotFound();
@@ -114,9 +115,9 @@ namespace Tech_In.Controllers
             articleVM.AuthorSummary = author.Summary;
             articleVM.CommentsCount = _context.ArticleComment.Where(cmt => cmt.ArticleId == article.OriginalId).Count();
             articleVM.VisitorsCount = _context.ArticleVisitor.Where(av => av.ArticleId == article.OriginalId).Count();
-            if (user != null)
+            if (currentUserId != null)
             {
-                if (articleVM.AuthorId == user.Id)
+                if (articleVM.AuthorId == currentUserId)
                     articleVM.IsArticleAuthor = true;
                 else
                     articleVM.IsArticleAuthor = false;
@@ -126,8 +127,9 @@ namespace Tech_In.Controllers
             return View("ArticleSingle",articleVM);
         }
         [Authorize]
-        public IActionResult New()
+        public async Task<IActionResult> New()
         {
+            await OnGetSesstion();
             List<Category> categories=  _context.Category.OrderBy(x=>x.Title).ToList();
             ViewBag.Categories = new SelectList(categories, "Id", "Title");
             return View();
@@ -138,12 +140,12 @@ namespace Tech_In.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.GetCurrentUser(HttpContext);
+                string currentUserId = await OnGetSesstion();
                 var article = _mapper.Map<Article>(vm);
                 article.CreateTime = DateTime.Now;
                 article.Status = "active";
                 article.OriginalId = 0;
-                article.UserId = user.Id;
+                article.UserId = currentUserId;
                 _context.Article.Add(article);
                 _context.SaveChanges();
                 string[] tagArray = vm.Tags.Split(',');
@@ -157,7 +159,7 @@ namespace Tech_In.Controllers
                             ApprovedStatus = false,
                             SkillName = tag.ToLower(),
                             TimeApproved = DateTime.Now,
-                            UserId = user.Id
+                            UserId = currentUserId
                         };
                         _context.SkillTag.Add(sktag);
                         _context.SaveChanges();
@@ -255,8 +257,8 @@ namespace Tech_In.Controllers
         [Authorize]
         public async Task<IActionResult> Edit(int Id)
         {
-            var article = _context.Article.Where(x => x.Id == Id).SingleOrDefault();
-            var user = await _userManager.GetCurrentUser(HttpContext);
+            string currentUserId = await OnGetSesstion();
+            var article = _context.Article.Where(x => x.Id == Id && x.UserId==currentUserId).SingleOrDefault();
             if (article == null)
             {
                 return NotFound();
@@ -277,8 +279,8 @@ namespace Tech_In.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteArticle(int Id)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
-            var articles = _context.Article.Where(x => x.OriginalId == Id && x.UserId==user.Id);
+            string currentUserId = await OnGetSesstion();
+            var articles = _context.Article.Where(x => x.OriginalId == Id && x.UserId==currentUserId);
             if (articles == null)
             {
                 return NotFound();
@@ -320,9 +322,9 @@ namespace Tech_In.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.GetCurrentUser(HttpContext);
+                string currentUserId = await OnGetSesstion();
                 var oldArticle = _context.Article.Where(olda => olda.Id == vm.Id).SingleOrDefault();
-                if (user.Id != oldArticle.UserId)
+                if (currentUserId != oldArticle.UserId)
                     return BadRequest();
                 oldArticle.Status = "history";
                 vm.Id = 0;
@@ -330,7 +332,7 @@ namespace Tech_In.Controllers
                 article.CreateTime = DateTime.Now;
                 article.Status = "active";
                 article.OriginalId = oldArticle.OriginalId;
-                article.UserId = user.Id;
+                article.UserId = currentUserId;
                 _context.Article.Add(article);
                 _context.SaveChanges();
                 string[] tagArray = vm.Tags.Split(',');
@@ -344,7 +346,7 @@ namespace Tech_In.Controllers
                             ApprovedStatus = false,
                             SkillName = tag.ToLower(),
                             TimeApproved = DateTime.Now,
-                            UserId = user.Id
+                            UserId = currentUserId
                         };
                         _context.SkillTag.Add(sktag);
                         _context.SaveChanges();
@@ -400,6 +402,7 @@ namespace Tech_In.Controllers
 
         public async Task<IActionResult> SearchByTag(int Id,string search,int? page)
         {
+            await OnGetSesstion();
             ViewData["CurrentFilter"] = search;
             if (search != null)
             {
@@ -433,6 +436,7 @@ namespace Tech_In.Controllers
 
         public async Task<IActionResult> SearchByCategory(int Id, string search, int? page)
         {
+            await OnGetSesstion();
             ViewData["CurrentFilter"] = search;
             if (search != null)
             {
@@ -469,14 +473,14 @@ namespace Tech_In.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.GetCurrentUser(HttpContext);
+                string currentUserId = await OnGetSesstion();
                 var comment = new ArticleComment {
                     ArticleId = vm.ArticleId,
                     Comment = vm.Comment,
                     CreateTime = DateTime.Now,
                     Status = "active",
                     OriginalId = 0,
-                    UserId = user.Id
+                    UserId = currentUserId
                 };
                 _context.ArticleComment.Add(comment);
                 _context.SaveChanges();
@@ -489,7 +493,7 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> Comments(int articleId)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
+            string currentUserId = await OnGetSesstion();
             var comments = _context.ArticleComment.Where(art => art.ArticleId == articleId && art.Status=="active").Select(x => new CommentVM { Comment = x.Comment, CreateTime = x.CreateTime, Id = x.Id, Status = x.Status, UserId = x.UserId }).ToList();
             foreach(var cmt in comments)
             {
@@ -497,9 +501,9 @@ namespace Tech_In.Controllers
                 cmt.UserImg = commentAuthor.ProfileImage;
                 cmt.UserName = commentAuthor.FirstName + " " + commentAuthor.LastName;
                 cmt.IsCommentAuthor = false;
-                if (user != null)
+                if (currentUserId != null)
                 {
-                    if(user.Id == commentAuthor.UserId)
+                    if(currentUserId == commentAuthor.UserId)
                     {
                         cmt.IsCommentAuthor = true;
                     }
@@ -510,8 +514,8 @@ namespace Tech_In.Controllers
         }
         public async Task<IActionResult> EditComment(int Id)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
-            var comment = _context.ArticleComment.Where(x => x.Id == Id && x.UserId == user.Id).SingleOrDefault();
+            string currentUserId = await OnGetSesstion();
+            var comment = _context.ArticleComment.Where(x => x.Id == Id && x.UserId == currentUserId).SingleOrDefault();
             if (comment == null)
             {
                 return NotFound();
@@ -523,8 +527,8 @@ namespace Tech_In.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.GetCurrentUser(HttpContext);
-                var comment = _context.ArticleComment.Where(x => x.Id == vm.Id && x.UserId == user.Id).SingleOrDefault();
+                string currentUserId = await OnGetSesstion();
+                var comment = _context.ArticleComment.Where(x => x.Id == vm.Id && x.UserId == currentUserId).SingleOrDefault();
                 if (comment == null)
                 {
                     return NotFound();
@@ -537,7 +541,7 @@ namespace Tech_In.Controllers
                     Comment = vm.Comment,
                     CreateTime = DateTime.Now,
                     Status = "active",
-                    UserId = user.Id
+                    UserId = currentUserId
                 };
                 _context.ArticleComment.Add(updatedComment);
                 _context.SaveChanges();
@@ -547,8 +551,8 @@ namespace Tech_In.Controllers
         }
         public async Task<IActionResult> DeleteComment(int id)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
-            var comments = _context.ArticleComment.Where(x => x.OriginalId == id && x.UserId == user.Id).ToList();
+            string currentUserId = await OnGetSesstion();
+            var comments = _context.ArticleComment.Where(x => x.OriginalId == id && x.UserId == currentUserId).ToList();
             if (comments == null)
             {
                 return NotFound();
@@ -562,22 +566,22 @@ namespace Tech_In.Controllers
         }
         public async Task<IActionResult> ArticleViews(int articleId)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
-            if (user != null)
+            string currentUserId = await OnGetSesstion();
+            if (currentUserId != null)
             {
-                var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
+                var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == currentUserId).SingleOrDefault();
                 if (userPersonalRow == null)
                 {
                     return RedirectToAction("CompleteProfile", "Home");
                 }
                 //If Registered Visitor Counter
-                ArticleVisitor isVisited = _context.ArticleVisitor.Where(qv => qv.UserId == user.Id && qv.ArticleId == articleId).SingleOrDefault();
+                ArticleVisitor isVisited = _context.ArticleVisitor.Where(qv => qv.UserId == currentUserId && qv.ArticleId == articleId).SingleOrDefault();
                 if (isVisited == null)
                 {
                     _context.ArticleVisitor.Add(new ArticleVisitor
                     {
                         ArticleId = articleId,
-                        UserId = user.Id,
+                        UserId = currentUserId,
                         IsLoggedIn = true,
                         UserIp = null
                     });
@@ -592,7 +596,7 @@ namespace Tech_In.Controllers
                         AIUserInterest userLikeTag = new AIUserInterest
                         {
                             TagId = tag.TagId,
-                            UserId = user.Id,
+                            UserId = currentUserId,
                             Count = 1
                         };
                         _context.AIUserInterest.Add(userLikeTag);
@@ -690,6 +694,22 @@ namespace Tech_In.Controllers
             {
                 return NotFound();
             }
+        }
+
+        public async Task<string> OnGetSesstion()
+        {
+            const string SessionKeyName = "_Name";
+            const string SessionKeyPic = "_PPic";
+            const string SessionKeyId = "_Id";
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString(SessionKeyName)))
+            {
+                var user = await _userManager.GetCurrentUser(HttpContext);
+                HttpContext.Session.SetString(SessionKeyName, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.FirstName).FirstOrDefault());
+                HttpContext.Session.SetString(SessionKeyPic, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.ProfileImage).FirstOrDefault());
+                HttpContext.Session.SetString(SessionKeyId, user.Id);
+            }
+            @ViewBag.UName = HttpContext.Session.GetString(SessionKeyName);
+            return HttpContext.Session.GetString(SessionKeyId);
         }
     }
 }
