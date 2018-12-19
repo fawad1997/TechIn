@@ -2282,3 +2282,99 @@ input:checked + .slider:before {
     padding-top:40px;
     padding-bottom:40px;
 }
+/* Friends Request Section */
+.dropdownn {
+    position: relative
+}
+
+.count-info .label {
+    line-height: 12px;
+    padding: 2px 5px;
+    position: absolute;
+    left: 10px;
+    top: 12px
+}
+
+.dropdown-menu-right, .navbar-static-top .dropdown-menu {
+    right: 0;
+    left: auto
+}
+
+.navbar .dropdown-menu {
+    margin-top: 0
+}
+
+.dropdown-menu.show {
+    display: block
+}
+
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 0 3px rgba(86,96,117,.7);
+    font-size: 12px !important;
+    text-shadow: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    display: none;
+    float: left;
+    min-width: 10rem;
+    padding: .5rem 0;
+    margin: .125rem 0 0;
+    color: #212529;
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: .25rem
+}
+
+.navbar-top-links .dropdown-alerts, .navbar-top-links .dropdown-messages, .navbar-top-links .dropdown-tasks {
+    margin-left: auto;
+    width: 310px;
+    min-width: 0
+}
+
+.navbar-top-links .dropdown-messages {
+    margin-left: 5px
+}
+
+.dropdown-alerts, .dropdown-messages {
+    padding: 10px;
+    width: 310px;
+    min-width: 0
+}
+
+.dropdown-item {
+    padding: 3px 12px 3px 0
+}
+
+.float-left {
+    float: left !important
+}
+
+img.rounded-circle {
+    width: 38px;
+    height: 38px
+}
+
+.float-right {
+    float: right !important
+}
+
+.small, small {
+    font-size: 80%;
+    font-weight: 400
+}
+
+.dropdown-divider {
+    height: 0;
+    margin: .5rem 0;
+    overflow: hidden;
+    border-top: 1px solid #e9ecef
+}
+.fa-15x {
+    font-size: 1.5em;
+}

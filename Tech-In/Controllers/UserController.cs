@@ -256,6 +256,28 @@ namespace Tech_In.Controllers
             _context.SaveChanges();
             return Json(new { success = true, msg = "Friend Request Sent!" });
         }
+        public async Task<IActionResult> AcceptFriend(string UserName)
+        {
+            string currentUserId = await OnGetSesstion();
+            var userToAdd = _context.Users.Where(x => x.UserName == UserName).FirstOrDefault();
+            if (userToAdd == null || userToAdd.Id == currentUserId)
+                return Json(new { success = false, msg = "Unable to accept :(" });
+            UserNetwork frnd = _context.UserNetwork.Where(a => a.User1 == userToAdd.Id && a.User2 == currentUserId && a.AreFriend == false).FirstOrDefault();
+            frnd.AreFriend = true;
+            _context.SaveChanges();
+            return Json(new { success = true, msg = "You and "+UserName+" are now Friends!" });
+        }
+        public async Task<IActionResult> RejectFriend(string UserName)
+        {
+            string currentUserId = await OnGetSesstion();
+            var userToAdd = _context.Users.Where(x => x.UserName == UserName).FirstOrDefault();
+            if (userToAdd == null || userToAdd.Id == currentUserId)
+                return Json(new { success = false, msg = "Unable to accept :(" });
+            UserNetwork frnd = _context.UserNetwork.Where(a => a.User1 == userToAdd.Id && a.User2 == currentUserId && a.AreFriend == false).FirstOrDefault();
+            _context.UserNetwork.Remove(frnd);
+            _context.SaveChanges();
+            return Json(new { success = true, msg = "Friend Request Rejected!" });
+        }
 
         public async Task<IActionResult> CancelFriend(string UserName)
         {
@@ -267,6 +289,29 @@ namespace Tech_In.Controllers
             _context.UserNetwork.Remove(alreadyEsists);
             _context.SaveChanges();
             return Json(new { success = true, msg = "Friend Request Canceled!" });
+        }
+        public async Task<IActionResult> CountFriendReq(string UserName)
+        {
+            string currentUserId = await OnGetSesstion();
+            int countFriendReq = _context.UserNetwork.Where(x => x.User2 == currentUserId && x.AreFriend == false).Count();
+            return Json(new { count = countFriendReq });
+        }
+
+        public async Task<IActionResult> FriendRequests()
+        {
+            string currentUserId = await OnGetSesstion();
+            var friendR = (from un in _context.UserNetwork
+                           join up in _context.UserPersonalDetail on un.User1 equals up.UserId
+                           where un.User2 == currentUserId && un.AreFriend == false
+                           select new FriendsVM
+                           {
+                               Name = up.FirstName + " " + up.LastName,
+                               UserName = un.ApplicationUser1.UserName,
+                               ProfilePic = up.ProfileImage,
+                               ReqTime = un.RecordTime
+                           }).ToList();
+            return View("_FriendReq", friendR);
+            //return null;
         }
 
 
@@ -338,9 +383,6 @@ namespace Tech_In.Controllers
                 return PartialView("AddEditUserExperience", vm);
             }
             return Json(new { success = true });
-            //@ViewBag.UName = HttpContext.Session.GetString("Name");
-            //return RedirectToAction("Index");
-            //return View("Index");
         }
 
         public async Task<JsonResult> DeleteUserExperience(int Id)
