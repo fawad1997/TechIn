@@ -24,21 +24,29 @@
                                 @if (item.IsFriendReqSent)
                                 {
                                     string can = item.UserName + "c";
+                                    string canl = can + "l";
+                                    string cani = can + "i";
+                                    string addl = item.UserName + "al";
+                                    string addi = item.UserName + "ai";
                                     <div style="float:right;">
-                                        <button id="@can" onclick="cancelFriend('@item.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i class="fa fa-user-plus"></i> Cancel Friend Request</button>
+                                        <button id="@can" onclick="cancelFriend('@item.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i id="@cani" class="fa fa-user-plus"></i><i id="@canl" style="display:none;" class="fa fa-spinner"></i> Cancel Friend Request</button>
                                     </div>
                                     <div style="float:right;">
-                                        <button id="@item.UserName" onclick="addFriend('@item.UserName')" style="padding:5px 15px;display:none;" class="main-btn blue-g-btn" type="button"><i class="fa fa-user-plus"></i> Add Friend</button>
+                                        <button id="@item.UserName" onclick="addFriend('@item.UserName')" style="padding:5px 15px;display:none;" class="main-btn blue-g-btn" type="button"><i id="@addi" class="fa fa-user-plus"></i><i id="@addl" style="display:none;" class="fa fa-spinner"></i> Add Friend</button>
                                     </div>
                                 }
                                 else
                                 {
-                                    <div style="float:right;">
-                                        <button id="@item.UserName" onclick="addFriend('@item.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i class="fa fa-user-plus"></i> Add Friend</button>
-                                    </div>
                                     string can = item.UserName + "c";
+                                    string canl = can + "l";
+                                    string cani = can + "i";
+                                    string addl = item.UserName + "al";
+                                    string addi = item.UserName + "ai";
                                     <div style="float:right;">
-                                        <button id="@can" onclick="cancelFriend('@item.UserName')" style="padding:5px 15px; display:none;" class="main-btn blue-g-btn" type="button"><i class="fa fa-user-plus"></i> Cancel Friend Request</button>
+                                        <button id="@item.UserName" onclick="addFriend('@item.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i id="@addi" class="fa fa-user-plus"></i><i id="@addl" style="display:none;" class="fa fa-spinner"></i> Add Friend</button>
+                                    </div>
+                                    <div style="float:right;">
+                                        <button id="@can" onclick="cancelFriend('@item.UserName')" style="padding:5px 15px; display:none;" class="main-btn blue-g-btn" type="button"><i id="@cani" class="fa fa-user-plus"></i><i id="@canl" style="display:none;" class="fa fa-spinner"></i> Cancel Friend Request</button>
                                     </div>
                                 }
                             }
@@ -88,7 +96,8 @@
 </div>
 <script>
 var addFriend = function (userName) {
-    //alert(userName);
+    $("#" + userName + "al").show();
+    $("#" + userName + "ai").hide();
     $.ajax({
         type: "POST",
         url: "/User/AddFriend",
@@ -101,17 +110,23 @@ var addFriend = function (userName) {
                 toastr.success(result.msg, userName);
                 $("#" + userName).hide();
                 $("#" + userName + 'c').show();
+                $("#" + userName + "al").hide();
+                $("#" + userName + "ai").show();
             } else {
                 toastr.options = {
                     "positionClass": "toast-bottom-right"
                 }
                 toastr.error(result.msg, userName);
+                $("#" + userName + "al").hide();
+                $("#" + userName + "ai").show();
             }
         }
 
     })
     };
     var cancelFriend = function (userName) {
+        $("#" + userName + "cl").show();
+        $("#" + userName + "ci").hide();
         $.ajax({
             type: "POST",
             url: "/User/CancelFriend",
@@ -124,11 +139,15 @@ var addFriend = function (userName) {
                     toastr.info(result.msg, userName);
                     $("#" + userName + 'c').hide();
                     $("#" + userName).show();
+                    $("#" + userName + "cl").hide();
+                    $("#" + userName + "ci").show();
                 } else {
                     toastr.options = {
                         "positionClass": "toast-bottom-right"
                     }
                     toastr.error(result.msg, userName);
+                    $("#" + userName + "cl").hide();
+                    $("#" + userName + "ci").show();
                 }
             }
 
