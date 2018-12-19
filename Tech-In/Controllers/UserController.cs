@@ -54,7 +54,9 @@ namespace Tech_In.Controllers
                              FirstName = u.FirstName,
                              LastName = u.LastName,
                              ProfileImage = u.ProfileImage,
-                             UserName = us.UserName
+                             UserName = us.UserName,
+                             IsFriend = _context.UserNetwork.Where(a => (a.User1 == us.Id || a.User1 == userloggedId) && (a.User2 == us.Id || a.User2 == userloggedId)).Any(),
+                             IsFriendReqSent = _context.UserNetwork.Where(a => a.User1 == userloggedId && a.User2 == us.Id).Any()
                          }).Take(10);
             if (!String.IsNullOrEmpty(search))
             {

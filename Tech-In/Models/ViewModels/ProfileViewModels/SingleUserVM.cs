@@ -11,5 +11,7 @@ namespace Tech_In.Models.ViewModels.ProfileViewModels
         public string LastName { get; set; }
         public string ProfileImage { get; set; }
         public string UserName { get; set; }
+        public bool IsFriend { get; set; }
+        public bool IsFriendReqSent { get; set; }
     }
 }
