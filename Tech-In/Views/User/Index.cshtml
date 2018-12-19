@@ -29,7 +29,7 @@
                                     string addl = item.UserName + "al";
                                     string addi = item.UserName + "ai";
                                     <div style="float:right;">
-                                        <button id="@can" onclick="cancelFriend('@item.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i id="@cani" class="fa fa-user-plus"></i><i id="@canl" style="display:none;" class="fa fa-spinner"></i> Cancel Friend Request</button>
+                                        <button id="@can" onclick="cancelFriend('@item.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i id="@cani" class="fa fa-trash"></i><i id="@canl" style="display:none;" class="fa fa-spinner"></i> Cancel Friend Request</button>
                                     </div>
                                     <div style="float:right;">
                                         <button id="@item.UserName" onclick="addFriend('@item.UserName')" style="padding:5px 15px;display:none;" class="main-btn blue-g-btn" type="button"><i id="@addi" class="fa fa-user-plus"></i><i id="@addl" style="display:none;" class="fa fa-spinner"></i> Add Friend</button>
@@ -46,7 +46,7 @@
                                         <button id="@item.UserName" onclick="addFriend('@item.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i id="@addi" class="fa fa-user-plus"></i><i id="@addl" style="display:none;" class="fa fa-spinner"></i> Add Friend</button>
                                     </div>
                                     <div style="float:right;">
-                                        <button id="@can" onclick="cancelFriend('@item.UserName')" style="padding:5px 15px; display:none;" class="main-btn blue-g-btn" type="button"><i id="@cani" class="fa fa-user-plus"></i><i id="@canl" style="display:none;" class="fa fa-spinner"></i> Cancel Friend Request</button>
+                                        <button id="@can" onclick="cancelFriend('@item.UserName')" style="padding:5px 15px; display:none;" class="main-btn blue-g-btn" type="button"><i id="@cani" class="fa fa-trash"></i><i id="@canl" style="display:none;" class="fa fa-spinner"></i> Cancel Friend Request</button>
                                     </div>
                                 }
                             }
@@ -95,7 +95,8 @@
     </a>
 </div>
 <script>
-var addFriend = function (userName) {
+    var addFriend = function (userName) {
+    $("#" + userName).prop('disabled', true);
     $("#" + userName + "al").show();
     $("#" + userName + "ai").hide();
     $.ajax({
@@ -112,6 +113,7 @@ var addFriend = function (userName) {
                 $("#" + userName + 'c').show();
                 $("#" + userName + "al").hide();
                 $("#" + userName + "ai").show();
+                $("#" + userName).prop('disabled', false);
             } else {
                 toastr.options = {
                     "positionClass": "toast-bottom-right"
@@ -119,12 +121,14 @@ var addFriend = function (userName) {
                 toastr.error(result.msg, userName);
                 $("#" + userName + "al").hide();
                 $("#" + userName + "ai").show();
+                $("#" + userName).prop('disabled', false);
             }
         }
 
     })
     };
     var cancelFriend = function (userName) {
+        $("#" + userName + 'c').prop('disabled', true);
         $("#" + userName + "cl").show();
         $("#" + userName + "ci").hide();
         $.ajax({
@@ -141,6 +145,7 @@ var addFriend = function (userName) {
                     $("#" + userName).show();
                     $("#" + userName + "cl").hide();
                     $("#" + userName + "ci").show();
+                    $("#" + userName + 'c').prop('disabled', false);
                 } else {
                     toastr.options = {
                         "positionClass": "toast-bottom-right"
@@ -148,6 +153,7 @@ var addFriend = function (userName) {
                     toastr.error(result.msg, userName);
                     $("#" + userName + "cl").hide();
                     $("#" + userName + "ci").show();
+                    $("#" + userName + 'c').prop('disabled', false);
                 }
             }
 
