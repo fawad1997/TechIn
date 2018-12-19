@@ -237,6 +237,37 @@ namespace Tech_In.Controllers
             return user.Id;
         }
 
+        public async Task<IActionResult> AddFriend(string UserName)
+        {
+            string currentUserId = await OnGetSesstion();
+            var userToAdd = _context.Users.Where(x => x.UserName == UserName).FirstOrDefault();
+            if (userToAdd == null || userToAdd.Id == currentUserId)
+                return Json(new { success = false, msg = "Sorry, Unable to send Friend Request :(" });
+            UserNetwork uN = new UserNetwork
+            {
+                User1 = currentUserId,
+                User2 = userToAdd.Id,
+                RecordTime = DateTime.Now,
+                AreFriend = false
+            };
+            _context.UserNetwork.Add(uN);
+            _context.SaveChanges();
+            return Json(new { success = true, msg = "Friend Request Sent!" });
+        }
+
+        public async Task<IActionResult> CancelFriend(string UserName)
+        {
+            string currentUserId = await OnGetSesstion();
+            var userToCancel = _context.Users.Where(x => x.UserName == UserName).FirstOrDefault();
+            var alreadyEsists = _context.UserNetwork.Where(a => (a.User1 == currentUserId || a.User1 == userToCancel.Id) && (a.User2 == currentUserId || a.User2 == userToCancel.Id)).FirstOrDefault();
+            if (alreadyEsists == null)
+                return Json(new { success = false, msg = "Unable to cancel request!" });
+            _context.UserNetwork.Remove(alreadyEsists);
+            _context.SaveChanges();
+            return Json(new { success = true, msg = "Friend Request Canceled!" });
+        }
+
+
         //User Experience
         public async Task<IActionResult> AddEditUserExperience(int Id)
         {
@@ -889,6 +920,8 @@ namespace Tech_In.Controllers
             if (string.IsNullOrEmpty(HttpContext.Session.GetString(SessionKeyName)))
             {
                 var user = await _userManager.GetCurrentUser(HttpContext);
+                if (user == null)
+                    return null;
                 HttpContext.Session.SetString(SessionKeyName, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.FirstName).FirstOrDefault());
                 HttpContext.Session.SetString(SessionKeyPic, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.ProfileImage).FirstOrDefault());
                 HttpContext.Session.SetString(SessionKeyId, user.Id);

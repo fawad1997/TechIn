@@ -9,8 +9,13 @@
     <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="navbar-right">
         <ul class="nav navbar-nav navbar-right main-nav">
             <li class="has-dropdown">
-                
-                <a asp-area="" asp-controller="Manage" asp-action="Index" title="Manage"><img style="height:25px;width:25px;" src="@ViewBag.UserPic" />  @ViewBag.UName</a>
+                <a><i class="fa fa-user"></i></a>
+                <ul class="dropdown">
+                    <li><div class="bg-dark">Hello</div></li>
+                </ul>
+            </li>
+            <li class="has-dropdown">
+                <a asp-area="" asp-controller="Manage" asp-action="Index" title="Manage"><img class="img img-circle" style="height:25px;width:25px;" src="@ViewBag.UserPic" />  @ViewBag.UName</a>
                 <ul class="dropdown">
                     <li><a href="/u/@ViewBag.UserName">Profile</a></li>
                     <li><a href="/Manage/ExternalLogins">Settings</a></li>
@@ -18,7 +23,7 @@
                 </ul>
             </li>
             <li>
-                <a><button type="submit" class="btn-link navbar-link">Log out</button></a>
+                <a><button style="color:black; text-decoration:none;" type="submit" class="btn-link navbar-link">Log out</button></a>
             </li>
         </ul>
     </form>

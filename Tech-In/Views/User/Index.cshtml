@@ -4,6 +4,8 @@
     ViewData["Title"] = "Users";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<link rel="stylesheet" href="~/css/toastr.css" />
+<script src="~/js/toastr.js"></script>
 
 <div class="container padding-40">
     <div class="row">
@@ -17,6 +19,17 @@
                         </div>
                         <div class="col-sm-8 col-lg-9">
                             <h3 style="margin-bottom:0px;"><a style="color: black;text-decoration: none;" href="/u/@item.UserName">@item.FirstName @item.LastName </a></h3>
+                            @if (item.UserName != ViewBag.UserName)
+                            {
+                                <div style="float:right;">
+                                    <button id="@item.UserName" onclick="addFriend('@item.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i class="fa fa-user-plus"></i> Add Friend</button>
+                                </div>
+                                string can = item.UserName+"c";
+                                <div style="float:right;">
+                                    <button id="@can" onclick="cancelFriend('@item.UserName')" style="padding:5px 15px; display:none;" class="main-btn blue-g-btn" type="button"><i class="fa fa-user-plus"></i> Cancel Friend Request</button>
+                                </div>
+                            }
+
                         </div>
                     </div>
                 </div>
@@ -60,4 +73,52 @@
         Next
     </a>
 </div>
+<script>
+var addFriend = function (userName) {
+    //alert(userName);
+    $.ajax({
+        type: "POST",
+        url: "/User/AddFriend",
+        data: { UserName: userName },
+        success: function (result) {
+            if (result.success) {
+                toastr.options = {
+                    "positionClass": "toast-bottom-right"
+                }
+                toastr.success(result.msg, userName);
+                $("#" + userName).hide();
+                $("#" + userName + 'c').show();
+            } else {
+                toastr.options = {
+                    "positionClass": "toast-bottom-right"
+                }
+                toastr.error(result.msg, userName);
+            }
+        }
 
+    })
+    };
+    var cancelFriend = function (userName) {
+        $.ajax({
+            type: "POST",
+            url: "/User/CancelFriend",
+            data: { UserName: userName },
+            success: function (result) {
+                if (result.success) {
+                    toastr.options = {
+                        "positionClass": "toast-bottom-right"
+                    }
+                    toastr.info(result.msg, userName);
+                    $("#" + userName + 'c').hide();
+                    $("#" + userName).show();
+                } else {
+                    toastr.options = {
+                        "positionClass": "toast-bottom-right"
+                    }
+                    toastr.error(result.msg, userName);
+                }
+            }
+
+        })
+    };
+</script>

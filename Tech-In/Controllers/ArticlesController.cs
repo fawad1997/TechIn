@@ -705,6 +705,8 @@ namespace Tech_In.Controllers
             if (string.IsNullOrEmpty(HttpContext.Session.GetString(SessionKeyName)))
             {
                 var user = await _userManager.GetCurrentUser(HttpContext);
+                if (user == null)
+                    return null;
                 HttpContext.Session.SetString(SessionKeyName, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.FirstName).FirstOrDefault());
                 HttpContext.Session.SetString(SessionKeyPic, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.ProfileImage).FirstOrDefault());
                 HttpContext.Session.SetString(SessionKeyId, user.Id);
