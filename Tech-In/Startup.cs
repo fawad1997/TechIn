@@ -10,6 +10,7 @@ using System;
 using Tech_In.Data;
 using Tech_In.Extensions;
 using Tech_In.Models;
+using Tech_In.Models.Database;
 using Tech_In.Services;
 
 namespace Tech_In
@@ -109,7 +110,6 @@ namespace Tech_In
 
             app.UseAuthentication();
             app.UseSession();
-
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

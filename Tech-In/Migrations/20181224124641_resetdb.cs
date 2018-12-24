@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Tech_In.Migrations
 {
-    public partial class initial : Migration
+    public partial class resetdb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -81,6 +81,31 @@ namespace Tech_In.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Article",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ArticleBody = table.Column<string>(type: "nvarchar(MAX)", nullable: false),
+                    ArticleImg = table.Column<string>(nullable: true),
+                    CreateTime = table.Column<DateTime>(nullable: false),
+                    OriginalId = table.Column<int>(nullable: false),
+                    Status = table.Column<string>(maxLength: 8, nullable: false),
+                    Title = table.Column<string>(maxLength: 150, nullable: false),
+                    UserId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Article", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Article_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -166,6 +191,27 @@ namespace Tech_In.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Category",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ActiveStatus = table.Column<bool>(nullable: false),
+                    AddedBy = table.Column<string>(nullable: true),
+                    Title = table.Column<string>(maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Category", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Category_AspNetUsers_AddedBy",
+                        column: x => x.AddedBy,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -275,6 +321,34 @@ namespace Tech_In.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserNetwork",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    AreFriend = table.Column<bool>(nullable: false),
+                    RecordTime = table.Column<DateTime>(nullable: false),
+                    User1 = table.Column<string>(nullable: true),
+                    User2 = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserNetwork", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserNetwork_AspNetUsers_User1",
+                        column: x => x.User1,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserNetwork_AspNetUsers_User2",
+                        column: x => x.User2,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserPublication",
                 columns: table => new
                 {
@@ -304,6 +378,7 @@ namespace Tech_In.Migrations
                     UserQuestionId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Description = table.Column<string>(type: "nvarchar(MAX)", nullable: false),
+                    HasVerifiedAns = table.Column<bool>(nullable: false),
                     PostTime = table.Column<DateTime>(nullable: false),
                     Title = table.Column<string>(maxLength: 50, nullable: false),
                     UserId = table.Column<string>(nullable: true)
@@ -335,6 +410,137 @@ namespace Tech_In.Migrations
                         column: x => x.CountryId,
                         principalTable: "Country",
                         principalColumn: "CountryId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ArticleComment",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ArticleId = table.Column<int>(nullable: false),
+                    Comment = table.Column<string>(maxLength: 300, nullable: false),
+                    CreateTime = table.Column<DateTime>(nullable: false),
+                    OriginalId = table.Column<int>(nullable: false),
+                    Status = table.Column<string>(maxLength: 8, nullable: false),
+                    UserId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArticleComment", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ArticleComment_Article_ArticleId",
+                        column: x => x.ArticleId,
+                        principalTable: "Article",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ArticleComment_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ArticleVisitor",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ArticleId = table.Column<int>(nullable: false),
+                    IsLoggedIn = table.Column<bool>(nullable: false),
+                    UserId = table.Column<string>(maxLength: 300, nullable: true),
+                    UserIp = table.Column<string>(maxLength: 100, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArticleVisitor", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ArticleVisitor_Article_ArticleId",
+                        column: x => x.ArticleId,
+                        principalTable: "Article",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ArticleCategory",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ArticleId = table.Column<int>(nullable: false),
+                    CategoryId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArticleCategory", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ArticleCategory_Article_ArticleId",
+                        column: x => x.ArticleId,
+                        principalTable: "Article",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ArticleCategory_Category_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Category",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AIUserInterest",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Count = table.Column<int>(nullable: false),
+                    TagId = table.Column<int>(nullable: false),
+                    UserId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AIUserInterest", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AIUserInterest_SkillTag_TagId",
+                        column: x => x.TagId,
+                        principalTable: "SkillTag",
+                        principalColumn: "SkillTagId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AIUserInterest_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ArticleTag",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ArticleId = table.Column<int>(nullable: false),
+                    TagId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArticleTag", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ArticleTag_Article_ArticleId",
+                        column: x => x.ArticleId,
+                        principalTable: "Article",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ArticleTag_SkillTag_TagId",
+                        column: x => x.TagId,
+                        principalTable: "SkillTag",
+                        principalColumn: "SkillTagId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -391,6 +597,28 @@ namespace Tech_In.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "QuestionVisitor",
+                columns: table => new
+                {
+                    QuestionVisitorId = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    IsLoggedIn = table.Column<bool>(nullable: false),
+                    QuestionId = table.Column<int>(nullable: false),
+                    UserId = table.Column<string>(nullable: true),
+                    UserIp = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QuestionVisitor", x => x.QuestionVisitorId);
+                    table.ForeignKey(
+                        name: "FK_QuestionVisitor_UserQuestion_QuestionId",
+                        column: x => x.QuestionId,
+                        principalTable: "UserQuestion",
+                        principalColumn: "UserQuestionId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserQAComment",
                 columns: table => new
                 {
@@ -427,6 +655,7 @@ namespace Tech_In.Migrations
                     UserQAnswerId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Description = table.Column<string>(type: "nvarchar(MAX)", nullable: false),
+                    IsVerified = table.Column<bool>(nullable: false),
                     PostTime = table.Column<DateTime>(nullable: false),
                     UserId = table.Column<string>(nullable: true),
                     UserQuestionId = table.Column<int>(nullable: false)
@@ -455,8 +684,8 @@ namespace Tech_In.Migrations
                     UserQAVotingID = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     IsAnswer = table.Column<bool>(nullable: false),
+                    UserAnswerId = table.Column<int>(nullable: true),
                     UserId = table.Column<string>(nullable: true),
-                    UserQAnswerId = table.Column<int>(nullable: true),
                     UserQuestionId = table.Column<int>(nullable: true),
                     Value = table.Column<int>(nullable: false),
                     Visibility = table.Column<bool>(nullable: false)
@@ -580,6 +809,56 @@ namespace Tech_In.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_AIUserInterest_TagId",
+                table: "AIUserInterest",
+                column: "TagId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AIUserInterest_UserId",
+                table: "AIUserInterest",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Article_UserId",
+                table: "Article",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ArticleCategory_ArticleId",
+                table: "ArticleCategory",
+                column: "ArticleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ArticleCategory_CategoryId",
+                table: "ArticleCategory",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ArticleComment_ArticleId",
+                table: "ArticleComment",
+                column: "ArticleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ArticleComment_UserId",
+                table: "ArticleComment",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ArticleTag_ArticleId",
+                table: "ArticleTag",
+                column: "ArticleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ArticleTag_TagId",
+                table: "ArticleTag",
+                column: "TagId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ArticleVisitor_ArticleId",
+                table: "ArticleVisitor",
+                column: "ArticleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
                 column: "RoleId");
@@ -619,6 +898,11 @@ namespace Tech_In.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Category_AddedBy",
+                table: "Category",
+                column: "AddedBy");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_City_CountryId",
                 table: "City",
                 column: "CountryId");
@@ -632,6 +916,11 @@ namespace Tech_In.Migrations
                 name: "IX_QuestionSkill_UserQuestionId",
                 table: "QuestionSkill",
                 column: "UserQuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuestionVisitor_QuestionId",
+                table: "QuestionVisitor",
+                column: "QuestionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SkillTag_UserId",
@@ -677,6 +966,16 @@ namespace Tech_In.Migrations
                 name: "IX_UserLanguageSkill_UserId",
                 table: "UserLanguageSkill",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserNetwork_User1",
+                table: "UserNetwork",
+                column: "User1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserNetwork_User2",
+                table: "UserNetwork",
+                column: "User2");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserPersonalDetail_CityId",
@@ -742,6 +1041,21 @@ namespace Tech_In.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AIUserInterest");
+
+            migrationBuilder.DropTable(
+                name: "ArticleCategory");
+
+            migrationBuilder.DropTable(
+                name: "ArticleComment");
+
+            migrationBuilder.DropTable(
+                name: "ArticleTag");
+
+            migrationBuilder.DropTable(
+                name: "ArticleVisitor");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
@@ -758,6 +1072,9 @@ namespace Tech_In.Migrations
 
             migrationBuilder.DropTable(
                 name: "QuestionSkill");
+
+            migrationBuilder.DropTable(
+                name: "QuestionVisitor");
 
             migrationBuilder.DropTable(
                 name: "UserAcheivement");
@@ -778,6 +1095,9 @@ namespace Tech_In.Migrations
                 name: "UserLanguageSkill");
 
             migrationBuilder.DropTable(
+                name: "UserNetwork");
+
+            migrationBuilder.DropTable(
                 name: "UserPersonalDetail");
 
             migrationBuilder.DropTable(
@@ -794,6 +1114,12 @@ namespace Tech_In.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserSkill");
+
+            migrationBuilder.DropTable(
+                name: "Category");
+
+            migrationBuilder.DropTable(
+                name: "Article");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

@@ -21,33 +21,47 @@
                             <h3 style="margin-bottom:0px;"><a style="color: black;text-decoration: none;" href="/u/@item.UserName">@item.FirstName @item.LastName </a></h3>
                             @if (item.UserName != ViewBag.UserName)
                             {
-                                @if (item.IsFriendReqSent)
+                                @if (item.IsFriend)
                                 {
                                     string can = item.UserName + "c";
                                     string canl = can + "l";
                                     string cani = can + "i";
                                     string addl = item.UserName + "al";
                                     string addi = item.UserName + "ai";
-                                    <div style="float:right;">
-                                        <button id="@can" onclick="cancelFriend('@item.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i id="@cani" class="fa fa-trash"></i><i id="@canl" style="display:none;" class="fa fa-spinner"></i> Cancel Friend Request</button>
-                                    </div>
-                                    <div style="float:right;">
-                                        <button id="@item.UserName" onclick="addFriend('@item.UserName')" style="padding:5px 15px;display:none;" class="main-btn blue-g-btn" type="button"><i id="@addi" class="fa fa-user-plus"></i><i id="@addl" style="display:none;" class="fa fa-spinner"></i> Add Friend</button>
-                                    </div>
+                            <div style="float:right;">
+                                <button id="@can" onclick="cancelFriend('@item.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i id="@cani" class="fa fa-trash"></i><i id="@canl" style="display:none;" class="fa fa-spinner"></i> Unfriend</button>
+                            </div>
                                 }
                                 else
                                 {
-                                    string can = item.UserName + "c";
-                                    string canl = can + "l";
-                                    string cani = can + "i";
-                                    string addl = item.UserName + "al";
-                                    string addi = item.UserName + "ai";
-                                    <div style="float:right;">
-                                        <button id="@item.UserName" onclick="addFriend('@item.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i id="@addi" class="fa fa-user-plus"></i><i id="@addl" style="display:none;" class="fa fa-spinner"></i> Add Friend</button>
-                                    </div>
-                                    <div style="float:right;">
-                                        <button id="@can" onclick="cancelFriend('@item.UserName')" style="padding:5px 15px; display:none;" class="main-btn blue-g-btn" type="button"><i id="@cani" class="fa fa-trash"></i><i id="@canl" style="display:none;" class="fa fa-spinner"></i> Cancel Friend Request</button>
-                                    </div>
+                                    @if (item.IsFriendReqSent)
+                                    {
+                                        string can = item.UserName + "c";
+                                        string canl = can + "l";
+                                        string cani = can + "i";
+                                        string addl = item.UserName + "al";
+                                        string addi = item.UserName + "ai";
+                                        <div style="float:right;">
+                                            <button id="@can" onclick="cancelFriend('@item.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i id="@cani" class="fa fa-trash"></i><i id="@canl" style="display:none;" class="fa fa-spinner"></i> Cancel Friend Request</button>
+                                        </div>
+                                        <div style="float:right;">
+                                            <button id="@item.UserName" onclick="addFriend('@item.UserName')" style="padding:5px 15px;display:none;" class="main-btn blue-g-btn" type="button"><i id="@addi" class="fa fa-user-plus"></i><i id="@addl" style="display:none;" class="fa fa-spinner"></i> Add Friend</button>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        string can = item.UserName + "c";
+                                        string canl = can + "l";
+                                        string cani = can + "i";
+                                        string addl = item.UserName + "al";
+                                        string addi = item.UserName + "ai";
+                                        <div style="float:right;">
+                                            <button id="@item.UserName" onclick="addFriend('@item.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i id="@addi" class="fa fa-user-plus"></i><i id="@addl" style="display:none;" class="fa fa-spinner"></i> Add Friend</button>
+                                        </div>
+                                        <div style="float:right;">
+                                            <button id="@can" onclick="cancelFriend('@item.UserName')" style="padding:5px 15px; display:none;" class="main-btn blue-g-btn" type="button"><i id="@cani" class="fa fa-trash"></i><i id="@canl" style="display:none;" class="fa fa-spinner"></i> Cancel Friend Request</button>
+                                        </div>
+                                    }
                                 }
                             }
 
