@@ -253,6 +253,21 @@ namespace Tech_In.Controllers
             var userToAdd = _context.Users.Where(x => x.UserName == UserName).FirstOrDefault();
             if (userToAdd == null || userToAdd.Id == currentUserId)
                 return Json(new { success = false, msg = "Sorry, Unable to send Friend Request :(" });
+            int countrecieverfrnds = _context.UserNetwork.Where(y => y.User1 == userToAdd.Id || y.User2 == userToAdd.Id && y.AreFriend == true).Count();
+            int countsenderfrnds = _context.UserNetwork.Where(y => y.User1 == currentUserId || y.User2 == currentUserId && y.AreFriend == true).Count();
+            if (countrecieverfrnds >= 5000)
+            {
+                return Json(new { success = false, msg = "Sorry, Reciever has too many friends :(" });
+            }
+            else
+            {
+                DateTime lastOneDayReq = DateTime.Now.AddDays(-1);
+                int lastDayReqCount = _context.UserNetwork.Where(z => z.User1 == currentUserId && z.RecordTime > lastOneDayReq).Count();
+                if(lastDayReqCount>=20)
+                    return Json(new { success = false, msg = "Sorry, you can only send 20 requests per day :(" });
+                if (countsenderfrnds >= 5000)
+                    return Json(new { success = false, msg = "Sorry, you have reached your 5000 friends limit :(" });
+            }
             UserNetwork uN = new UserNetwork
             {
                 User1 = currentUserId,
@@ -270,6 +285,11 @@ namespace Tech_In.Controllers
             var userToAdd = _context.Users.Where(x => x.UserName == UserName).FirstOrDefault();
             if (userToAdd == null || userToAdd.Id == currentUserId)
                 return Json(new { success = false, msg = "Unable to accept :(" });
+            int countrecieverfrnds = _context.UserNetwork.Where(y => y.User1 == currentUserId || y.User2 == currentUserId && y.AreFriend == true).Count();
+            if (countrecieverfrnds >= 5000)
+            {
+                return Json(new { success = false, msg = "Sorry, You already have 5000 friends :(" });
+            }
             UserNetwork frnd = _context.UserNetwork.Where(a => a.User1 == userToAdd.Id && a.User2 == currentUserId && a.AreFriend == false).FirstOrDefault();
             frnd.AreFriend = true;
             _context.SaveChanges();
