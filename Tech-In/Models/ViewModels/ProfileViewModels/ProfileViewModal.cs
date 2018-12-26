@@ -10,7 +10,11 @@ namespace Tech_In.Models.ViewModels.ProfileViewModels
     public class ProfileViewModal
     {
         public string Nam { get; set; }
+        public string UserName { get; set; }
         public bool IsCurrentUser { get; set; }
+        public bool AreFriends { get; set; }
+        public bool IsFriendReqSent { get; set; }
+        public bool IsFriendReqRecieved { get; set; }
         public UserPersonalViewModel UserPersonalVM = new UserPersonalViewModel();
 
         public IEnumerable<EducationVM> EduVMList { get; set; }

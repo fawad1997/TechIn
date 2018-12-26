@@ -53,8 +53,13 @@ namespace Tech_In.Controllers
 
 
         [Authorize]
-        public IActionResult CompleteProfile()
+        public async Task<IActionResult> CompleteProfile()
         {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            if(_context.UserPersonalDetail.Where(x=>x.UserId == user.Id).Any())
+            {
+                return RedirectToAction("Index","Home");
+            }
             CompleteProfileVM vm = new CompleteProfileVM();
             ViewBag.CountryList = new SelectList(GetCountryList(), "CountryId", "CountryName");
             return View(vm);
@@ -99,6 +104,10 @@ namespace Tech_In.Controllers
                     {
                         userPersonal.ProfileImage = $"/images/users/{fileNam}";
                     }
+                }
+                else
+                {
+                    userPersonal.ProfileImage = "/images/user.png";
                 }
                 user.UserName = vm.UserName;
                 userPersonal.CityId = vm.CityId;

@@ -56,7 +56,8 @@ namespace Tech_In.Controllers
                              ProfileImage = u.ProfileImage,
                              UserName = us.UserName,
                              IsFriend = _context.UserNetwork.Where(a => (a.User1 == us.Id || a.User1 == userloggedId) && (a.User2 == us.Id || a.User2 == userloggedId) && a.AreFriend==true).Any(),
-                             IsFriendReqSent = _context.UserNetwork.Where(a => a.User1 == userloggedId && a.User2 == us.Id).Any()
+                             IsFriendReqSent = _context.UserNetwork.Where(a => a.User1 == userloggedId && a.User2 == us.Id).Any(),
+                             IsFriendReqRecieved = _context.UserNetwork.Where(a => a.User1 == us.Id && a.User2 == userloggedId).Any()
                          }).Take(10);
             if (!String.IsNullOrEmpty(search))
             {
@@ -81,15 +82,22 @@ namespace Tech_In.Controllers
             {
                 return RedirectToAction("CompleteProfile", "Home");
             }
-
-
             ProfileViewModal PVM = new ProfileViewModal();
             if (user.Id == userloggedId)
                 PVM.IsCurrentUser = true;
             else
+            {
                 PVM.IsCurrentUser = false;
+                var AreFrndList = _context.UserNetwork.Where(a => (a.User1 == user.Id || a.User1 == userloggedId) && (a.User2 == user.Id || a.User2 == userloggedId)).ToList();
+                if (AreFrndList.Any())
+                {
+                    PVM.AreFriends = AreFrndList.Where(a => (a.User1 == user.Id || a.User1 == userloggedId) && (a.User2 == user.Id || a.User2 == userloggedId) && a.AreFriend == true).Any();
+                    PVM.IsFriendReqRecieved = AreFrndList.Where(a => (a.User1 == user.Id) && (a.User2 == userloggedId) && a.AreFriend == false).Any();
+                    PVM.IsFriendReqSent = AreFrndList.Where(a => (a.User1 == userloggedId) && (a.User2 == user.Id) && a.AreFriend == false).Any();
+                }
+            }
             PVM.UserPersonalVM = _context.UserPersonalDetail.Where(m => m.UserId == user.Id).Select(x => new UserPersonalViewModel { FirstName = x.FirstName, LastName = x.LastName, Summary = x.Summary, ProfileImage = x.ProfileImage, DOB = x.DOB, UserPersonalDetailID = x.UserPersonalDetailId, Gender = x.Gender, CityName = x.City.CityName, CountryName = x.City.Country.CountryName }).SingleOrDefault();
-
+            PVM.UserName = username;
             PVM.UserPersonalVM.PhoneNo = user.PhoneNumber;
             PVM.UserPersonalVM.Email = user.Email;
 
@@ -266,6 +274,17 @@ namespace Tech_In.Controllers
             frnd.AreFriend = true;
             _context.SaveChanges();
             return Json(new { success = true, msg = "You and "+UserName+" are now Friends!" });
+        }
+        public async Task<IActionResult> AcceptFriendR(string UserName)
+        {
+            string currentUserId = await OnGetSesstion();
+            var userToAdd = _context.Users.Where(x => x.UserName == UserName).FirstOrDefault();
+            if (userToAdd == null || userToAdd.Id == currentUserId)
+                return Json(new { success = false, msg = "Unable to accept :(" });
+            UserNetwork frnd = _context.UserNetwork.Where(a => a.User1 == userToAdd.Id && a.User2 == currentUserId && a.AreFriend == false).FirstOrDefault();
+            frnd.AreFriend = true;
+            _context.SaveChanges();
+            return Json(new { success = true });
         }
         public async Task<IActionResult> RejectFriend(string UserName)
         {

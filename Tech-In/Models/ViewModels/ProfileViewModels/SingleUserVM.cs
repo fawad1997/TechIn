@@ -13,5 +13,6 @@ namespace Tech_In.Models.ViewModels.ProfileViewModels
         public string UserName { get; set; }
         public bool IsFriend { get; set; }
         public bool IsFriendReqSent { get; set; }
+        public bool IsFriendReqRecieved { get; set; }
     }
 }

@@ -1847,12 +1847,18 @@ a div p{
     position:relative;
     width:150px;
 }
+.right-icon-div-more-m {
+    margin: -70px auto 4% 85%;
+    position: relative;
+    width: 150px;
+}
 .round-icon-back {
     background: #FAFAFA;
     width: 40px;
     font-size: 1.7em;
     text-align: center;
     border-radius: 50%;
+    display:inline-block;
 }
 
 .round-icon-back:hover {
@@ -1914,10 +1920,8 @@ a div p{
     }
     
 }
+
 @media only screen and (max-width: 490px) {
-    .profile-name{
-        margin-top: 2%;
-    }
     .profile-less{
         font-size: 18px;
     }
