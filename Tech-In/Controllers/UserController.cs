@@ -330,7 +330,33 @@ namespace Tech_In.Controllers
                                ReqTime = un.RecordTime
                            }).ToList();
             return View("_FriendReq", friendR);
-            //return null;
+        }
+        public async Task<IActionResult> MyFriendList()
+        {
+
+            string currentUserId = await OnGetSesstion();
+            var friendsR = (from un in _context.UserNetwork
+                           join up in _context.UserPersonalDetail on un.User1 equals up.UserId
+                           where un.User2 == currentUserId && un.AreFriend == true
+                           select new FriendsVM
+                           {
+                               Name = up.FirstName + " " + up.LastName,
+                               UserName = un.ApplicationUser1.UserName,
+                               ProfilePic = up.ProfileImage,
+                               ReqTime = un.RecordTime
+                           }).ToList();
+            var friendsR2 = (from un in _context.UserNetwork
+                            join up in _context.UserPersonalDetail on un.User2 equals up.UserId
+                            where un.User1 == currentUserId && un.AreFriend == true
+                            select new FriendsVM
+                            {
+                                Name = up.FirstName + " " + up.LastName,
+                                UserName = un.ApplicationUser2.UserName,
+                                ProfilePic = up.ProfileImage,
+                                ReqTime = un.RecordTime
+                            }).ToList();
+            friendsR.AddRange(friendsR2);
+            return View("_FriendsList",friendsR);
         }
 
 

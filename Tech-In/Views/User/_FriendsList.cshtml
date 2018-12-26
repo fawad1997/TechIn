@@ -1,0 +1,60 @@
+﻿@model List<Tech_In.Models.ViewModels.ProfileViewModels.FriendsVM>
+@{ 
+    Layout = null;
+}
+<br/>
+<div class="row">
+    @if (Model.Count == 0)
+    {
+        <p>You dont have any friends yet!</p>
+    }
+    else
+    {
+        @foreach (var item in Model)
+        {
+            string icnl = @item.UserName + "load";
+            string icnd = @item.UserName + "del";
+            <div id="@item.UserName" class="col-sm-6 friend">
+                <div class="col-sm-4">
+                    <img src="@item.ProfilePic" />
+                </div>
+                <div class="col-sm-8">
+                    <h3>@item.Name</h3>
+                    <div style="float:right;">
+                        <button onclick="unFriend('@item.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i id="@icnd" class="fa fa-trash"></i><i id="@icnl" style="display:none;" class="fa fa-spinner"></i> Unfriend</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+
+            </div>
+        }
+    }
+</div>
+<script>
+    var unFriend = function (userName) {
+        $("#" + userName + " button").prop('disabled', true);
+        $("#" + userName + "load").show();
+        $("#" + userName + "del").hide();
+        $.ajax({
+            type: "POST",
+            url: "/User/CancelFriend",
+            data: { UserName: userName },
+            success: function (result) {
+                if (result.success) {
+                    toastr.options = {
+                        "positionClass": "toast-bottom-right"
+                    }
+                    toastr.info("Friend Removed", userName);
+                    $("#" + userName).remove();
+                } else {
+                    toastr.options = {
+                        "positionClass": "toast-bottom-right"
+                    }
+                    toastr.error(result.msg, userName);
+                }
+            }
+
+        })
+    };
+</script>

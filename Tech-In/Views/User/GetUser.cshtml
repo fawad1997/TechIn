@@ -110,6 +110,10 @@
                         <li role="presentation">
                             <a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Questions</a>
                         </li>
+                        @if (Model.IsCurrentUser)
+                        {
+                            <li><a id="opnfrnd" href="#friends">Friends</a></li>
+                        }
                     </ul>
 
                     <!-- Tab panes -->
@@ -437,34 +441,34 @@
                                 <!--/Education-->
                                 <!--Skills-->
                                 @*<div class="post">
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <h6 class="inline small-h">Skills</h6>
-                                    <br />
-                                    <!--Add-->
-                                    <div class="right-post-icon-div" data-toggle="modal" data-target="#skillModal">
-                                        <div class="round-icon-back">
-                                            <i class="fa fa-plus"></i>
-                                        </div>
-                                    </div>
-                                    <!--/Add-->
-                                    <hr />
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h6 class="inline small-h">Skills</h6>
+                            <br />
+                            <!--Add-->
+                            <div class="right-post-icon-div" data-toggle="modal" data-target="#skillModal">
+                                <div class="round-icon-back">
+                                    <i class="fa fa-plus"></i>
                                 </div>
-                                <div class="row">
-                                    <div class="col-xs-12 margin-both-lr">
-                                        <div class="widget-tags">
-                                            <a href="#">Java</a>
-                                            <a href="#">Php</a>
-                                            <a href="#">Web Development</a>
-                                            <a href="#">Web Designing</a>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-
                             </div>
-                        </div>*@
+                            <!--/Add-->
+                            <hr />
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 margin-both-lr">
+                                <div class="widget-tags">
+                                    <a href="#">Java</a>
+                                    <a href="#">Php</a>
+                                    <a href="#">Web Development</a>
+                                    <a href="#">Web Designing</a>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>*@
                                 <!--/Skills-->
                                 <!--Certification-->
                                 <div class="post">
@@ -1087,7 +1091,15 @@
                             </div>
                         </div>
 
-
+                        <div id="friends" class="tab-pane fade">
+                            <div style="text-align:center;position:relative;left:50%;" id="loaderDivFrnd">
+                                <br /><br />
+                                <div style="position: relative; left: -50%;">
+                                    <img style=" height:150px;" src="~/images/load.gif" />
+                                </div>
+                                <br /><br />
+                            </div>
+                        </div>
 
                         <script>
                             $("#showAnswers").click(function () {
@@ -1549,10 +1561,13 @@
 
 <!-- /Blog -->
 <script>
-    //$("#aboutbtn").click(function () {
-    //    $("#about").load("/user/loadabout",
-    //        { userid: 1 });
-    //});
+    $(document).ready(function () {
+        $(".nav-tabs #opnfrnd").click(function () {
+            $(this).tab('show');
+            //loaderDivFrnd
+            $("#friends").load("/User/MyFriendList");
+        });
+    });
 
     var addFriend = function (userName) {
         $("#" + userName+" button").prop('disabled', true);
