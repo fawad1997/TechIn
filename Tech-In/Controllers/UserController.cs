@@ -173,7 +173,12 @@ namespace Tech_In.Controllers
             return View(PVM);
         }
         
-
+        [HttpPost]
+        public async Task<IActionResult> AddPost(Object o)
+        {
+            string userloggedId = await OnGetSesstion();
+            return null;
+        }
 
         //Personal Details
         public async Task<IActionResult> UpdatePersonalDetail(int Id)

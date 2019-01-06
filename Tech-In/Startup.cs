@@ -56,11 +56,15 @@ namespace Tech_In
                 googleOptions.ClientSecret = Configuration.GetConnectionString("GoogleClientSecret");
             });
 
-            //services.AddAuthentication().AddLinkedIn(options =>
-            //{
-            //    options.ClientId = Configuration["Authentication:LinkedIn:ClientId"];
-            //    options.ClientSecret = Configuration["Authentication:LinkedIn:ClientSecret"];
-            //});
+            services.AddAuthentication(
+                options =>
+                {
+                    //Blah Blah Blah
+                }).AddCookie(opts =>
+                {
+                    opts.Cookie.HttpOnly = false;
+                }
+            );
 
             //Model Mappings
             var configMap = new AutoMapper.MapperConfiguration(c =>
@@ -110,6 +114,11 @@ namespace Tech_In
 
             app.UseAuthentication();
             app.UseSession();
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Add("X-Frame-Options", "DENY"); // This to prevent 'x frame options header not set'te
+                await next();
+            });
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
