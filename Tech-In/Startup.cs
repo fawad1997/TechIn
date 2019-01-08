@@ -59,10 +59,9 @@ namespace Tech_In
             services.AddAuthentication(
                 options =>
                 {
-                    //Blah Blah Blah
                 }).AddCookie(opts =>
                 {
-                    opts.Cookie.HttpOnly = false;
+                    opts.Cookie.HttpOnly = true;
                 }
             );
 
@@ -116,7 +115,9 @@ namespace Tech_In
             app.UseSession();
             app.Use(async (context, next) =>
             {
-                context.Response.Headers.Add("X-Frame-Options", "DENY"); // This to prevent 'x frame options header not set'te
+                context.Response.Headers.Add("X-Frame-Options", "DENY"); // This to prevent 'x frame options header not set
+                context.Response.Headers.Add("X-Xss-Protection", "1"); // Fix Web Browser XSS Protection Not Enabled
+                context.Response.Headers.Add("X-Content-Type-Options", "nosniff");//X-Content-Type-Options Header Missing fix 
                 await next();
             });
             app.UseMvc(routes =>
