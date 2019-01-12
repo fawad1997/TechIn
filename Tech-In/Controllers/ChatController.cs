@@ -52,40 +52,40 @@ namespace Tech_In.Controllers
             ViewBag.currentUser = user.Id;
             return View();
         }
-
-        public async Task<IActionResult> Conversation(string contact)
+        
+        [HttpPost]
+        public async Task<JsonResult> Conversation(string contact)
         {
             var user = await _userManager.GetCurrentUser(HttpContext);
            
             var conversations = _context.Conversation.Where(c => (c.RecieverId ==user.Id  && c.SenderId == contact) || (c.RecieverId == contact && c.SenderId == user.Id))
                                   .OrderBy(c => c.CreatedAt)
                                   .ToList();
-            //return Json( new { status = "success", data = conversations }/*,JsonRequestBehavior.AllowGet*/);
-            return View("Index", conversations);
+            return Json(new { status = "success", data = conversations }/*,JsonRequestBehavior.AllowGet*/);
         }
 
-        [HttpPost]
-        public async Task<JsonResult> SendMessage()
+        [HttpGet]
+        public async Task<JsonResult> SendMessage(string recieverId, string message)
         {
             var user = await _userManager.GetCurrentUser(HttpContext);
-            var userId = Convert.ToInt32(user.Id);
-            string socket_id = Request.Form["socket_id"];
+            var userId = user.Id;
+            //string socket_id = Request.Form["socket_id"];
             Conversation convo = new Conversation
             {
                 SenderId = user.Id,
-                Message = Request.Form["message"],
-                RecieverId = Request.Form["contact"]
+                Message = message,
+                RecieverId = recieverId
               
             };
             _context.Conversation.Add(convo);
             _context.SaveChanges();
             
-            var conversationChannel = GetConvoChannel(userId, Convert.ToInt32(Request.Form["contact"]));
-            await pusher.TriggerAsync(
-              conversationChannel,
-              "new_message",
-              convo,
-              new TriggerOptions() { SocketId = socket_id });
+            //var conversationChannel = GetConvoChannel(userId, Convert.ToInt32(Request.Form["contact"]));
+            //await pusher.TriggerAsync(
+            //  conversationChannel,
+            //  "new_message",
+            //  convo,
+            //  new TriggerOptions() { SocketId = socket_id });
             return Json(convo);
         }
       

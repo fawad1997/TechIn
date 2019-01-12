@@ -1,5 +1,4 @@
-﻿@model List<Tech_In.Models.ViewModels.ChatViewModels.ChatConversationVM>
-    @{
+﻿    @{
 
         ViewData["Title"] = "Chat";
     }
@@ -26,7 +25,7 @@
                                     <ul id="contacts" class="list-group">
                                         @foreach (var user in @ViewBag.allUsers)
                                         {
-                                            <a class="user__item contact-@user.UserID" data-contact-id="@user.UserID" data-contact-name="@user.FirstName">
+                                            <a onclick="loadcon('@user.UserID')" class="user__item contact-@user.UserID" data-contact-id="@user.UserID" data-contact-name="@user.FirstName">
                                                 <li>
                                                     <div class="avatar">
 
@@ -45,53 +44,25 @@
 
             </div>
             <div class="col-xs-12 col-md-9 chat__body">
-                @foreach (var item in Model)
-                {
-                 <div class="row">
-                    <div class="col-xs-12">
-                        <div class="mesgs">
-                            <div class="msg_history">
-                                <div class="incoming_msg">
-                                    <div class="incoming_msg_img">  </div>
-                                    <div class="received_msg">
-                                        <div class="received_withd_msg">
-                                          
-                                            @if (ViewBag.currentUser == item.RecieverId)
-                                            {
-                                               <p>
-                                                 @item.Message                                     
-                                            </p>
-                                            }
-                                            <span class="time_date"> @item.CreatedAt </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="outgoing_msg">
-                                    @if (ViewBag.currentUser == item.SenderId)
-                                    {
-                                    <div class="sent_msg">
-                                        <p>
-                                            @item.Message
-                                        </p>
-                                        <span class="time_date"> @item.CreatedAt</span>
-                                    </div>
-                                    }
-                                </div>
-                            </div> 
+
+                <div class="col-xs-12 col-md-9 chat__body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <ul class="list-group chat__main"></ul>
                         </div>
-                    <div class="chat__type__body">
-                        <div class="chat__type">
-                            <textarea id="msg_box" placeholder="Type your message"></textarea>
-                            <button class="btn btn-primary" id="sendMessage">Send</button>
+                        <div class="chat__type__body">
+                            <div class="chat__type">
+                                <textarea id="msg_box" placeholder="Type your message"></textarea>
+                                <button class="btn btn-primary" id="sendMessage">Send</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="chat__typing">
-                        <span id="typerDisplay"></span>
+                        <div class="chat__typing">
+                            <span id="typerDisplay"></span>
+                        </div>
                     </div>
                 </div>
-            </div> }
-                }
-        </div>
+
+            </div>
         @*<script>
              var newMessageTpl =
              `<div>
@@ -212,3 +183,66 @@
              }
              </script>*@
     </div>
+        <script>
+                var loadcon = function (e) {
+                    console.log(e);
+                    //$('#contacts').find('li').removeClass('active');
+                    //$('#contacts .contact-' + currentContact.id).find('li').addClass('active');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/chat/conversation",
+                        data: { contact: e },
+                        success: function (convo) {
+                            loadChat(convo.data);
+                        }
+                    });
+
+                    $('#sendMessage').click(function () {
+                        alert("OKOK");
+                        var message = $('#msg_box').val();
+                        var recieverId = e;
+                        $.ajax({
+                            type: "GET",
+                            url: "/chat/SendMessage",
+                            data: { recieverId: recieverId, message: message },
+                            success: function (instantSentMessage) {
+                                //displayMessage(instantSentMessage);
+                                //$('#msg_box').val('');
+                            }
+                        });
+
+                    });
+            };
+
+            @*function displayMessage( message_obj ) {
+                 const msg_id = message_obj.id;
+                 const msg_body = message_obj.message;
+                 let template = $(newMessageTpl).html();
+                 template = template.replace("{{id}}", msg_id);
+                 template = template.replace("{{body}}", msg_body);
+                 template = $(template);
+                 if ( message_obj.sender_id == @ViewBag.currentUser ) {
+                     template.find('.__chat__').addClass('from__chat');
+                 } else {
+                     template.find('.__chat__').addClass('receive__chat');
+                 }
+                 if ( message_obj.status == 1 ) {
+                     template.find('.delivery-status').show();
+                 }
+                 $('.chat__main').append(template);
+             }*@
+
+            //load chat data into view
+            function loadChat(chat_data) {
+                chat_data.forEach(function (data) {
+                    displayMessage(data);
+                });
+                $('.chat__body').show();
+                $('.__no__chat__').hide();
+            }
+
+           
+
+
+        </script>
