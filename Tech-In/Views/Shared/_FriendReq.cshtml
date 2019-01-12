@@ -1,0 +1,111 @@
+﻿@model List<Tech_In.Models.ViewModels.ProfileViewModels.FriendsVM>
+@{
+    Layout = null;
+}
+@if (Model.Count == 0)
+{
+    <li>
+        <div class="text-center link-block">
+            <a href="#" class="dropdown-item">
+                <i class="fa fa-user"></i> <strong>No Requests Found!</strong>
+            </a>
+        </div>
+    </li>
+}
+else
+{
+    <li>
+        <div class="text-center link-block">
+            <a href="#" class="dropdown-item">
+                <i class="fa fa-user"></i> <strong>Friend Requests</strong>
+            </a>
+        </div>
+    </li>
+}
+@foreach (FriendsVM req in Model)
+{
+    <li class="dropdown-divider"></li>
+    <li>
+        <div class="dropdown-messages-box">
+            <a class="dropdown-item float-left" href="/u/@req.UserName">
+                <img alt="image" class="img-circle rounded-circle" src="@req.ProfilePic">
+            </a>
+            @{ string frd = req.UserName + "frd";}
+            <div id="@frd" class="media-body">
+                <small class="float-right">@req.GetPastTime()</small>
+                <strong>@req.Name</strong> sent you friend request!. <br>
+                <button onclick="addF('@req.UserName')" class="btn btn-info btn-sm" type="button">Accept</button> <button onclick="delF('@req.UserName')" class="btn btn-sm" type="button">Delete</button>
+            </div>
+        </div>
+    </li>
+}
+<script>
+    var addF = function (uname) {
+        $.ajax({
+            method: 'post',
+            url: '/user/acceptFriend',
+            data: {
+                UserName: uname
+            },
+            success: function (result) {
+                if (result.success) {
+                    toastr.options = {
+                        "positionClass": "toast-bottom-right"
+                    }
+                    toastr.success(result.msg, "Friends");
+                    $("#" + uname + "frd").html("you are now <strong>friends</strong>!");
+                    $.ajax({
+                        method: 'post',
+                        url: '/user/countfriendreq',
+                        success: function (count) {
+                            if (count.count > 0) {
+                                $("#frcount").text(count.count);
+                            } else {
+                                $("#frcount").text('');
+                            }
+                        }
+                    });
+                } else {
+                    toastr.options = {
+                        "positionClass": "toast-bottom-right"
+                    }
+                    toastr.error(result.msg, userName);
+                }
+            }
+        });
+    };
+    var delF = function (uname) {
+        $.ajax({
+            method: 'post',
+            url: '/user/rejectFriend',
+            data: {
+                UserName: uname
+            },
+            success: function (result) {
+                if (result.success) {
+                    toastr.options = {
+                        "positionClass": "toast-bottom-right"
+                    }
+                    toastr.success(result.msg, "Friends");
+                    $("#" + uname + "frd").html("friend request <strong>cancelled</strong>!");
+                    $.ajax({
+                        method: 'post',
+                        url: '/user/countfriendreq',
+                        success: function (count) {
+                            if (count.count > 0) {
+                                $("#frcount").text(count.count);
+                            } else {
+                                $("#frcount").text('');
+                            }
+                        }
+                    });
+                } else {
+                    toastr.options = {
+                        "positionClass": "toast-bottom-right"
+                    }
+                    toastr.error(result.msg, userName);
+                }
+            }
+        });
+    };
+</script>

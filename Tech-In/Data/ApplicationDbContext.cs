@@ -31,6 +31,7 @@ namespace Tech_In.Data
         public DbSet<UserPublication> UserPublication { get; set; }
         public DbSet<UserAcheivement> UserAcheivement { get; set; }
         public DbSet<SkillTag> SkillTag { get; set; }
+        public DbSet<UserNetwork> UserNetwork { get; set; }
 
         public DbSet<UserQAComment> UserQAComment { get; set; }
         public DbSet<UserQAnswer> UserQAnswer { get; set; }

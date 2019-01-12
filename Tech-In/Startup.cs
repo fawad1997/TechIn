@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Tech_In.Data;
 using Tech_In.Extensions;
 using Tech_In.Models;
+using Tech_In.Models.Database;
 using Tech_In.Services;
 
 namespace Tech_In
@@ -56,11 +57,14 @@ namespace Tech_In
                 googleOptions.ClientSecret = Configuration.GetConnectionString("GoogleClientSecret");
             });
 
-            //services.AddAuthentication().AddLinkedIn(options =>
-            //{
-            //    options.ClientId = Configuration["Authentication:LinkedIn:ClientId"];
-            //    options.ClientSecret = Configuration["Authentication:LinkedIn:ClientSecret"];
-            //});
+            services.AddAuthentication(
+                options =>
+                {
+                }).AddCookie(opts =>
+                {
+                    opts.Cookie.HttpOnly = true;
+                }
+            );
 
             //Model Mappings
             var configMap = new AutoMapper.MapperConfiguration(c =>
@@ -110,7 +114,13 @@ namespace Tech_In
 
             app.UseAuthentication();
             app.UseSession();
-
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Add("X-Frame-Options", "DENY"); // This to prevent 'x frame options header not set
+                context.Response.Headers.Add("X-Xss-Protection", "1"); // Fix Web Browser XSS Protection Not Enabled
+                context.Response.Headers.Add("X-Content-Type-Options", "nosniff");//X-Content-Type-Options Header Missing fix 
+                await next();
+            });
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

@@ -543,6 +543,28 @@ namespace Tech_In.Migrations
                     b.ToTable("UserLanguageSkill");
                 });
 
+            modelBuilder.Entity("Tech_In.Models.Database.UserNetwork", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("AreFriend");
+
+                    b.Property<DateTime>("RecordTime");
+
+                    b.Property<string>("User1");
+
+                    b.Property<string>("User2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("User1");
+
+                    b.HasIndex("User2");
+
+                    b.ToTable("UserNetwork");
+                });
+
             modelBuilder.Entity("Tech_In.Models.Database.UserPublication", b =>
                 {
                     b.Property<int>("UserPublicationId")
@@ -993,6 +1015,17 @@ namespace Tech_In.Migrations
                     b.HasOne("Tech_In.Models.ApplicationUser", "ApplicationUser")
                         .WithMany("UserLanguageSkills")
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.UserNetwork", b =>
+                {
+                    b.HasOne("Tech_In.Models.ApplicationUser", "ApplicationUser1")
+                        .WithMany()
+                        .HasForeignKey("User1");
+
+                    b.HasOne("Tech_In.Models.ApplicationUser", "ApplicationUser2")
+                        .WithMany()
+                        .HasForeignKey("User2");
                 });
 
             modelBuilder.Entity("Tech_In.Models.Database.UserPublication", b =>

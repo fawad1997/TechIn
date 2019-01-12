@@ -35,29 +35,31 @@ namespace Tech_In.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
-            if(user == null)
+            string currentUserId = await OnGetSesstion();
+            if(currentUserId == null)
             {
                 return View();
             }
             else
             {
-                var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
+                var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == currentUserId).SingleOrDefault();
                 if (userPersonalRow == null)
                 {
                     return RedirectToAction("CompleteProfile", "Home");
                 }
             }
-
-            HttpContext.Session.SetString("Name", _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.FirstName).SingleOrDefault());
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
             return View("Welcome");
         }
 
 
         [Authorize]
-        public IActionResult CompleteProfile()
+        public async Task<IActionResult> CompleteProfile()
         {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            if(_context.UserPersonalDetail.Where(x=>x.UserId == user.Id).Any())
+            {
+                return RedirectToAction("Index","Home");
+            }
             CompleteProfileVM vm = new CompleteProfileVM();
             ViewBag.CountryList = new SelectList(GetCountryList(), "CountryId", "CountryName");
             return View(vm);
@@ -103,6 +105,10 @@ namespace Tech_In.Controllers
                         userPersonal.ProfileImage = $"/images/users/{fileNam}";
                     }
                 }
+                else
+                {
+                    userPersonal.ProfileImage = "/images/user.png";
+                }
                 user.UserName = vm.UserName;
                 userPersonal.CityId = vm.CityId;
                 userPersonal.FirstName = vm.FirstName;
@@ -137,6 +143,27 @@ namespace Tech_In.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+        public async Task<string> OnGetSesstion()
+        {
+            const string SessionKeyName = "_Name";
+            const string SessionKeyPic = "_PPic";
+            const string SessionKeyId = "_Id";
+            const string SessionUserName = "_UserName";
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString(SessionKeyName)))
+            {
+                var user = await _userManager.GetCurrentUser(HttpContext);
+                if (user == null)
+                    return null;
+                HttpContext.Session.SetString(SessionKeyName, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.FirstName).FirstOrDefault());
+                HttpContext.Session.SetString(SessionKeyPic, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.ProfileImage).FirstOrDefault());
+                HttpContext.Session.SetString(SessionKeyId, user.Id);
+                HttpContext.Session.SetString(SessionUserName, user.UserName);
+            }
+            @ViewBag.UName = HttpContext.Session.GetString(SessionKeyName);
+            @ViewBag.UserName = HttpContext.Session.GetString(SessionUserName);
+            @ViewBag.UserPic = HttpContext.Session.GetString(SessionKeyPic);
+            return HttpContext.Session.GetString(SessionKeyId);
         }
     }
 }
