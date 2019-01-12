@@ -48,6 +48,8 @@ namespace Tech_In.Data
         public DbSet<ArticleCategory> ArticleCategory { get; set; }
         public DbSet<AIUserInterest> AIUserInterest { get; set; }
 
+        public DbSet<Conversation> Conversation { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

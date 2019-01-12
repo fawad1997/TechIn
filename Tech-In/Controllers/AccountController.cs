@@ -103,15 +103,17 @@ namespace Tech_In.Controllers
                         HttpContext.Session.SetString("UserId",user.Id);
                         HttpContext.Session.SetString("Email", user.Email);
                         var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
+
                         if (userPersonalRow == null)
                         {
                             return RedirectToAction("CompleteProfile", "Home");
                         }
                         else
                         {
-                            HttpContext.Session.SetString("Name", userPersonalRow.FirstName);
-                            _logger.LogInformation("User logged in.");
-                            return RedirectToLocal(returnUrl);
+                                HttpContext.Session.SetString("Name", userPersonalRow.FirstName);
+                                _logger.LogInformation("User logged in.");
+                                return RedirectToLocal(returnUrl);
+                            
                         }
                     }
                 }
@@ -585,6 +587,8 @@ namespace Tech_In.Controllers
         {
             return View();
         }
+
+
 
         #region Helpers
 

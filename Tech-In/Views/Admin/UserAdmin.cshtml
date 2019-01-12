@@ -1,0 +1,44 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model List<Tech_In.Models.ViewModels.ProfileViewModels.UserPersonalViewModel>;
+@{
+    Layout = "_LayoutAdmin";
+}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h4 class="title">Users</h4>
+                        <p class="category">List of User that are registerd.</p>
+                    </div>
+                    <div class="content table-responsive table-full-width">
+                        <table class="table table-striped">
+                            <thead>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Gender</th>
+                            <th>DOB</th>
+                            <th>Options</th>
+                            </thead>
+                            <tbody>
+                                @foreach (var user in Model)
+                                {
+                                    <tr>
+                                    <td>@user.UserPersonalDetailID</td>
+                                    <td>@user.FirstName @user.LastName </td>
+                                    <td>@user.Gender</td>
+                                    <td>@user.DOB</td>
+                                    <td>Delete </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+</div>

@@ -101,7 +101,7 @@ namespace Tech_In.Controllers
             //Get Article Tags Ids
             var arttags = _context.ArticleTag.Where(tg => tg.ArticleId == article.Id).ToList();
             articleVM.Tags = new List<SkillTag>();
-            foreach(var arttag in arttags)
+            foreach(var arttag in arttags)  
             {
                 var singleTag = _context.SkillTag.Where(sktag => sktag.SkillTagId == arttag.TagId).SingleOrDefault();
                 articleVM.Tags.Add(singleTag);
@@ -251,7 +251,6 @@ namespace Tech_In.Controllers
             }
             return BadRequest();
         }
-
         [Authorize]
         public async Task<IActionResult> Edit(int Id)
         {
@@ -313,7 +312,6 @@ namespace Tech_In.Controllers
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
-
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> UpdateArticle(NewArticleVM vm)
@@ -379,7 +377,6 @@ namespace Tech_In.Controllers
             }
             return View(vm);
         }
-
         public IActionResult ArticleEditHistory(int articleId)
         {
             var historyList = _context.Article.Where(x => x.OriginalId == articleId).ToList();
@@ -397,7 +394,6 @@ namespace Tech_In.Controllers
             }
             return View("_ArticleEditHistory",vm);
         }
-
         public async Task<IActionResult> SearchByTag(int Id,string search,int? page)
         {
             ViewData["CurrentFilter"] = search;
@@ -430,7 +426,6 @@ namespace Tech_In.Controllers
             int pageSize = 10;
             return View("Index",new ArticleListVM { Articles = await PaginatedList<SingleArticleVM>.CreateAsync(articel.AsQueryable(), page ?? 1, pageSize) });
         }
-
         public async Task<IActionResult> SearchByCategory(int Id, string search, int? page)
         {
             ViewData["CurrentFilter"] = search;
@@ -463,7 +458,6 @@ namespace Tech_In.Controllers
             int pageSize = 10;
             return View("Index", new ArticleListVM { Articles = await PaginatedList<SingleArticleVM>.CreateAsync(articel.AsQueryable(), page ?? 1, pageSize) });
         }
-
         [Authorize]
         public async Task<IActionResult> AddComment(AddCommentVM vm)
         {
@@ -622,7 +616,6 @@ namespace Tech_In.Controllers
             }//If Anonomus Visitor Ends Here
             return Ok();
         }
-
         public IActionResult TopCategories()
         {
             var topCatg = _context.ArticleCategory.GroupBy(o => new { o.CategoryId }).Select(g => new TopCategoryVM
@@ -636,7 +629,6 @@ namespace Tech_In.Controllers
             }
             return View("_TopCategory",topCatg);
         }
-
         public IActionResult PopularPosts()
         {
             var topPosts = _context.ArticleVisitor.GroupBy(o => new { o.ArticleId }).Select(m => new PopularPostVM
@@ -653,7 +645,6 @@ namespace Tech_In.Controllers
             }
             return View("_PopularPosts",topPosts);
         }
-
         public IActionResult TopTags()
         {
             var topTags = _context.ArticleTag.GroupBy(o => new { o.TagId }).Select(m => new TopTagVM

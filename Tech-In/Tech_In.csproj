@@ -29,6 +29,10 @@
     <Compile Remove="Migrations\20180630193905_stuff.Designer.cs" />
     <Compile Remove="Migrations\20180703102905_comment.cs" />
     <Compile Remove="Migrations\20180703102905_comment.Designer.cs" />
+    <Compile Remove="Migrations\20190108221617_convo.cs" />
+    <Compile Remove="Migrations\20190108221617_convo.Designer.cs" />
+    <Compile Remove="Migrations\20190109132527_convo.cs" />
+    <Compile Remove="Migrations\20190109132527_convo.Designer.cs" />
   </ItemGroup>
 
 
@@ -36,13 +40,14 @@
     <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="Facebook" Version="7.0.6" />
     <PackageReference Include="iTextSharp" Version="5.5.13" />
-    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.0.1" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.2" PrivateAssets="All" /><PackageReference Include="MimeKit" Version="2.0.4" />
+    <PackageReference Include="Microsoft.jQuery.Unobtrusive.Ajax" Version="3.2.6" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.4" PrivateAssets="All" /><PackageReference Include="MimeKit" Version="2.0.4" /><PackageReference Include="PusherServer" Version="4.1.0" />
     <PackageReference Include="SendGrid" Version="9.9.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0004" />
     <PackageReference Include="toastr" Version="2.1.1" />
@@ -127,6 +132,37 @@
     <None Include="wwwroot\floara\js\third_party\embedly.min.js" />
     <None Include="wwwroot\floara\js\third_party\image_aviary.min.js" />
     <None Include="wwwroot\floara\js\third_party\spell_checker.min.js" />
+    <None Include="wwwroot\scss\.DS_Store" />
+    <None Include="wwwroot\scss\paper-dashboard.scss" />
+    <None Include="wwwroot\scss\paper\.DS_Store" />
+    <None Include="wwwroot\scss\paper\mixins\_buttons.scss" />
+    <None Include="wwwroot\scss\paper\mixins\_cards.scss" />
+    <None Include="wwwroot\scss\paper\mixins\_chartist.scss" />
+    <None Include="wwwroot\scss\paper\mixins\_icons.scss" />
+    <None Include="wwwroot\scss\paper\mixins\_inputs.scss" />
+    <None Include="wwwroot\scss\paper\mixins\_labels.scss" />
+    <None Include="wwwroot\scss\paper\mixins\_navbars.scss" />
+    <None Include="wwwroot\scss\paper\mixins\_sidebar.scss" />
+    <None Include="wwwroot\scss\paper\mixins\_tabs.scss" />
+    <None Include="wwwroot\scss\paper\mixins\_transparency.scss" />
+    <None Include="wwwroot\scss\paper\mixins\_vendor-prefixes.scss" />
+    <None Include="wwwroot\scss\paper\plugins\.DS_Store" />
+    <None Include="wwwroot\scss\paper\_alerts.scss" />
+    <None Include="wwwroot\scss\paper\_buttons.scss" />
+    <None Include="wwwroot\scss\paper\_cards.scss" />
+    <None Include="wwwroot\scss\paper\_chartist.scss" />
+    <None Include="wwwroot\scss\paper\_checkbox-radio.scss" />
+    <None Include="wwwroot\scss\paper\_dropdown.scss" />
+    <None Include="wwwroot\scss\paper\_footers.scss" />
+    <None Include="wwwroot\scss\paper\_inputs.scss" />
+    <None Include="wwwroot\scss\paper\_misc.scss" />
+    <None Include="wwwroot\scss\paper\_mixins.scss" />
+    <None Include="wwwroot\scss\paper\_navbars.scss" />
+    <None Include="wwwroot\scss\paper\_responsive.scss" />
+    <None Include="wwwroot\scss\paper\_sidebar-and-main-panel.scss" />
+    <None Include="wwwroot\scss\paper\_tables.scss" />
+    <None Include="wwwroot\scss\paper\_typography.scss" />
+    <None Include="wwwroot\scss\paper\_variables.scss" />
   </ItemGroup>
 
   <ItemGroup>

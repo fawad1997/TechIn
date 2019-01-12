@@ -32,7 +32,7 @@
 
     <!-- Custom stlylesheet -->
     <link type="text/css" rel="stylesheet" href="~/css/style.css" />
-
+    <link href="~/css/chat.css" rel="stylesheet" />
     <script src="~/lib/jquery/dist/jquery.js"></script>
     <!-- Tagify -->
     <link href="~/css/tagify.css" rel="stylesheet" />
@@ -93,6 +93,16 @@
                             </li>
                             <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "User" ? "active" : "")">
                                 <a asp-area="" asp-controller="User" asp-action="Index">Users</a>
+                            </li>
+                            <li>
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <a asp-area="" asp-controller="Admin" asp-action="Index">Admin Page</a>
+                                    }
+                                }
+
                             </li>
                         </ul>
 

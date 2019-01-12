@@ -1,0 +1,214 @@
+﻿@model List<Tech_In.Models.ViewModels.ChatViewModels.ChatConversationVM>
+    @{
+
+        ViewData["Title"] = "Chat";
+    }
+
+    <head>
+        <title>pChat &mdash; Private Chatroom</title>
+    </head>
+
+    <!-- / Navigation Bar -->
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-md-3">
+                <aside class="main visible-md visible-lg">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="panel panel-default users__bar">
+                                <div class="panel-heading users__heading">
+                                    Contacts (@ViewBag.allUsers.Count)
+                                </div>
+                                <div class="__no__chat__">
+                                    <p>Select a contact to chat with</p>
+                                </div>
+                                <div class="panel-body users__body">
+                                    <ul id="contacts" class="list-group">
+                                        @foreach (var user in @ViewBag.allUsers)
+                                        {
+                                            <a class="user__item contact-@user.UserID" data-contact-id="@user.UserID" data-contact-name="@user.FirstName">
+                                                <li>
+                                                    <div class="avatar">
+
+                                                    </div>
+                                                    <span>@user.FirstName @user.LastName</span>
+                                                    <div class="status-bar"></div>
+                                                </li>
+                                            </a>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+            </div>
+            <div class="col-xs-12 col-md-9 chat__body">
+                @foreach (var item in Model)
+                {
+                 <div class="row">
+                    <div class="col-xs-12">
+                        <div class="mesgs">
+                            <div class="msg_history">
+                                <div class="incoming_msg">
+                                    <div class="incoming_msg_img">  </div>
+                                    <div class="received_msg">
+                                        <div class="received_withd_msg">
+                                          
+                                            @if (ViewBag.currentUser == item.RecieverId)
+                                            {
+                                               <p>
+                                                 @item.Message                                     
+                                            </p>
+                                            }
+                                            <span class="time_date"> @item.CreatedAt </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="outgoing_msg">
+                                    @if (ViewBag.currentUser == item.SenderId)
+                                    {
+                                    <div class="sent_msg">
+                                        <p>
+                                            @item.Message
+                                        </p>
+                                        <span class="time_date"> @item.CreatedAt</span>
+                                    </div>
+                                    }
+                                </div>
+                            </div> 
+                        </div>
+                    <div class="chat__type__body">
+                        <div class="chat__type">
+                            <textarea id="msg_box" placeholder="Type your message"></textarea>
+                            <button class="btn btn-primary" id="sendMessage">Send</button>
+                        </div>
+                    </div>
+                    <div class="chat__typing">
+                        <span id="typerDisplay"></span>
+                    </div>
+                </div>
+            </div> }
+                }
+        </div>
+        @*<script>
+             var newMessageTpl =
+             `<div>
+                 <div id="msg-{{id}}" class="row __chat__par__">
+                   <div class="__chat__">
+                     <p>{{body}}</p>
+                     <p class="delivery-status">Delivered</p>
+                   </div>
+                 </div>
+              </div>`;
+             var currentContact = null; // Holds contact currently being chatted with
+             var socketId = null;
+             var currentconversationChannel = null;
+             var conversationChannelName = null;
+
+             //Pusher client side setup
+             const pusher = new Pusher('687183', {
+                 cluster: 'us2'
+             });
+             pusher.connection.bind('connected', function () {
+                 socketId = pusher.connection.socket_id;
+             });
+             // select contact to chat with
+
+             $('.user__item').click(function (e) {
+                 alert("OKOKOK");
+                 e.preventDefault();
+                 currentContact = {
+                     id: $(this).data('contact-id'),
+                     name: $(this).data('contact-name'),
+                 };
+                 if ( conversationChannelName ) {
+                     pusher.unsubscribe( conversationChannelName );
+                 }
+                 conversationChannelName = getConvoChannel(
+                                               (@ViewBag.currentUser * 1) ,
+                                               (currentContact.userID * 1)
+                                           );
+                 currentconversationChannel = pusher.subscribe(conversationChannelName);
+                 bind_client_events();
+
+                 $('#contacts').find('li').removeClass('active');
+                 $('#contacts .contact-' + currentContact.id).find('li').addClass('active');
+                 getChat(currentContact.id);
+             });
+
+            //SOMETHING USING PUSHER
+             function getConvoChannel(user_id, contact_id) {
+                 if (user_id > contact_id) {
+                     return 'private-chat-' + contact_id + '-' + user_id;
+                 }
+                 return 'private-chat-' + user_id + '-' + contact_id;
+             }
+             function bind_client_events() {
+                 //bind private channel events here
+                 currentconversationChannel.bind("new_message", function (msg) {
+                     //add code here
+                 });
+                 currentconversationChannel.bind("message_delivered", function (msg) {
+                     $('#msg-' + msg.id).find('.delivery-status').show();
+                 });
+             }
+
+             //Send button's click event
+            $('#sendMessage').click( function() {
+                 $.post("/chat/SendMessage", {
+                     message: $('#msg_box').val(),
+                     contact: currentContact.id,
+                     socket_id: socketId,
+                 }).done( function (data) {
+                     //display the message immediately on the view of the sender
+                     displayMessage(data);
+                     $('#msg_box').val('');
+                 });
+             });
+             function bind_client_events(){
+                 //listening to the message_sent event by the message's recipient
+                 currentconversationChannel.bind("new_message", function(msg) {
+                         if ( msg.receiver_id == @ViewBag.currentUser ) {
+                             displayMessage(msg);
+                         }
+                 });
+             }
+
+
+             // get chat data
+             function getChat( contact_id ) {
+                 $.get("/chat/conversation/" + contact_id )
+                  .done( function(resp) {
+                     var chat_data = resp.data || [];
+                     loadChat( chat_data );
+                  });
+             }
+             //load chat data into view
+             function loadChat( chat_data ) {
+                 chat_data.forEach( function(data) {
+                     displayMessage(data);
+                 });
+                 $('.chat__body').show();
+                 $('.__no__chat__').hide();
+             }
+             function displayMessage( message_obj ) {
+                 const msg_id = message_obj.id;
+                 const msg_body = message_obj.message;
+                 let template = $(newMessageTpl).html();
+                 template = template.replace("{{id}}", msg_id);
+                 template = template.replace("{{body}}", msg_body);
+                 template = $(template);
+                 if ( message_obj.sender_id == @ViewBag.currentUser ) {
+                     template.find('.__chat__').addClass('from__chat');
+                 } else {
+                     template.find('.__chat__').addClass('receive__chat');
+                 }
+                 if ( message_obj.status == 1 ) {
+                     template.find('.delivery-status').show();
+                 }
+                 $('.chat__main').append(template);
+             }
+             </script>*@
+    </div>
