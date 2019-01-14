@@ -7,15 +7,15 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using System;
 using Tech_In.Data;
-using Tech_In.Models.Database;
 using Tech_In.Models.Model;
 
 namespace Tech_In.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190109085924_userpost")]
+    partial class userpost
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -375,30 +375,6 @@ namespace Tech_In.Migrations
                     b.HasIndex("AddedBy");
 
                     b.ToTable("Category");
-                });
-
-            modelBuilder.Entity("Tech_In.Models.Database.Conversation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("CreatedAt");
-
-                    b.Property<string>("Message");
-
-                    b.Property<string>("RecieverId");
-
-                    b.Property<string>("SenderId");
-
-                    b.Property<int>("Status");
-
-                    b.Property<string>("UserId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Conversation");
                 });
 
             modelBuilder.Entity("Tech_In.Models.Database.QuestionSkill", b =>
@@ -979,13 +955,6 @@ namespace Tech_In.Migrations
                     b.HasOne("Tech_In.Models.ApplicationUser", "UserRef")
                         .WithMany()
                         .HasForeignKey("AddedBy");
-                });
-
-            modelBuilder.Entity("Tech_In.Models.Database.Conversation", b =>
-                {
-                    b.HasOne("Tech_In.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany("Conversations")
-                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("Tech_In.Models.Database.QuestionSkill", b =>

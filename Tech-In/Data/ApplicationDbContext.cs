@@ -22,6 +22,7 @@ namespace Tech_In.Data
         }
         public DbSet<Country> Country { get; set; }
         public DbSet<City> City { get; set; }
+        public DbSet<UserPost> UserPost { get; set; }
         public DbSet<UserPersonalDetail> UserPersonalDetail { get; set; }
         public DbSet<UserExperience> UserExperience { get; set; }
         public DbSet<UserEducation> UserEducation { get; set; }

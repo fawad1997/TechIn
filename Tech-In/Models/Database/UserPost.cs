@@ -18,7 +18,7 @@ namespace Tech_In.Models.Database
         [DisplayFormat(DataFormatString = "{0:yyyy-mm-dd}", ApplyFormatInEditMode = true)]
         public DateTime CreateTime { get; set; }
 
-        [StringLength(maximumLength: 1000, MinimumLength = 5)]
+        [StringLength(maximumLength: 1000, MinimumLength = 3)]
         public string Summary { get; set; }
 
         public string Image { get; set; }

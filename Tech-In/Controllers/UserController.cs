@@ -174,10 +174,35 @@ namespace Tech_In.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> AddPost(Object o)
+        public async Task<IActionResult> AddPost(AddPostVM post)
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            if (post.PostImg == null && post.PostDescription.Length < 3)
+            {
+                ModelState.AddModelError("PostDescription", "Post length should be greater then 3 characters");
+                return null;
+            }
+            UserPost p = new UserPost
+            {
+                OriginalId = 0,
+                Status = "Active",
+                CreateTime = DateTime.Now,
+                Summary = post.PostDescription,
+                Image = null,
+                UserId = user.Id
+            };
+            _context.UserPost.Add(p);
+            await _context.SaveChangesAsync();
+            p.OriginalId = p.UserPostId;
+            _context.SaveChanges();
+            return Redirect("/u/"+ user.UserName);
+        }
+
+        public async Task<IActionResult> LoadPosts()
         {
             string userloggedId = await OnGetSesstion();
-            return null;
+            var posts = _context.UserPost.Where(x=>x.UserId == userloggedId).Take(10);
+            return View("_ViewPosts");
         }
 
         //Personal Details
