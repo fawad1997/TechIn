@@ -57,13 +57,19 @@ namespace Tech_In.Controllers
         public async Task<JsonResult> Conversation(string contact)
         {
             var user = await _userManager.GetCurrentUser(HttpContext);
-           
-            var conversations = _context.Conversation.Where(c => (c.RecieverId ==user.Id  && c.SenderId == contact) || (c.RecieverId == contact && c.SenderId == user.Id))
-                                  .OrderBy(c => c.CreatedAt)
-                                  .ToList();
+
+            var conversations = _context.Conversation
+                                         .Where(c => (c.RecieverId == user.Id && c.SenderId == contact) &&
+                                                      c.Status != Models.Database.Conversation.MessageStatus.Delivered)
+                                         .OrderByDescending(c => c.CreatedAt).Take(10)
+                                         .ToList();
+
+            conversations.ForEach(c => c.Status = Models.Database.Conversation.MessageStatus.Delivered);
+            _context.SaveChanges();
+
             return Json(new { status = "success", data = conversations }/*,JsonRequestBehavior.AllowGet*/);
         }
-
+        
         [HttpGet]
         public async Task<JsonResult> SendMessage(string recieverId, string message)
         {
@@ -74,8 +80,8 @@ namespace Tech_In.Controllers
             {
                 SenderId = user.Id,
                 Message = message,
-                RecieverId = recieverId
-              
+                RecieverId = recieverId,
+                Status = Models.Database.Conversation.MessageStatus.Sent
             };
             _context.Conversation.Add(convo);
             _context.SaveChanges();
@@ -86,7 +92,7 @@ namespace Tech_In.Controllers
             //  "new_message",
             //  convo,
             //  new TriggerOptions() { SocketId = socket_id });
-            return Json(convo);
+            return Json(new List<Conversation>() { convo });
         }
       
         private String GetConvoChannel(int user_id, int contact_id)
