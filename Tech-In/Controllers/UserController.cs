@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -26,12 +28,14 @@ namespace Tech_In.Controllers
         private readonly ApplicationDbContext _context;
         private UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         //private IHttpContextAccessor _accessor;
-        public UserController(ApplicationDbContext context, UserManager<ApplicationUser> userManager,IMapper mapper)
+        public UserController(ApplicationDbContext context, UserManager<ApplicationUser> userManager,IMapper mapper, IHostingEnvironment hostingEnvironment)
         {
             _context = context;
             _userManager = userManager;
             _mapper = mapper;
+            _hostingEnvironment = hostingEnvironment;
             //_accessor = accessor;
         }
         public async Task<IActionResult> Index(string currentFilter, string search, int? page)
@@ -96,6 +100,26 @@ namespace Tech_In.Controllers
                     PVM.IsFriendReqSent = AreFrndList.Where(a => (a.User1 == userloggedId) && (a.User2 == user.Id) && a.AreFriend == false).Any();
                 }
             }
+            var wallPosts = (from pst in _context.UserPost
+                             join us in _userManager.Users on pst.UserId equals us.Id
+                             join u in  _context.UserPersonalDetail on pst.UserId equals u.UserId
+                             orderby pst.OriginalId descending
+                select new UserPostVM
+                {
+                    ProfilePic = u.ProfileImage,
+                    Name = u.FirstName+" "+u.LastName,
+                    UserName = us.UserName,
+                    UserPostId = pst.UserPostId,
+                    OriginalId = pst.OriginalId,
+                    Status = pst.Status,
+                    Summary = pst.Summary,
+                    Image = pst.Image,
+                    CreateTime = pst.CreateTime,
+                    IsLiked = _context.PostLikes.Where(y=>y.PostId == pst.UserPostId && y.UserId == userloggedId).Any(),
+                    TotalLikes = _context.PostLikes.Where(z=>z.PostId == pst.UserPostId).Count()
+                }
+            ).Take(10);
+            PVM.UserPosts = wallPosts;
             PVM.UserPersonalVM = _context.UserPersonalDetail.Where(m => m.UserId == user.Id).Select(x => new UserPersonalViewModel { FirstName = x.FirstName, LastName = x.LastName, Summary = x.Summary, ProfileImage = x.ProfileImage, DOB = x.DOB, UserPersonalDetailID = x.UserPersonalDetailId, Gender = x.Gender, CityName = x.City.CityName, CountryName = x.City.Country.CountryName }).SingleOrDefault();
             PVM.UserName = username;
             PVM.UserPersonalVM.PhoneNo = user.PhoneNumber;
@@ -191,6 +215,34 @@ namespace Tech_In.Controllers
                 Image = null,
                 UserId = user.Id
             };
+            if (post.PostImg != null)
+            {
+                if ((post.PostImg.Length / 1000) > 7000)
+                {
+                    ViewBag.ProfilePic = "Image can't exceed 7Mb size";
+                    return View();
+                }
+                string path = Path.Combine(_hostingEnvironment.WebRootPath, "images/posts");
+                string extension = Path.GetExtension(post.PostImg.FileName).Substring(1);
+                if (!(extension.ToLower() == "png" || extension.ToLower() == "jpg" || extension.ToLower() == "jpeg"))
+                {
+                    ViewBag.ProfilePic = "Only png, jpg & jpeg are allowed";
+                    return View();
+                }
+                string fileNam = user.Id.Substring(24) + "p." + extension;
+                using (var vs = new FileStream(Path.Combine(path, fileNam), FileMode.CreateNew))
+                {
+                    await post.PostImg.CopyToAsync(vs);
+                }
+                using (var img = SixLabors.ImageSharp.Image.Load(Path.Combine(path, fileNam)))
+                {
+                    p.Image = $"/images/posts/{fileNam}";
+                }
+            }
+            else
+            {
+                p.Image = null;
+            }
             _context.UserPost.Add(p);
             await _context.SaveChangesAsync();
             p.OriginalId = p.UserPostId;
@@ -198,13 +250,36 @@ namespace Tech_In.Controllers
             return Redirect("/u/"+ user.UserName);
         }
 
-        public async Task<IActionResult> LoadPosts()
+        public async Task<IActionResult> DeletePost(int Id)
         {
             string userloggedId = await OnGetSesstion();
-            var posts = _context.UserPost.Where(x=>x.UserId == userloggedId).Take(10);
-            return View("_ViewPosts");
+            var likes = _context.PostLikes.Where(aa => aa.PostId == Id);
+            foreach(var like in likes)
+            {
+                _context.PostLikes.Remove(like);
+            }
+            _context.SaveChanges();
+            var userpost = _context.UserPost.Where(x => x.UserPostId == Id).FirstOrDefault();
+            _context.Remove(userpost);
+            _context.SaveChanges();
+            return Redirect("/u/" + HttpContext.Session.GetString("_UserName"));
         }
 
+        public IActionResult ViewLikes(int Id)
+        {
+            var users = (from usr in _context.UserPersonalDetail
+                         join p in _context.PostLikes on usr.UserId equals p.UserId
+                         join us in _userManager.Users on usr.UserId equals us.Id
+                         where p.PostId == Id
+                         select new LikesViewVM
+                         {
+                             Name = usr.FirstName + " " + usr.LastName,
+                             Image = usr.ProfileImage,
+                             UserName = us.UserName
+                         }
+                  ).ToList();
+            return View("_ViewLikes",users);
+        }
         //Personal Details
         public async Task<IActionResult> UpdatePersonalDetail(int Id)
         {
@@ -408,7 +483,29 @@ namespace Tech_In.Controllers
             friendsR.AddRange(friendsR2);
             return View("_FriendsList",friendsR);
         }
-
+        
+        public async Task<IActionResult> ToggleLike(int Id)
+        {
+            string userloggedId = await OnGetSesstion();
+            PostLikes ifLiked = _context.PostLikes.Where(x => x.PostId == Id && x.UserId == userloggedId).FirstOrDefault();
+            if (ifLiked == null)
+            {
+                PostLikes pLike = new PostLikes
+                {
+                    PostId = Id,
+                    UserId = userloggedId
+                };
+                _context.PostLikes.Add(pLike);
+                _context.SaveChanges();
+                return Json(new { like = true, unlike = false });
+            }
+            else
+            {
+                _context.PostLikes.Remove(ifLiked);
+                _context.SaveChanges();
+                return Json(new { like = false, unlike = true });
+            }
+        }
 
         //User Experience
         public async Task<IActionResult> AddEditUserExperience(int Id)

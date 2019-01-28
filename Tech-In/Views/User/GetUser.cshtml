@@ -124,10 +124,12 @@
 
                                 @await Html.PartialAsync("_AddPostPartial", new Tech_In.Models.ViewModels.ProfileViewModels.AddPostVM { Id = 0 })
 
-                                <div id="posts">
-
-                                </div>
-
+                            </div>
+                            <div id="wallposts">
+                                @foreach (var singlePost in Model.UserPosts)
+                                {
+                                    @await Html.PartialAsync("_ViewPosts", singlePost)
+                                }
                             </div>
                         </div>
                         <!--/Wall Div-->
@@ -1481,7 +1483,6 @@
             //loaderDivFrnd
             $("#friends").load("/User/MyFriendList");
         });
-        $("#posts").load("/user/loadposts");
         
         
     });
@@ -1601,7 +1602,6 @@
                 $("#delExpModal").modal('hide');
                 $("#row_exp_" + empId).remove();
             }
-
         })
     }
 

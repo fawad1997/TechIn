@@ -1,0 +1,16 @@
+﻿@model List<Tech_In.Models.ViewModels.ProfileViewModels.LikesViewVM>
+@{
+    Layout = null;
+}
+@foreach (var u in Model)
+{
+<div class="row">
+    <div class="col-xs-3 col-md-2">
+        <img src="@u.Image" class="post-img img-circle" />
+    </div>
+    <div class="col-xs-9 col-md-10">
+        <a href="/u/@u.UserName"><h3>@u.Name</h3></a>
+    </div>
+    <hr/>
+</div>
+}

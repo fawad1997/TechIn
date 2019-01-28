@@ -35,6 +35,7 @@ namespace Tech_In.Controllers
 
         public async Task<IActionResult> Index()
         {
+            IQueryable<UserPostVM> wallPosts = null;
             string currentUserId = await OnGetSesstion();
             if(currentUserId == null)
             {
@@ -47,8 +48,27 @@ namespace Tech_In.Controllers
                 {
                     return RedirectToAction("CompleteProfile", "Home");
                 }
+                wallPosts = (from pst in _context.UserPost
+                    join us in _userManager.Users on pst.UserId equals us.Id
+                             join u in _context.UserPersonalDetail on pst.UserId equals u.UserId
+                             orderby pst.OriginalId descending
+                    select new UserPostVM
+                    {
+                        ProfilePic = u.ProfileImage,
+                        Name = u.FirstName + " " + u.LastName,
+                        UserName = us.UserName,
+                        UserPostId = pst.UserPostId,
+                        OriginalId = pst.OriginalId,
+                        Status = pst.Status,
+                        Summary = pst.Summary,
+                        Image = pst.Image,
+                        CreateTime = pst.CreateTime,
+                        IsLiked = _context.PostLikes.Where(y => y.PostId == pst.UserPostId && y.UserId == currentUserId).Any(),
+                        TotalLikes = _context.PostLikes.Where(z => z.PostId == pst.UserPostId).Count()
+                    }
+                ).Take(10);
             }
-            return View("Welcome");
+            return View("Welcome",wallPosts);
         }
 
 

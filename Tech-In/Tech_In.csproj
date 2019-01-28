@@ -132,7 +132,14 @@
   <ItemGroup>
     <Folder Include="Data\Migrations\" />
     <Folder Include="wwwroot\images\article\" />
+    <Folder Include="wwwroot\images\posts\" />
     <Folder Include="wwwroot\images\users\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Views\Home\_ViewPosts.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
   </ItemGroup>
 
 </Project>

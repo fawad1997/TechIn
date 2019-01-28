@@ -11,7 +11,7 @@ namespace Tech_In.Models.Database
         public static void Initilize(ApplicationDbContext context)
         {
             context.Database.EnsureCreated();
-            InitilizaCategory(context);
+            //InitilizaCategory(context);
             //Populating Countries
             if (context.Country.Any())
                 return;

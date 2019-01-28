@@ -25,5 +25,6 @@ namespace Tech_In.Models.ViewModels.ProfileViewModels
         public IEnumerable<LanguageSkillVM> LanguageSkillVMList { get; set; }
         public IEnumerable<PublicationVM> PublicationVMListJP { get; set; }
         public IEnumerable<PublicationVM> PublicationVMListCP { get; set; }
+        public IEnumerable<UserPostVM> UserPosts { get; set; }
     }
 }

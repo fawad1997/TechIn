@@ -401,6 +401,23 @@ namespace Tech_In.Migrations
                     b.ToTable("Conversation");
                 });
 
+            modelBuilder.Entity("Tech_In.Models.Database.PostLikes", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("PostId");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(300);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("PostLikes");
+                });
+
             modelBuilder.Entity("Tech_In.Models.Database.QuestionSkill", b =>
                 {
                     b.Property<int>("QuestionSkillId")
@@ -986,6 +1003,14 @@ namespace Tech_In.Migrations
                     b.HasOne("Tech_In.Models.ApplicationUser", "ApplicationUser")
                         .WithMany("Conversations")
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.PostLikes", b =>
+                {
+                    b.HasOne("Tech_In.Models.Database.UserPost", "PostRef")
+                        .WithMany()
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Tech_In.Models.Database.QuestionSkill", b =>

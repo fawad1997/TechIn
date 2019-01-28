@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Tech_In.Migrations
 {
-    public partial class conversation : Migration
+    public partial class postlikes : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -345,6 +345,58 @@ namespace Tech_In.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserNetwork",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    AreFriend = table.Column<bool>(nullable: false),
+                    RecordTime = table.Column<DateTime>(nullable: false),
+                    User1 = table.Column<string>(nullable: true),
+                    User2 = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserNetwork", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserNetwork_AspNetUsers_User1",
+                        column: x => x.User1,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserNetwork_AspNetUsers_User2",
+                        column: x => x.User2,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserPost",
+                columns: table => new
+                {
+                    UserPostId = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CreateTime = table.Column<DateTime>(nullable: false),
+                    Image = table.Column<string>(nullable: true),
+                    OriginalId = table.Column<int>(nullable: false),
+                    Status = table.Column<string>(maxLength: 8, nullable: false),
+                    Summary = table.Column<string>(maxLength: 1000, nullable: true),
+                    UserId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserPost", x => x.UserPostId);
+                    table.ForeignKey(
+                        name: "FK_UserPost_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserPublication",
                 columns: table => new
                 {
@@ -564,6 +616,26 @@ namespace Tech_In.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PostLikes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    PostId = table.Column<int>(nullable: false),
+                    UserId = table.Column<string>(maxLength: 300, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PostLikes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PostLikes_UserPost_PostId",
+                        column: x => x.PostId,
+                        principalTable: "UserPost",
+                        principalColumn: "UserPostId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -909,6 +981,11 @@ namespace Tech_In.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PostLikes_PostId",
+                table: "PostLikes",
+                column: "PostId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_QuestionSkill_SkillTagId",
                 table: "QuestionSkill",
                 column: "SkillTagId");
@@ -969,6 +1046,16 @@ namespace Tech_In.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserNetwork_User1",
+                table: "UserNetwork",
+                column: "User1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserNetwork_User2",
+                table: "UserNetwork",
+                column: "User2");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserPersonalDetail_CityId",
                 table: "UserPersonalDetail",
                 column: "CityId");
@@ -976,6 +1063,11 @@ namespace Tech_In.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_UserPersonalDetail_UserId",
                 table: "UserPersonalDetail",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserPost_UserId",
+                table: "UserPost",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -1065,6 +1157,9 @@ namespace Tech_In.Migrations
                 name: "Conversation");
 
             migrationBuilder.DropTable(
+                name: "PostLikes");
+
+            migrationBuilder.DropTable(
                 name: "QuestionSkill");
 
             migrationBuilder.DropTable(
@@ -1087,6 +1182,9 @@ namespace Tech_In.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserLanguageSkill");
+
+            migrationBuilder.DropTable(
+                name: "UserNetwork");
 
             migrationBuilder.DropTable(
                 name: "UserPersonalDetail");
@@ -1114,6 +1212,9 @@ namespace Tech_In.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "UserPost");
 
             migrationBuilder.DropTable(
                 name: "City");
