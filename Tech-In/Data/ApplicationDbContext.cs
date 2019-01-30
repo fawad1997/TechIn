@@ -24,6 +24,7 @@ namespace Tech_In.Data
         public DbSet<City> City { get; set; }
         public DbSet<UserPost> UserPost { get; set; }
         public DbSet<PostLikes> PostLikes { get; set; }
+        public DbSet<PostComments> PostComments { get; set; }
         public DbSet<UserPersonalDetail> UserPersonalDetail { get; set; }
         public DbSet<UserExperience> UserExperience { get; set; }
         public DbSet<UserEducation> UserEducation { get; set; }

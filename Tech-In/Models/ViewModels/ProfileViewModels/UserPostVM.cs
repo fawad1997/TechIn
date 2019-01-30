@@ -25,6 +25,7 @@ namespace Tech_In.Models.ViewModels.ProfileViewModels
         public string UserId { get; set; }
         public Boolean IsLiked { get; set; }
         public int TotalLikes { get; set; }
+        public int TotalComments { get; set; }
         public string UserName { get; set; }
         public string Name { get; set; }
         public string ProfilePic { get; set; }

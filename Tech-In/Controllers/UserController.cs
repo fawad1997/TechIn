@@ -118,7 +118,8 @@ namespace Tech_In.Controllers
                     Image = pst.Image,
                     CreateTime = pst.CreateTime,
                     IsLiked = _context.PostLikes.Where(y=>y.PostId == pst.UserPostId && y.UserId == userloggedId).Any(),
-                    TotalLikes = _context.PostLikes.Where(z=>z.PostId == pst.UserPostId).Count()
+                    TotalLikes = _context.PostLikes.Where(z=>z.PostId == pst.UserPostId).Count(),
+                    TotalComments = _context.PostComments.Where(aa=>aa.PostId == pst.UserPostId).Count()
                 }
             ).Take(10);
             PVM.UserPosts = wallPosts;
@@ -256,15 +257,40 @@ namespace Tech_In.Controllers
         {
             string userloggedId = await OnGetSesstion();
             var likes = _context.PostLikes.Where(aa => aa.PostId == Id);
-            foreach(var like in likes)
+            var comments = _context.PostComments.Where(aa => aa.PostId == Id);
+            foreach (var like in likes)
             {
                 _context.PostLikes.Remove(like);
+            }
+            foreach (var comment in comments)
+            {
+                _context.PostComments.Remove(comment);
             }
             _context.SaveChanges();
             var userpost = _context.UserPost.Where(x => x.UserPostId == Id).FirstOrDefault();
             _context.Remove(userpost);
             _context.SaveChanges();
             return Redirect("/u/" + HttpContext.Session.GetString("_UserName"));
+        }
+
+        public async Task<IActionResult> AddPostComment(int Id,string Msg)
+        {
+            var userId = await OnGetSesstion();
+            PostComments pC = new PostComments
+            {
+                PostId = Id,
+                CommentMsg = Msg,
+                UserId = userId
+            };
+            _context.PostComments.Add(pC);
+            _context.SaveChanges();
+            return Json(new { success = true });
+        }
+
+        public IActionResult LoadUserComments(int Id)
+        {
+            var postComments = _context.PostComments.Where(x => x.PostId == Id).Select(y => new PostCommentsView { Name = _context.UserPersonalDetail.Where(z => z.UserId == y.UserId).Select(aa => aa.FirstName).FirstOrDefault(),Comment = y.CommentMsg, Image = _context.UserPersonalDetail.Where(z => z.UserId == y.UserId).Select(aa => aa.ProfileImage).FirstOrDefault(),UserName = _userManager.Users.Where(bb=>bb.Id==y.UserId).Select(cc=>cc.UserName).FirstOrDefault() }).ToList();
+            return PartialView("_PostCommentPartial",postComments);
         }
 
         public IActionResult ViewLikes(int Id)

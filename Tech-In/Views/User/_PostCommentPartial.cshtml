@@ -1,0 +1,18 @@
+﻿@model List<Tech_In.Models.ViewModels.ProfileViewModels.PostCommentsView>
+<br/>
+@foreach (var cmt in Model)
+{
+    <hr />
+    <div class="container">
+        <div class="row">
+            <div class="col-md-1">
+                <img style="float:right;" src="@cmt.Image" class="post-img img-circle" />
+            </div>
+            <div class="col-md-11">
+                <stong><a style="color:black;" href="/u/@cmt.UserName"> @cmt.Name</a></stong>
+                <p>@cmt.Comment</p>
+            </div>
+        </div>
+    </div>
+
+}

@@ -64,7 +64,8 @@ namespace Tech_In.Controllers
                         Image = pst.Image,
                         CreateTime = pst.CreateTime,
                         IsLiked = _context.PostLikes.Where(y => y.PostId == pst.UserPostId && y.UserId == currentUserId).Any(),
-                        TotalLikes = _context.PostLikes.Where(z => z.PostId == pst.UserPostId).Count()
+                        TotalLikes = _context.PostLikes.Where(z => z.PostId == pst.UserPostId).Count(),
+                        TotalComments = _context.PostComments.Where(z => z.PostId == pst.UserPostId).Count()
                     }
                 ).Take(10);
             }
@@ -147,9 +148,8 @@ namespace Tech_In.Controllers
                 userPersonal.UserId = user.Id;
                 _context.UserPersonalDetail.Add(userPersonal);
                 await _context.SaveChangesAsync();
-                HttpContext.Session.SetString("Name", userPersonal.FirstName);
 
-                return RedirectToAction("Index", "User");
+                return RedirectToAction("Index", "Home");
             }
             ViewBag.CountryList = new SelectList(GetCountryList(), "CountryId", "CountryName");
             return View("CompleteProfile");
