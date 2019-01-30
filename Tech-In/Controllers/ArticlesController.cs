@@ -108,8 +108,10 @@ namespace Tech_In.Controllers
                 articleVM.Tags.Add(singleTag);
             }
             //Author
+
             var author = _context.UserPersonalDetail.Where(usr => usr.UserId == article.UserId).SingleOrDefault();
-            articleVM.AuthorId = article.UserId;
+            articleVM.AuthorUserName = _userManager.Users.Where(x => x.Id == author.UserId).Select(y => y.UserName).SingleOrDefault();
+            articleVM.AuthorId = author.UserId;
             articleVM.AuthorImg = author.ProfileImage;
             articleVM.AuthorName = author.FirstName + " " + author.LastName;
             articleVM.AuthorSummary = author.Summary;
@@ -631,6 +633,8 @@ namespace Tech_In.Controllers
             {
                 category.CategoryName = _context.Category.Where(x => x.Id == category.CategoryId).Select(y=>y.Title).SingleOrDefault();
             }
+            if (topCatg == null)
+                return NotFound();
             return View("_TopCategory",topCatg);
         }
         public IActionResult PopularPosts()
@@ -647,6 +651,8 @@ namespace Tech_In.Controllers
                 post.ArticleTitle = article.Title;
                 post.CreateTime = article.CreateTime;
             }
+            if (topPosts == null)
+                return NotFound();
             return View("_PopularPosts",topPosts);
         }
         public IActionResult TopTags()
@@ -661,6 +667,8 @@ namespace Tech_In.Controllers
                 var tag = _context.SkillTag.Where(x => x.SkillTagId == tagCountID.Id).FirstOrDefault();
                 tagCountID.TagName = tag.SkillName;
             }
+            if (topTags == null)
+                return NotFound();
             return View("_TopTags",topTags);
         }
         public async Task<IActionResult> AIUserInterests()

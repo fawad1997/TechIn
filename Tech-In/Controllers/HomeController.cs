@@ -164,6 +164,60 @@ namespace Tech_In.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+        public IActionResult CountUsers()
+        {
+            int countUsers = _context.UserPersonalDetail.Count();
+            return Json(new { count = countUsers });
+        }
+        public IActionResult CountQuestions()
+        {
+            int countQuestions = _context.UserQuestion.Count();
+            return Json(new { count = countQuestions });
+        }
+        public IActionResult CountArticles()
+        {
+            int countArticles = _context.Article.Count();
+            return Json(new { count = countArticles });
+        }
+        public IActionResult Policies()
+        {
+            return View();
+        }
+        public IActionResult Terms()
+        {
+            return View();
+        }
+        public IActionResult Faqs()
+        {
+            return View();
+        }
+
+        public IActionResult About()
+        {
+            return View();
+        }
+        public IActionResult Developers()
+        {
+            return View();
+        }
+
+        public IActionResult Contact()
+        {
+            return View();
+        }
+        public IActionResult Help()
+        {
+            return View();
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+        public IActionResult Security()
+        {
+            return View();
+        }
         public async Task<string> OnGetSesstion()
         {
             const string SessionKeyName = "_Name";

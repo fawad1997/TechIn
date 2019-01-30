@@ -103,6 +103,7 @@ namespace Tech_In.Controllers
             var wallPosts = (from pst in _context.UserPost
                              join us in _userManager.Users on pst.UserId equals us.Id
                              join u in  _context.UserPersonalDetail on pst.UserId equals u.UserId
+                             where pst.UserId == user.Id
                              orderby pst.OriginalId descending
                 select new UserPostVM
                 {
@@ -285,7 +286,6 @@ namespace Tech_In.Controllers
         {
             var user = await _userManager.GetCurrentUser(HttpContext);
             ViewBag.CountryList = new SelectList(GetCountryList(), "CountryId", "CountryName");
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
             UserPersonalViewModel vm = new UserPersonalViewModel();
             if (Id > 0)
             {
@@ -319,6 +319,7 @@ namespace Tech_In.Controllers
         {
             if (ModelState.IsValid)
             {
+                await OnGetSesstion();
                 var user = await _userManager.GetCurrentUser(HttpContext);
                 var pd = _context.UserPersonalDetail.Where(p => p.UserId == user.Id).FirstOrDefault();
                 pd.FirstName = vm.FirstName;
@@ -342,7 +343,7 @@ namespace Tech_In.Controllers
                 ViewBag.CountryList = new SelectList(GetCountryList(), "CountryId", "CountryName");
                 return PartialView("UpdatePersonalDetail", vm);
             }
-            return Json(new { success = true });
+            return Redirect("/u/" + HttpContext.Session.GetString("_UserName"));
         }
 
         public async Task<string> SetUserId()
@@ -574,7 +575,7 @@ namespace Tech_In.Controllers
                 ViewBag.CountryList = new SelectList(GetCountryList(), "CountryId", "CountryName");
                 return PartialView("AddEditUserExperience", vm);
             }
-            return Json(new { success = true });
+            return Json(new { success = true, username = HttpContext.Session.GetString("_UserName") });
         }
 
         public async Task<JsonResult> DeleteUserExperience(int Id)
@@ -624,7 +625,7 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateEducation(EducationVM vm)
         {
-            string userId = HttpContext.Session.GetString("UserId");
+            string userId = await OnGetSesstion();
             if (userId == null)
             {
                 userId = await SetUserId();
@@ -650,8 +651,7 @@ namespace Tech_In.Controllers
                 _context.UserEducation.Add(edu);
             }
             _context.SaveChanges();
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
-            return RedirectToAction("Index");
+            return Redirect("/u/" + HttpContext.Session.GetString("_UserName"));
         }
 
         public async Task<JsonResult> DeleteUserEducation(int Id)
@@ -698,7 +698,7 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateCertification(CertificationVM vm)
         {
-            string userId = HttpContext.Session.GetString("UserId");
+            string userId = await OnGetSesstion();
             if (userId == null)
             {
                 userId = await SetUserId();
@@ -724,9 +724,7 @@ namespace Tech_In.Controllers
                 _context.UserCertification.Add(cert);
             }
             _context.SaveChanges();
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
-            return RedirectToAction("Index");
-            //return View("Index");
+            return Redirect("/u/" + HttpContext.Session.GetString("_UserName"));
         }
 
         public async Task<JsonResult> DeleteUserCertification(int Id)
@@ -769,7 +767,7 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateAchievment(AchievmentVM vm)
         {
-            string userId = HttpContext.Session.GetString("UserId");
+            string userId = await OnGetSesstion();
             if (userId == null)
             {
                 userId = await SetUserId();
@@ -790,9 +788,7 @@ namespace Tech_In.Controllers
                 _context.UserAcheivement.Add(achiev);
             }
             _context.SaveChanges();
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
-            return RedirectToAction("Index");
-            //return View("Index");
+            return Redirect("/u/" + HttpContext.Session.GetString("_UserName"));
         }
 
         public async Task<JsonResult> DeleteUserAchievment(int Id)
@@ -835,7 +831,7 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateHobby(HobbyVM vm)
         {
-            string userId = HttpContext.Session.GetString("UserId");
+            string userId = await OnGetSesstion();
             if (userId == null)
             {
                 userId = await SetUserId();
@@ -857,10 +853,7 @@ namespace Tech_In.Controllers
             }
             _context.SaveChanges();
             var hobbiess = _context.UserHobby.ToList();
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
-            //return Json(new { hobbies = hobbiess });
-            return RedirectToAction("Index");
-            //return View("Index");
+            return Redirect("/u/" + HttpContext.Session.GetString("_UserName"));
         }
 
         public async Task<JsonResult> DeleteUserHobby(int Id)
@@ -903,7 +896,7 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateLS(LanguageSkillVM vm)
         {
-            string userId = HttpContext.Session.GetString("UserId");
+            string userId = await OnGetSesstion();
             if (userId == null)
             {
                 userId = await SetUserId();
@@ -924,9 +917,7 @@ namespace Tech_In.Controllers
                 _context.UserLanguageSkill.Add(ls);
             }
             _context.SaveChanges();
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
-            return RedirectToAction("Index");
-            //return View("Index");
+            return Redirect("/u/" + HttpContext.Session.GetString("_UserName"));
         }
 
         public async Task<JsonResult> DeleteLanguageSkill(int Id)
@@ -973,7 +964,7 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdatePublication(PublicationVM vm)
         {
-            string userId = HttpContext.Session.GetString("UserId");
+            string userId = await OnGetSesstion();
             if (userId == null)
             {
                 userId = await SetUserId();
@@ -1000,9 +991,7 @@ namespace Tech_In.Controllers
                 _context.UserPublication.Add(publication);
             }
             _context.SaveChanges();
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
-            return RedirectToAction("Index");
-            //return View("Index");
+            return Redirect("/u/" + HttpContext.Session.GetString("_UserName"));
         }
 
         public async Task<JsonResult> DeletePublication(int Id)

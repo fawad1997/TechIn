@@ -245,35 +245,25 @@ else
         <aside id="aside" class="col-md-3">
 
             <!-- Search -->
-            @*<div class="widget">
-        <div class="widget-search">
-            <input class="search-input" id="searchText" type="text" placeholder="search questions">
-            <button class="search-btn" id="searchButton" type="button">
-                <i class="fa fa-search"></i>
-            </button>
-        </div>*@
-            @*<div class="widget-search">
-            <input class="search-input" id="searchText" type="text" placeholder="search questions">
-            <button class="search-btn" id="searchButton" type="button">
-                <i class="fa fa-search"></i>
-            </button>
-        </div>*@
-            <form asp-action="Index" method="get">
-                <div class="form-actions no-color">
-                    <div class="widget-search">
-                        <input type="text" placeholder="search questions" name="SearchString" value="@ViewData["currentFilter"]" />
-                        <button type="submit" id="searchButton" value="Search" class="search-btn">  <i class="fa fa-search"></i> </button>
-                    </div>
-                </div>
-            </form>
             <div class="widget">
-                @{
 
-            Html.RenderPartial("_Tag.cshtml", Model);
-                }
+                <form asp-action="Index" method="get">
+                    <div class="form-actions no-color">
+                        <div class="widget-search">
+                            <input type="text" placeholder="search questions" name="SearchString" value="@ViewData["currentFilter"]" />
+                            <button type="submit" id="searchButton" value="Search" class="search-btn">  <i class="fa fa-search"></i> </button>
+                        </div>
+                    </div>
+                </form>
+                <button onclick="location.href='@Url.Action("New", "Question")'" class="main-btn btn-block">Ask a Question</button>
+                @*<div class="widget">*@
+                    @{
 
+                        Html.RenderPartial("_Tag.cshtml", Model);
+                    }
+
+                @*</div>*@
             </div>
-</div>
             
             <script>
                 $(document).ready(function () {
@@ -287,7 +277,6 @@ else
             </script>
             <!-- /Search -->
 
-            <button onclick="location.href='@Url.Action("New", "Question")'" class="main-btn btn-block">Ask a Question</button>
         </aside>
     </div>
 </div>

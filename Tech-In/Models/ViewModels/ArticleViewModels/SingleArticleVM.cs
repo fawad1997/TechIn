@@ -21,6 +21,7 @@ namespace Tech_In.Models.ViewModels.ArticleViewModels
         public string ArticleBody { get; set; }
         public List<SkillTag> Tags { get; set; }
         public DateTime CreateTime { get; set; }
+        public string AuthorUserName { get; set; }
         public string AuthorId { get; set; }
         public string AuthorName { get; set; }
         public string AuthorImg { get; set; }

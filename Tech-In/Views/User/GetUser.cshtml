@@ -143,7 +143,7 @@
                                             @if (Model.IsCurrentUser)
                                             {
                                                 <!--Edit-->
-                                                <div class="right-post-icon-div" onclick="EditPersonalD(@Model.UserPersonalVM.UserPersonalDetailID)">
+                                                <div class="right-post-icon-div" onclick="EditPersonalD('@Model.UserPersonalVM.UserPersonalDetailID')">
                                                     <div class="round-icon-back">
                                                         <i class="fa fa-pencil"></i>
                                                     </div>
@@ -1565,7 +1565,7 @@
     };
 
     var EditPersonalD = function (id) {
-        debugger;
+        
         var url = "/User/UpdatePersonalDetail?Id=" + id;
         $("#viewPDBody").load(url, function () {
             $("#myPD").modal("show");

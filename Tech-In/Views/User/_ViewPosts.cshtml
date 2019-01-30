@@ -11,9 +11,9 @@
             <img src="@Model.ProfilePic" class="post-img img-circle" />
         </div>
         <div class="col-xs-10 col-md-11">
-            <h6 class="inline small-h"><a style="color:black;" href="/u/@Model.UserName"> @Model.UserName</a></h6>
+            <h6 class="inline small-h"><a style="color:black;" href="/u/@Model.UserName"> @Model.Name</a></h6>
             <br />
-            <!--Edit-->
+            <!--Edit--> 
             <div class="right-post-icon-div">
                 <a href="/User/DeletePost/@Model.UserPostId">
                     <div class="round-icon-back">
@@ -27,13 +27,15 @@
         </div>
         <div class="col-xs-12">
             <hr />
-            <p class="black">
-                @Model.Summary
-            </p>
-            @if (Model.Image != null)
-            {
-                <img src="@Model.Image" style="height:400px !important;" />
-            }
+            <div class="row container">
+                <p class="black">
+                    @Model.Summary
+                </p>
+                @if (Model.Image != null)
+                {
+                    <img src="@Model.Image" style="height:400px !important;" />
+                }
+            </div>
             @if (Model.TotalLikes != 0)
             {
                 string plikes = "totallikes" + Model.UserPostId;
@@ -81,10 +83,10 @@
                 <i class="fa fa-comment-o" aria-hidden="true"></i>
                 Comment
             </button>
-            <button class="transparent-btn">
+            @*<button class="transparent-btn">
                 <i class="fa fa-share" aria-hidden="true"></i>
                 Share
-            </button>
+            </button>*@
         </div>
     </div>
 </div>
