@@ -82,11 +82,11 @@
                         <!--  Main navigation  -->
 
                         <ul class="main-nav nav navbar-nav">
-                            <li>
-                                <a asp-controller="Question" asp-action="Index">Questions</a>
+                            <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Question" ? "active" : "")">
+                                <a asp-area="" asp-controller="Question" asp-action="Index">Questions</a>
                             </li>
-                            <li>
-                                <a asp-area="" asp-controller="Articles" asp-action="Index">Articles</a>
+                            <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Article" ? "active" : "")">
+                                <a asp-area="" asp-controller="Article" asp-action="Index">Articles</a>
                             </li>
                             <li>
                                 <a asp-area="" asp-controller="Job" asp-action="Index">Job</a>
@@ -164,14 +164,14 @@
                     <!--  Main navigation  -->
 
                     <ul class="main-nav nav navbar-nav">
-                        <li>
-                            <a asp-controller="Question" asp-action="Index">Questions</a>
+                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Question" ? "active" : "")">
+                            <a asp-area="" asp-controller="Question" asp-action="Index">Questions</a>
                         </li>
                         <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Articles" ? "active" : "")">
                             <a asp-area="" asp-controller="Articles" asp-action="Index">Articles</a>
                         </li>
-                        <li>
-                            <a asp-area="" asp-controller="Job" asp-action="Index">Job</a>
+                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Job" ? "active" : "")">
+                            <a asp-area="" asp-controller="Job" asp-action="Index">Jobs</a>
                         </li>
                         <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "User" ? "active" : "")">
                             <a asp-area="" asp-controller="User" asp-action="Index">Users</a>
