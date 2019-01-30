@@ -135,6 +135,7 @@ namespace Tech_In.Controllers
                 userPersonal.LastName = vm.LastName;
                 userPersonal.IsDOBPublic = false;
                 userPersonal.DOB = vm.DOB;
+                userPersonal.CoverImage = "/images/s.png";
                 if (vm.Gender == 0)
                 {
                     userPersonal.Gender = Gender.Male;

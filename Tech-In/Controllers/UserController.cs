@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using SixLabors.ImageSharp;
 using Tech_In.Data;
 using Tech_In.Extensions;
 using Tech_In.Models;
@@ -121,7 +122,7 @@ namespace Tech_In.Controllers
                 }
             ).Take(10);
             PVM.UserPosts = wallPosts;
-            PVM.UserPersonalVM = _context.UserPersonalDetail.Where(m => m.UserId == user.Id).Select(x => new UserPersonalViewModel { FirstName = x.FirstName, LastName = x.LastName, Summary = x.Summary, ProfileImage = x.ProfileImage, DOB = x.DOB, UserPersonalDetailID = x.UserPersonalDetailId, Gender = x.Gender, CityName = x.City.CityName, CountryName = x.City.Country.CountryName }).SingleOrDefault();
+            PVM.UserPersonalVM = _context.UserPersonalDetail.Where(m => m.UserId == user.Id).Select(x => new UserPersonalViewModel { FirstName = x.FirstName, LastName = x.LastName, Summary = x.Summary,CoverImage = x.CoverImage, ProfileImage = x.ProfileImage, DOB = x.DOB, UserPersonalDetailID = x.UserPersonalDetailId, Gender = x.Gender, CityName = x.City.CityName, CountryName = x.City.Country.CountryName }).SingleOrDefault();
             PVM.UserName = username;
             PVM.UserPersonalVM.PhoneNo = user.PhoneNumber;
             PVM.UserPersonalVM.Email = user.Email;
@@ -506,6 +507,112 @@ namespace Tech_In.Controllers
                 _context.SaveChanges();
                 return Json(new { like = false, unlike = true });
             }
+        }
+
+        public async Task<IActionResult> UpdatePicturesSummary()
+        {
+            var currentUser = await OnGetSesstion();
+            var userPersonalDetails = _context.UserPersonalDetail.Where(x => x.UserId == currentUser).SingleOrDefault();
+            UserPicsVM userPics = new UserPicsVM
+            {
+                Id = userPersonalDetails.UserPersonalDetailId,
+                PPic = userPersonalDetails.ProfileImage,
+                Cpic = userPersonalDetails.CoverImage,
+                Summary = userPersonalDetails.Summary
+            };
+            return PartialView(userPics);
+        }
+        [HttpPost]
+        public async Task<IActionResult> UpdatePicturesSummaryP(UserPicsVM vm)
+        {
+            if (ModelState.IsValid)
+            {
+                var currentUser = await OnGetSesstion();
+                var userPersonalDetails = _context.UserPersonalDetail.Where(x => x.UserId == currentUser).FirstOrDefault();
+                if (vm.ProfileImage != null)
+                {
+                    var pfile = vm.ProfileImage;
+                    if ((pfile.Length / 1000) > 5000)
+                    {
+                        ModelState.AddModelError("ProfileImage", "Image can't exceed 5Mb size");
+                        return PartialView("UpdatePicturesSummaryP",vm);
+                    }
+                    string path = Path.Combine(_hostingEnvironment.WebRootPath, "images/users");
+                    string extension = Path.GetExtension(pfile.FileName).Substring(1);
+                    if (!(extension.ToLower() == "png" || extension.ToLower() == "jpg" || extension.ToLower() == "jpeg"))
+                    {
+                        ModelState.AddModelError("ProfileImage", "Only png, jpg & jpeg are allowed");
+                        return PartialView("UpdatePicturesSummaryP", vm);
+                    }
+                    string fileNam = currentUser.Substring(24) + DateTime.Now.ToString("ddMMyyhhmmsstt") + "p." + extension;
+                    using (var vs = new FileStream(Path.Combine(path, fileNam), FileMode.CreateNew))
+                    {
+                        await pfile.CopyToAsync(vs);
+                    }
+                    using (var img = SixLabors.ImageSharp.Image.Load(Path.Combine(path, fileNam)))
+                    {
+                        userPersonalDetails.ProfileImage = $"/images/users/{fileNam}";
+                    }
+                }
+                if(vm.CoverImage != null)
+                {
+                    var file = vm.CoverImage;
+                    string errorMsg = null;
+
+                    String[] orgfileName = file.FileName.Split('.');
+                    if (orgfileName[1].ToLower() != "jpg" && orgfileName[1].ToLower() != "jpeg" && orgfileName[1].ToLower() != "png")
+                    {
+                        errorMsg = "Only .jpg, .jpeg & .png are allowed";
+                        ModelState.AddModelError("CoverImage", errorMsg);
+                        return PartialView("UpdatePicturesSummaryP", vm);
+                    }
+
+                    string path = Path.Combine(_hostingEnvironment.WebRootPath, "images/users");
+                    var filename = orgfileName[0] + DateTime.Now.ToString("ddMMyyhhmmsstt") + "c." + orgfileName[1];
+                    using (var fs = new FileStream(Path.Combine(path, filename), FileMode.Create))
+                    {
+                        await file.CopyToAsync(fs);
+                    }
+                    using (var img = Image.Load(Path.Combine(path, filename)))
+                    {
+                        var srce = $"/images/users/{filename}";
+                        var exten = Path.GetExtension(filename).Substring(1);
+                        var siz = file.Length / 1000;
+                        if (img.Height > 400)
+                        {
+                            if (img.Width > 700)
+                            {
+                                if (siz < 5000)
+                                {
+                                    userPersonalDetails.CoverImage = srce;
+                                    //add to db
+                                    //return Json(new { success = true, response = vm });
+                                }
+                                else
+                                    errorMsg = "Image should be less than 10 MB";
+                            }
+                            else
+                                errorMsg = "Image Width should be greater than 700px";
+                        }
+                        else
+                            errorMsg = "Image height should be greater than 400px";
+
+                        if (errorMsg != null)
+                        {
+                            string fullPath = path + "/" + filename;
+                            if (System.IO.File.Exists(fullPath))
+                            {
+                                System.IO.File.Delete(fullPath);
+                            }
+                            ModelState.AddModelError("CoverImage", errorMsg);
+                            return PartialView("UpdatePicturesSummaryP", vm);
+                        }
+                    }
+                }
+                userPersonalDetails.Summary = vm.Summary;
+                _context.SaveChanges();
+            }
+            return Redirect("/u/" + HttpContext.Session.GetString("_UserName"));
         }
 
         //User Experience

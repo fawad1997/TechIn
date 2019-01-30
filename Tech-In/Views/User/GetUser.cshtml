@@ -14,18 +14,12 @@
         <div class="row">
             <div class="col-md-9">
                 <div>
-                    <img src="~/images/s.png" class="img-responsive profile-cover" />
+                    <img src="@Model.UserPersonalVM.CoverImage" class="img-responsive profile-cover" />
                 </div>
                 <!--Cover Div-->
                 <div class="profile-pic-align">
-                    @if (Model.UserPersonalVM.ProfileImage == null)
-                    {
-                        <img src="~/images/noimg.svg" class="img-responsive img-rounded profile-pic" />
-                    }
-                    else
-                    {
+                    
                         <img src="@Model.UserPersonalVM.ProfileImage" class="img-responsive img-rounded profile-pic profile-pic-align" />
-                    }
 
                 </div>
                 <!--/Profile Picture-->
@@ -33,7 +27,7 @@
                 {
                     <!--Edit-->
                     <div class="right-icon-div">
-                        <div class="round-icon-back">
+                        <div onclick="editPCS()" class="round-icon-back">
                             <i class="fa fa-pencil"></i>
                         </div>
                     </div>
@@ -358,34 +352,34 @@
                                 <!--/Education-->
                                 <!--Skills-->
                                 @*<div class="post">
-                                        <div class="row">
-                                            <div class="col-xs-12">
-                                                <h6 class="inline small-h">Skills</h6>
-                                                <br />
-                                                <!--Add-->
-                                                <div class="right-post-icon-div" data-toggle="modal" data-target="#skillModal">
-                                                    <div class="round-icon-back">
-                                                        <i class="fa fa-plus"></i>
-                                                    </div>
-                                                </div>
-                                                <!--/Add-->
-                                                <hr />
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <h6 class="inline small-h">Skills</h6>
+                                        <br />
+                                        <!--Add-->
+                                        <div class="right-post-icon-div" data-toggle="modal" data-target="#skillModal">
+                                            <div class="round-icon-back">
+                                                <i class="fa fa-plus"></i>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-xs-12 margin-both-lr">
-                                                    <div class="widget-tags">
-                                                        <a href="#">Java</a>
-                                                        <a href="#">Php</a>
-                                                        <a href="#">Web Development</a>
-                                                        <a href="#">Web Designing</a>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
-
                                         </div>
-                                    </div>*@
+                                        <!--/Add-->
+                                        <hr />
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-12 margin-both-lr">
+                                            <div class="widget-tags">
+                                                <a href="#">Java</a>
+                                                <a href="#">Php</a>
+                                                <a href="#">Web Development</a>
+                                                <a href="#">Web Designing</a>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+                            </div>*@
                                 <!--/Skills-->
                                 <!--Certification-->
                                 <div class="post">
@@ -1104,7 +1098,22 @@
                 </div>
 
             </div>
+            @* Edit Profile Pictures Modal Show *@
+            <div class="modal fade" id="myPCS">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Profile Summary</h3>
+                        </div>
+                        <div class="modal-body" id="viewPCSBody">
 
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* / Edit Profile Pictures Modal Show *@
 
             @* Edit PersonalDetails Modal Show *@
             <div class="modal fade" id="myPD">
@@ -1571,7 +1580,15 @@
             $("#myPD").modal("show");
 
         })
+    }
 
+    var editPCS = function () {
+
+        var url = "/User/UpdatePicturesSummary";
+        $("#viewPCSBody").load(url, function () {
+            $("#myPCS").modal("show");
+
+        })
     }
     //Add and Edit Experience Modal Show Function
     var AddEditExp = function (id) {
