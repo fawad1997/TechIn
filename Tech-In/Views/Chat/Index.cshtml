@@ -5,6 +5,12 @@
 
 <head>
     <title>pChat &mdash; Private Chatroom</title>
+    <style>
+        .backblue {
+            background-color: #6195FF;
+            color:white;
+        }
+    </style>
 </head>
 
 <!-- / Navigation Bar -->
@@ -25,8 +31,8 @@
                                 <ul id="contacts" class="list-group">
                                     @foreach (var user in @ViewBag.allUsers)
                                     {
-                                        <li>
-                                            <button class="user__item" data-contact-id="@user.UserID" data-contact-name="@user.FirstName">
+                                        <li class="list-group">
+                                            <button class="user__item list-group-item" data-contact-id="@user.UserID" data-contact-name="@user.FirstName">
                                                 <div class="avatar">
                                                 </div>
                                                 <span>@user.FirstName @user.LastName</span>
@@ -46,7 +52,7 @@
 
             <div class="col-xs-12 col-md-9 chat__body">
                 <div class="row">
-                    <div class="col-xs-12">
+                    <div class="col-xs-12" style="border:1px solid grey;border-radius:5px; padding:5px;overflow-y: auto;height: 400px;">
                         <ul class="list-group" id="chat"></ul>
                     </div>
 
@@ -85,14 +91,18 @@
 
             $('#sendMessage').click(function () {
                 var message = $('#msg_box').val();
-                        $.ajax({
-                            type: "GET",
-                            url: "/chat/SendMessage",
-                            data: { recieverId: recieverId, message: message },
-                            success: function (data) {
-                                SetChat(data);
-                            }
-                });
+                if (message == null || message == "" || message.length == 0 || recieverId.length == 0) {
+                    return;
+                } else {
+                    $.ajax({
+                        type: "GET",
+                        url: "/chat/SendMessage",
+                        data: { recieverId: recieverId, message: message },
+                        success: function (data) {
+                            SetChat(data);
+                        }
+                    });
+                }
                 $('#msg_box').val("");
                     });
         });
@@ -101,7 +111,7 @@
             var _html = "";
             var _this = $('#chat');
             $.each(data, function (index, chat) {
-                _html += "<li class='list-group-item'>" + (chat.senderId == recieverId ? "<div class='pull-left'>" : "<div class='pull-right'>") + chat.message + "</div><div class='clearfix'></li>";
+                _html += (chat.senderId == recieverId ? "<li class='list-group-item'>" : "<li class='list-group-item backblue'>") + (chat.senderId == recieverId ? "<div class='pull-left'>" : "<div class='pull-right'>") + chat.message + "</div><div class='clearfix'></li>";
             });
             _this.append(_html);
         }
