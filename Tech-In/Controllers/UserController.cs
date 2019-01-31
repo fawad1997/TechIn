@@ -108,6 +108,7 @@ namespace Tech_In.Controllers
                              orderby pst.OriginalId descending
                 select new UserPostVM
                 {
+                    UserId = pst.UserId,
                     ProfilePic = u.ProfileImage,
                     Name = u.FirstName+" "+u.LastName,
                     UserName = us.UserName,
@@ -1288,6 +1289,7 @@ namespace Tech_In.Controllers
             @ViewBag.UName = HttpContext.Session.GetString(SessionKeyName);
             @ViewBag.UserName = HttpContext.Session.GetString(SessionUserName);
             @ViewBag.UserPic = HttpContext.Session.GetString(SessionKeyPic);
+            @ViewBag.UserID = HttpContext.Session.GetString(SessionKeyId);
             return HttpContext.Session.GetString(SessionKeyId);
         }
 
