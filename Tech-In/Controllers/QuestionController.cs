@@ -36,10 +36,10 @@ namespace Tech_In.Controllers
             ViewData["CurrentFilter"] = searchString;
 
             //Check User Profile is complete or not 
-            var user = await _userManager.GetCurrentUser(HttpContext);
+            var user = await OnGetSesstion();
             if(user != null)
             {
-                var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
+                var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user).SingleOrDefault();
                 if (userPersonalRow == null)
                 {
                     return RedirectToAction("CompleteProfile", "Home");
@@ -70,52 +70,16 @@ namespace Tech_In.Controllers
                                 || s.Title.Contains(searchString));
 
             }
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
             int pageSize = 5;
             return View(new QuestionListVM { Questions = await PaginatedList<NewQuestionVM>.CreateAsync(questionList.AsQueryable(), page ?? 1, pageSize) });
           
         }
 
-
-        //public async Task<IActionResult> Index()
-        //{
-           
-          
-        //    //Check User Profile is complete or not
-        //    var user = await _userManager.GetCurrentUser(HttpContext);
-        //    var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
-        //    var questionList = _context.UserQuestion
-        //            .Select(c => new NewQuestionVM
-        //            {
-        //                UserQuestionId = c.UserQuestionId,
-        //                Title = c.Title,
-        //                PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.FirstName).SingleOrDefault(),
-        //                UserPic = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.ProfileImage).SingleOrDefault(),
-        //                PostTime = c.PostTime,
-        //                HasVerifiedAns = c.HasVerifiedAns,
-        //                Visitors= _context.QuestionVisitor.Where(f=> f.QuestionId==c.UserQuestionId).Count(),
-        //                Tags = c.Tag.Select(t => new QuestionTagViewModel
-        //                {
-        //                    SkillName = t.SkillTag.SkillName
-        //                }).ToList(),
-        //                Voting = c.UserQAVoting.Sum(x => x.Value)
-
-        //            }).ToList();
-
-            
-        //    if (userPersonalRow == null)
-        //    {
-        //        return RedirectToAction("CompleteProfile", "Home");
-        //    }
-
-        //    @ViewBag.UName = HttpContext.Session.GetString("Name");
-        //    return View(questionList);
-        //}
+        
         public async Task<IActionResult> QuestionDetail(int id)
         {
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
             ViewBag.QuestionId = id;
-            var user = await _userManager.GetCurrentUser(HttpContext);
+            var user = await OnGetSesstion();
             var QuestionList = _context.UserQuestion.Where(x => x.UserQuestionId == id)
                      .Select(c => new NewQuestionVM
                      {
@@ -159,19 +123,19 @@ namespace Tech_In.Controllers
             {
                 if (user != null)
                 {
-                    var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
+                    var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user).SingleOrDefault();
                     if (userPersonalRow == null)
                     {
                         return RedirectToAction("CompleteProfile", "Home");
                     }
                     //If Registered Visitor Counter
-                    QuestionVisitor isVisited = _context.QuestionVisitor.Where(qv => qv.UserId == user.Id && qv.QuestionId == id).SingleOrDefault();
+                    QuestionVisitor isVisited = _context.QuestionVisitor.Where(qv => qv.UserId == user && qv.QuestionId == id).SingleOrDefault();
                     if (isVisited == null)
                     {
                         _context.QuestionVisitor.Add(new QuestionVisitor
                         {
                             QuestionId = id,
-                            UserId = user.Id,
+                            UserId = user,
                             IsLoggedIn = true,
                             UserIp = null
                         });
@@ -179,7 +143,7 @@ namespace Tech_In.Controllers
                     }
                     if (!QuestionList.HasVerifiedAns)
                     {
-                        var isUserPostedQuestion = _context.UserQuestion.Where(a => a.UserId == user.Id && a.UserQuestionId == id).SingleOrDefault();
+                        var isUserPostedQuestion = _context.UserQuestion.Where(a => a.UserId == user && a.UserQuestionId == id).SingleOrDefault();
                         if (isUserPostedQuestion != null)
                         {
                             ViewBag.ShowTick = true;
@@ -261,13 +225,12 @@ namespace Tech_In.Controllers
         public async Task<IActionResult> New()
         {
             //Check User Profile is complete or not
-            var user = await _userManager.GetCurrentUser(HttpContext);
-            var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
+            var user = await OnGetSesstion();
+            var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user).SingleOrDefault();
             if (userPersonalRow == null)
             {
                 return RedirectToAction("CompleteProfile", "Home");
             }
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
             return View();
 
         }
@@ -276,15 +239,14 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> PostQuestion(NewQuestionVM vm,string tags)
         {
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
             if (ModelState.IsValid)
             {
-                var user = await _userManager.GetCurrentUser(HttpContext); 
+                var user = await OnGetSesstion(); 
                 UserQuestion userQuestion = new UserQuestion();
                 userQuestion.Title = vm.Title;
                 userQuestion.PostTime = DateTime.Now;
                 userQuestion.Description = HttpUtility.HtmlEncode(vm.Description);
-                userQuestion.UserId = user.Id;
+                userQuestion.UserId = user;
                 _context.UserQuestion.Add(userQuestion);
                 _context.SaveChanges();
                 string[] tagArray = tags.Split(',');
@@ -298,7 +260,7 @@ namespace Tech_In.Controllers
                             ApprovedStatus = false,
                             SkillName = tag.ToLower(),
                             TimeApproved = DateTime.Now,
-                            UserId = user.Id
+                            UserId = user
                         };
                         _context.SkillTag.Add(sktag);
                         _context.SaveChanges();
@@ -328,26 +290,18 @@ namespace Tech_In.Controllers
 
             return View("New", vm);
         }
-        //public async Task<IActionResult> ViewQuestion()
-        //{
-        //    @ViewBag.UName = HttpContext.Session.GetString("Name");
-        //    var user = await _userManager.GetCurrentUser(HttpContext);
-        //    List<NewQuestionVM> QuestionList = _context.UserQuestion.Where(x => x.UserId == user.Id).Select(c => new NewQuestionVM { Title = c.Title, Description = c.Description }).ToList();
-        //    ViewBag.QuestionList = QuestionList;
-        //    return View("Detail");
-        //}
+
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> PostAnswer(CommonViewModel vm)
         {
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
             if (ModelState.IsValid)
             {
-                var user = await _userManager.GetCurrentUser(HttpContext);
+                var user = await OnGetSesstion();
                 UserQAnswer userQAnswer = new UserQAnswer();
                 userQAnswer.Description = HttpUtility.HtmlEncode(vm.QAnswerViewModel.Description);
                 userQAnswer.PostTime = DateTime.UtcNow;
-                userQAnswer.UserId = user.Id;
+                userQAnswer.UserId = user;
                 userQAnswer.UserQuestionId = vm.QAnswerViewModel.QuestionId;
                 _context.UserQAnswer.Add(userQAnswer);
                 _context.SaveChanges();
@@ -359,11 +313,11 @@ namespace Tech_In.Controllers
         [Authorize]
         public async Task<IActionResult> UpVote(int id,Boolean isQuestion,int ans)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
+            var user = await OnGetSesstion();
             if (isQuestion)
             {
-                var isAlreadyVoted = _context.UserQAVoting.FirstOrDefault(x => x.UserQuestionId == id && x.UserId == user.Id);
-                var isVotingOwnQuestion = _context.UserQuestion.FirstOrDefault(x => x.UserQuestionId == id && x.UserId == user.Id);
+                var isAlreadyVoted = _context.UserQAVoting.FirstOrDefault(x => x.UserQuestionId == id && x.UserId == user);
+                var isVotingOwnQuestion = _context.UserQuestion.FirstOrDefault(x => x.UserQuestionId == id && x.UserId == user);
                 if(isVotingOwnQuestion != null)
                 {
                     TempData["Msg"] = "You can't vote your own question!";
@@ -379,7 +333,7 @@ namespace Tech_In.Controllers
                         UserQuestionId = question.UserQuestionId,
                         UserAnswerId = null,
                         Visibility = true,
-                        UserId = user.Id
+                        UserId = user
                     });
                     TempData["Msg"] = "Thank you for your feedback!";
                     TempData["Color"] = "success";
@@ -392,8 +346,8 @@ namespace Tech_In.Controllers
             }
             else
             {//If Answer
-                var isAlreadyVoted = _context.UserQAVoting.FirstOrDefault(x => x.UserAnswerId == ans && x.UserId == user.Id);
-                var isVotingOwnAnswer = _context.UserQAnswer.FirstOrDefault(x => x.UserQAnswerId == ans && x.UserId == user.Id);
+                var isAlreadyVoted = _context.UserQAVoting.FirstOrDefault(x => x.UserAnswerId == ans && x.UserId == user);
+                var isVotingOwnAnswer = _context.UserQAnswer.FirstOrDefault(x => x.UserQAnswerId == ans && x.UserId == user);
                 if (isVotingOwnAnswer != null)
                 {
                     TempData["Msg"] = "You can't vote your own answer!";
@@ -409,7 +363,7 @@ namespace Tech_In.Controllers
                         UserQuestionId = null,
                         UserAnswerId = answer.UserQAnswerId,
                         Visibility = true,
-                        UserId = user.Id
+                        UserId = user
                     });
                     TempData["Msg"] = "Thank you for your feedback!";
                     TempData["Color"] = "success";
@@ -426,11 +380,11 @@ namespace Tech_In.Controllers
         [Authorize]
         public async Task<IActionResult> DownVote(int id, Boolean isQuestion, int ans)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
+            var user = await OnGetSesstion();
             if (isQuestion)
             {
-                var isAlreadyVoted = _context.UserQAVoting.FirstOrDefault(x => x.UserQuestionId == id && x.UserId == user.Id);
-                var isVotingOwnQuestion = _context.UserQuestion.FirstOrDefault(x => x.UserQuestionId == id && x.UserId == user.Id);
+                var isAlreadyVoted = _context.UserQAVoting.FirstOrDefault(x => x.UserQuestionId == id && x.UserId == user);
+                var isVotingOwnQuestion = _context.UserQuestion.FirstOrDefault(x => x.UserQuestionId == id && x.UserId == user);
                 if (isVotingOwnQuestion != null)
                 {
                     TempData["Msg"] = "You can't vote your own question!";
@@ -446,7 +400,7 @@ namespace Tech_In.Controllers
                         UserQuestionId = question.UserQuestionId,
                         UserAnswerId = null,
                         Visibility = true,
-                        UserId = user.Id
+                        UserId = user
                     });
                     TempData["Msg"] = "Thank you for your feedback!";
                     TempData["Color"] = "success";
@@ -459,8 +413,8 @@ namespace Tech_In.Controllers
             }
             else
             {//If Answer
-                var isAlreadyVoted = _context.UserQAVoting.FirstOrDefault(x => x.UserAnswerId == ans && x.UserId == user.Id);
-                var isVotingOwnAnswer = _context.UserQAnswer.FirstOrDefault(x => x.UserQAnswerId == ans && x.UserId == user.Id);
+                var isAlreadyVoted = _context.UserQAVoting.FirstOrDefault(x => x.UserAnswerId == ans && x.UserId == user);
+                var isVotingOwnAnswer = _context.UserQAnswer.FirstOrDefault(x => x.UserQAnswerId == ans && x.UserId == user);
                 if (isVotingOwnAnswer != null)
                 {
                     TempData["Msg"] = "You can't vote your own answer!";
@@ -476,7 +430,7 @@ namespace Tech_In.Controllers
                         UserQuestionId = null,
                         UserAnswerId = answer.UserQAnswerId,
                         Visibility = true,
-                        UserId = user.Id
+                        UserId = user
                     });
                     TempData["Msg"] = "Thank you for your feedback!";
                     TempData["Color"] = "success";
@@ -498,10 +452,10 @@ namespace Tech_In.Controllers
 
             if (ModelState.IsValid)
             {
-                var user = await _userManager.GetCurrentUser(HttpContext);
+                var user = await OnGetSesstion();
                 UserQAComment userQAComment = new UserQAComment();
                 userQAComment.Description = vm.QACommentsViewModel.Description;
-                userQAComment.UserId = user.Id;
+                userQAComment.UserId = user;
                 userQAComment.UserQACommentID = vm.QACommentsViewModel.UserQACommentID;
                 userQAComment.UserQuestionId = vm.QACommentsViewModel.UserQuestionId;
                 userQAComment.UserQAnswerId = vm.QACommentsViewModel.UserQAnswerId;
@@ -516,8 +470,8 @@ namespace Tech_In.Controllers
         [Authorize]
         public async Task<IActionResult> VerifyAnswer(int ansId,int questionId)
         {
-            var user = await _userManager.GetCurrentUser(HttpContext);
-            UserQuestion question= _context.UserQuestion.Where(x => x.UserQuestionId == questionId && x.UserId == user.Id).SingleOrDefault();
+            var user = await OnGetSesstion();
+            UserQuestion question= _context.UserQuestion.Where(x => x.UserQuestionId == questionId && x.UserId == user).SingleOrDefault();
             UserQAnswer answer = _context.UserQAnswer.Where(y => y.UserQAnswerId == ansId).SingleOrDefault();
             if(question!=null && answer != null)
             {
@@ -568,10 +522,26 @@ namespace Tech_In.Controllers
             return View("Index", new QuestionListVM { Questions = await PaginatedList<NewQuestionVM>.CreateAsync(questiontag.AsQueryable(), page ?? 1, pageSize) });
         }
 
-
-
-
-
-
+        public async Task<string> OnGetSesstion()
+        {
+            const string SessionKeyName = "_Name";
+            const string SessionKeyPic = "_PPic";
+            const string SessionKeyId = "_Id";
+            const string SessionUserName = "_UserName";
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString(SessionKeyName)))
+            {
+                var user = await _userManager.GetCurrentUser(HttpContext);
+                if (user == null)
+                    return null;
+                HttpContext.Session.SetString(SessionKeyName, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.FirstName).FirstOrDefault());
+                HttpContext.Session.SetString(SessionKeyPic, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.ProfileImage).FirstOrDefault());
+                HttpContext.Session.SetString(SessionKeyId, user.Id);
+                HttpContext.Session.SetString(SessionUserName, user.UserName);
+            }
+            @ViewBag.UName = HttpContext.Session.GetString(SessionKeyName);
+            @ViewBag.UserName = HttpContext.Session.GetString(SessionUserName);
+            @ViewBag.UserPic = HttpContext.Session.GetString(SessionKeyPic);
+            return HttpContext.Session.GetString(SessionKeyId);
+        }
     }
 }

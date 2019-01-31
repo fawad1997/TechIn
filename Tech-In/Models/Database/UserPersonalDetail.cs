@@ -19,7 +19,7 @@ namespace Tech_In.Models.Model
         [StringLength(100, MinimumLength = 2)]
         public string LastName { get; set; }
         
-        [StringLength(maximumLength:300,MinimumLength =50)]
+        [StringLength(maximumLength:300,MinimumLength =20)]
         public string Summary { get; set; }
         
         public string ProfileImage { get; set; }

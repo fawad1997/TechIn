@@ -107,7 +107,7 @@
                             <div class="form-group">
                                 <label class="control-label">Username<strong class="text-danger"> *</strong></label>
                                 <input asp-for="UserName" placeholder="e.g. fawad1997" class="input" />
-                                <span asp-validation-for="UserName" class="text-danger"></span>
+                                <span id="UserNamee" asp-validation-for="UserName" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
@@ -151,7 +151,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <center><button type="submit" class="main-btn blue-g-btn">Save & Continue</button></center>
+                        <center><button id="saveandcont" type="submit" class="main-btn blue-g-btn">Save & Continue</button></center>
                     </div>
                 </form>
             </div>
@@ -286,20 +286,28 @@
     <script>
 
         $(document).ready(function () {
-
+            //document.getElementById("myBtn").disabled = true; 
+            $("#saveandcont").attr('disabled', 'disabled');
             $("#UserName").change(function () {
                 var username = $(this).val();
 
-                //$.ajax({
-                //    type: "POST",
-                //    url: "/User/CheckUserName?Username=" + username,
-                //    contentType: "html",
-                //    success: function (response) {
-                //        alert("SUccess");
-
-                //    }
-                //})
-                alert("The text has been changed." + username);
+                $.ajax({
+                    type: "POST",
+                    url: "/User/CheckUserName?userName=" + username,
+                    contentType: "html",
+                    success: function (response) {
+                        if (response.success) {
+                            $("#saveandcont").removeAttr('disabled', 'disabled');
+                            $('#UserNamee').removeClass('text-danger');
+                            $("#UserNamee").text("Perfect!");
+                        } else {
+                            $("#saveandcont").attr('disabled', 'disabled');
+                            $('#UserNamee').addClass('text-danger');
+                            $("#UserNamee").text("Sorry,This Username is already taken!");
+                        }
+                    }
+                })
+                //alert("The text has been changed." + username);
             }); 
 
             $('#validateForm').bootstrapValidator({
@@ -338,7 +346,22 @@
                             }
                         }
                     },
-                    DOB: {
+                    UserName: {
+                        validators: {
+                            stringLength: {
+                                min: 2,
+                                max: 20,
+                                message: 'Username can contain minimum 2 and maximum 20 letters'
+                            },
+                            regexp: {
+                                regexp: /^[a-zA-Z][a-zA-Z0-9_]*$/i,
+                                message: 'UserName can be alphanumeric only'
+                            },
+                            notEmpty: {
+                                message: 'Please Enter your UserName'
+                            }
+                        }
+                    },DOB: {
                         validators: {
                             notEmpty: {
                                 message: 'Date of Birth is required'

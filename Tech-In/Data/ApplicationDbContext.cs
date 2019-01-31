@@ -22,6 +22,9 @@ namespace Tech_In.Data
         }
         public DbSet<Country> Country { get; set; }
         public DbSet<City> City { get; set; }
+        public DbSet<UserPost> UserPost { get; set; }
+        public DbSet<PostLikes> PostLikes { get; set; }
+        public DbSet<PostComments> PostComments { get; set; }
         public DbSet<UserPersonalDetail> UserPersonalDetail { get; set; }
         public DbSet<UserExperience> UserExperience { get; set; }
         public DbSet<UserEducation> UserEducation { get; set; }
@@ -31,6 +34,7 @@ namespace Tech_In.Data
         public DbSet<UserPublication> UserPublication { get; set; }
         public DbSet<UserAcheivement> UserAcheivement { get; set; }
         public DbSet<SkillTag> SkillTag { get; set; }
+        public DbSet<UserNetwork> UserNetwork { get; set; }
 
         //Questions Module
         public DbSet<UserQAComment> UserQAComment { get; set; }
@@ -58,6 +62,8 @@ namespace Tech_In.Data
         public DbSet<Tech_In.Models.Database.JobSkill> JobSkill { get; set; }
         public DbSet<Tech_In.Models.Database.SavedJob> SavedJob { get; set; }
                
+
+        public DbSet<Conversation> Conversation { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

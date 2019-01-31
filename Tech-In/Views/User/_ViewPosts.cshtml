@@ -1,0 +1,180 @@
+﻿@model Tech_In.Models.ViewModels.ProfileViewModels.UserPostVM
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<style>
+.blue-color {
+    color: #6195FF !important;
+}
+</style>
+<div class="post text">
+    <div class="row">
+        <div class="col-xs-2 col-md-1">
+            <img src="@Model.ProfilePic" class="post-img img-circle" />
+        </div>
+        <div class="col-xs-10 col-md-11">
+            <h6 class="inline small-h"><a style="color:black;" href="/u/@Model.UserName"> @Model.Name</a></h6>
+            <br />
+            <!--Edit--> 
+            <div class="right-post-icon-div">
+                <a href="/User/DeletePost/@Model.UserPostId">
+                    <div class="round-icon-back">
+                        <i class="fa fa-trash"></i>
+                    </div>
+                </a>
+            </div>
+
+            <!--/Edit-->
+            <p class="inline twelve-font">@Model.GetPastTime()</p>
+        </div>
+        <div class="col-xs-12">
+            <hr />
+            <div class="row container">
+                <p class="black">
+                    @Model.Summary
+                </p>
+                @if (Model.Image != null)
+                {
+                    <img src="@Model.Image" style="height:400px !important;" />
+                }
+            </div>
+            @if (Model.TotalLikes != 0)
+            {
+                string plikes = "totallikes" + Model.UserPostId;
+                string plikesmodal = "likesmodal" + Model.UserPostId;
+                <button onclick="checklikes('@Model.UserPostId')" class="btn-link" style="color: gray;text-decoration: none;">@Model.TotalLikes Likes</button>
+
+                <!-- Modal -->
+                <div class="modal fade bs-example-modal-md" id="@plikesmodal" role="dialog">
+                    <div class="modal-dialog modal-md">
+
+                        <!-- Modal content-->
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Liked By</h4>
+                            </div>
+                            <div id="@plikes" class="modal-body">
+                                <br /><br /><br />
+                                <div class="cent" id="loaderDivv" style="display:block; height:50px; width:50px;">
+                                    <img src="~/images/load.gif" />
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            }
+            @if (Model.TotalComments != 0)
+            {
+                <button class="btn-link" style="color: gray;text-decoration: none;">@Model.TotalComments Comments</button>
+            }
+            <hr />
+            @{ string lik = "like" + @Model.UserPostId;}
+            <button id="@lik" onclick="likeclick('@Model.UserPostId')" class="transparent-btn">
+                @if (Model.IsLiked)
+                {
+                    <span class="blue-color"><i class='fa fa-thumbs-up'></i> Liked</span>
+                }
+                else
+                {
+                    <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+                    <span>Like</span>
+                }
+            </button>
+            @{ string cmtid = "cmtbtn" + Model.UserPostId;
+                string cmtsec = "seccmt" + Model.UserPostId;
+            }
+            <button id="@cmtid" onclick="cmtload('@Model.UserPostId')" class="transparent-btn">
+                <i class="fa fa-comment-o" aria-hidden="true"></i>
+                Comment
+            </button>
+            <div style="display:none;" id="@cmtsec">
+                <div class="row">
+                    <hr />
+                    <div class="col-xs-2 col-md-1">
+                        <img src="@Model.ProfilePic" class="post-img img-circle" />
+                    </div>
+                    <div class="col-xs-10 col-md-11">
+                        @{ string chatid = "chatbtn" + Model.UserPostId;
+                            string chatmsg = "chatmsg" + Model.UserPostId;
+                        }
+                        <input id="@chatmsg" type="text" placeholder="Add comment!" onkeypress="return AddKeyPress(event,'@Model.UserPostId' );" />
+                    </div>
+                    <br />
+                    <div id="@chatid">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script language="javascript">
+
+    var cmtload = function (id) {
+        var cmtsec = "#seccmt" + id;
+        $(cmtsec).css('display', 'block');
+        var textid = "#chatbtn" + id;
+        $(textid).load("/user/LoadUserComments",
+            { Id: id });
+    };
+
+    function AddKeyPress(e,id) {
+        // look for window.event in case event isn't passed in
+        e = e || window.event;
+        if (e.keyCode == 13) {
+            var textid = "#chatbtn" + id;
+            var txtmssg = "#chatmsg" + id;
+            var txt = $(txtmssg).val();
+            $.ajax({
+                method: 'post',
+                url: '/user/addpostcomment',
+                data: {
+                    Id: id,
+                    Msg: txt
+                },
+                success: function (res) {
+                    if (res.success) {
+                        $(textid).load("/user/LoadUserComments",
+                            { Id: id });
+                    }
+                }
+            });
+            //alert(id + ' ' + txt);
+            return false;
+        }
+        return true;
+    }
+    var checklikes = function (id) {
+        var emtId = "#totallikes" + id;
+        var empmodal = "#likesmodal" + id;
+        $(emtId).load("/user/viewlikes",
+            { Id: id });
+        $(empmodal).modal("show");
+    }
+
+    var likeclick = function (id) {
+        console.log("hello");
+        var l = "#like" + id;
+        $.ajax({
+            method: 'post',
+            url: '/user/togglelike',
+            data: {
+                Id: id
+            },
+            success: function (res) {
+                if (res.like) {
+                    $(l).addClass("blue-color");
+                    $(l).text("");
+                    $(l).append("<i class='fa fa-thumbs-up'></i> Liked");
+                } else if (res.unlike) {
+                    $(l).removeClass("blue-color");
+                    $(l).text("");
+                    $(l).append("<i class='fa fa-thumbs-o-up' aria-hidden='true'></i> Like");
+                }
+            }
+        });
+    }
+</script>

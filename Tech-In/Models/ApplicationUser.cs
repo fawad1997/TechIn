@@ -24,5 +24,7 @@ namespace Tech_In.Models
         public virtual ICollection<UserQAnswer> UserQAnswers { get; set; }
         public virtual ICollection<UserQAVoting> UserQAVotings { get; set; }
         public virtual ICollection<UserQAComment> UserQAComments { get; set; }
+
+        public virtual ICollection<Conversation> Conversations { get; set; }
     }
 }

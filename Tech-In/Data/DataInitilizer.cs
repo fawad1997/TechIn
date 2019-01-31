@@ -60,31 +60,45 @@ namespace Tech_In.Models.Database
                 return;
             var categories = new Category[]
             {
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Algorithms"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Analytics"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Architecture software"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Artificial Intelligence"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Big Data"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Business Relationship Management"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Communication Tools"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Configuration Management"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Cost Control Software"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Databases"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Data Analysis"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Data Mining"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Enterprise Resourse Planning"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Internet of Things"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Information Security"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Information Visualization"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Legacy Systems"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="POS Systems"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Project Management"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Risk Management"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Scientific Computing"},
-                new Category {ActiveStatus=true,AddedBy="70234f03-9050-4345-a09b-65cbf3babaac",Title="Virtual Reality"}
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Algorithms"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Analytics"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Architecture software"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Artificial Intelligence"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Big Data"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Business Relationship Management"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Communication Tools"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Configuration Management"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Cost Control Software"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Databases"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Data Analysis"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Data Mining"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Enterprise Resourse Planning"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Internet of Things"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Information Security"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Information Visualization"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Legacy Systems"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="POS Systems"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Project Management"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Risk Management"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Scientific Computing"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Virtual Reality"},
+                new Category {ActiveStatus=true,AddedBy="19d58371-1426-48ee-a300-b22a3613ef0b",Title="Other"}
             }.ToList();
             foreach (Category cat in categories)
                 context.Category.Add(cat);
+            context.SaveChanges();
+
+            Article article = new Article
+            {
+                ArticleBody = "<p>You can easily publish articles on TechIn. Go to the articles nav, click on new article, Write, <strong>Title</strong>, Upload an Cover Imgae of article of minimum height <strong>400px</strong> and minimun width <strong>700px.</strong> Select an category from dropdown list and write description, in the tags section you can select maximum 5 tags.</p>",
+                ArticleImg = "/images/article/articlecover290119114822AM.png",
+                CreateTime = DateTime.Now,
+                Status = "active",
+                OriginalId = 1,
+                Title = "Publish Articles on TechIn",
+                UserId = "19d58371-1426-48ee-a300-b22a3613ef0b"
+            };
+            context.Article.Add(article);
             context.SaveChanges();
         }
     }

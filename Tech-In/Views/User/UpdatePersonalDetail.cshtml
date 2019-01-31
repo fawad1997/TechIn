@@ -2,7 +2,7 @@
 
 <script src="~/lib/jquery-validation/dist/additional-methods.js"></script>
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
-<form id="PDForm">
+<form id="PDForm" method="post" asp-action="UpdatePersonalDetails" asp-controller="User">
     @Html.HiddenFor(m => m.UserPersonalDetailID)
     <div class="row">
         <div class="col-sm-6">
@@ -84,7 +84,7 @@
     </div>
 
     <div class="form-group">
-        <button id="PDSubmit" type="button" class="main-btn btn-block">
+        <button id="PDSubmit" type="submit" class="main-btn btn-block">
             Update
         </button>
     </div>
@@ -170,30 +170,24 @@
         $("#PDSubmit").click(function () {
             var validator = $('#PDForm').data('bootstrapValidator');
             validator.validate();
-           // $('#PDForm').bootstrapValidator('validate');
-            if (validator.isValid()) {
-                $("#loaderDiv").show();
-                var pDFormData = $("#PDForm").serialize();
+             $('#PDForm').bootstrapValidator('validate');
+             if (validator.isValid()) {
+            $("#loaderDiv").show();
+            var pDFormData = $("#PDForm").serialize();
+            console.log(pDFormData);
 
-                $.ajax({
-                    type: "POST",
-                    url: "/User/UpdatePersonalDetails",
-                    data: pDFormData,
-                    success: function (result) {
-                        if (result.success) {
-                            $("#loaderDiv").hide();
-                            $("#myPD").modal("hide");
-                            window.location.href = "/User/Index";
-                        } else {
-                            $("#loaderDiv").hide();
-                            $('#PDForm').html(result);
+            $.ajax({
+                type: "POST",
+                url: "/User/updatepersonaldetails",
+                data: pDFormData,
+                success: function (response) {
 
-                        }
-                    }
-                })
+                }
+            })
+
             }//If IsValid
-            
-        })//PDSubmit Button Ends
+
+        });//PDSubmit Button Ends
 
 
         //For DIsplaying Cities List

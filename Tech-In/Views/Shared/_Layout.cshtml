@@ -32,7 +32,7 @@
 
     <!-- Custom stlylesheet -->
     <link type="text/css" rel="stylesheet" href="~/css/style.css" />
-
+    <link href="~/css/chat.css" rel="stylesheet" />
     <script src="~/lib/jquery/dist/jquery.js"></script>
     <!-- Tagify -->
     <link href="~/css/tagify.css" rel="stylesheet" />
@@ -82,17 +82,27 @@
                         <!--  Main navigation  -->
 
                         <ul class="main-nav nav navbar-nav">
-                            <li>
-                                <a asp-controller="Question" asp-action="Index">Questions</a>
+                            <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Question" ? "active" : "")">
+                                <a asp-area="" asp-controller="Question" asp-action="Index">Questions</a>
                             </li>
-                            <li>
-                                <a asp-area="" asp-controller="Articles" asp-action="Index">Articles</a>
+                            <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Article" ? "active" : "")">
+                                <a asp-area="" asp-controller="Article" asp-action="Index">Articles</a>
                             </li>
                             <li>
                                 <a asp-area="" asp-controller="Job" asp-action="Index">Job</a>
                             </li>
                             <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "User" ? "active" : "")">
                                 <a asp-area="" asp-controller="User" asp-action="Index">Users</a>
+                            </li>
+                            <li>
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <a asp-area="" asp-controller="Admin" asp-action="Index">Admin Page</a>
+                                    }
+                                }
+
                             </li>
                         </ul>
 
@@ -154,14 +164,14 @@
                     <!--  Main navigation  -->
 
                     <ul class="main-nav nav navbar-nav">
-                        <li>
-                            <a asp-controller="Question" asp-action="Index">Questions</a>
+                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Question" ? "active" : "")">
+                            <a asp-area="" asp-controller="Question" asp-action="Index">Questions</a>
                         </li>
                         <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Articles" ? "active" : "")">
                             <a asp-area="" asp-controller="Articles" asp-action="Index">Articles</a>
                         </li>
-                        <li>
-                            <a asp-area="" asp-controller="Job" asp-action="Index">Job</a>
+                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Job" ? "active" : "")">
+                            <a asp-area="" asp-controller="Job" asp-action="Index">Jobs</a>
                         </li>
                         <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "User" ? "active" : "")">
                             <a asp-area="" asp-controller="User" asp-action="Index">Users</a>
@@ -193,22 +203,22 @@
                             <strong>Features</strong>
                         </li>
                         <li>
-                            <a class="footer-li-a">
+                            <a class="footer-li-a" href="/Question">
                                 Questions
                             </a>
                         </li>
                         <li>
-                            <a class="footer-li-a">
+                            <a class="footer-li-a" href="/Articles">
                                 Articles
                             </a>
                         </li>
                         <li>
-                            <a class="footer-li-a">
+                            <a class="footer-li-a" href="/Job">
                                 Jobs
                             </a>
                         </li>
                         <li>
-                            <a class="footer-li-a">
+                            <a class="footer-li-a" href="/User">
                                 Network
                             </a>
                         </li>
@@ -220,17 +230,17 @@
                             <strong>Platform</strong>
                         </li>
                         <li>
-                            <a href="https://www.freeprivacypolicy.com/privacy/view/49a0408a29576cddd9cbe0d16b454b50" class="footer-li-a">
+                            <a href="/Home/Policies" class="footer-li-a">
                                 Policies
                             </a>
                         </li>
                         <li>
-                            <a class="footer-li-a">
+                            <a href="/Home/Terms" class="footer-li-a">
                                 Terms
                             </a>
                         </li>
                         <li>
-                            <a class="footer-li-a">
+                            <a href="/Home/Faqs" class="footer-li-a">
                                 FAQs
                             </a>
                         </li>
@@ -239,7 +249,7 @@
                 <div class="col-md-4 col-xs-12">
                     <!-- footer logo -->
                     <div class="footer-logo">
-                        <a href="index.html">
+                        <a href="/">
                             <img src="~/images/logo-alt.png" alt="logo">
                         </a>
                     </div>
@@ -251,7 +261,7 @@
                     <!-- footer copyright -->
                     <div class="footer-copyright">
                         <p>
-                            Copyright © 2018
+                            Copyright © @DateTime.Now.Year
                         </p>
                     </div>
                     <!-- /footer copyright -->
@@ -263,12 +273,12 @@
                             <strong>Company</strong>
                         </li>
                         <li>
-                            <a class="footer-li-a">
+                            <a href="/Home/About" class="footer-li-a">
                                 About
                             </a>
                         </li>
                         <li>
-                            <a class="footer-li-a">
+                            <a href="/Home/Developers" class="footer-li-a">
                                 Developers
                             </a>
                         </li>
@@ -280,22 +290,22 @@
                             <strong>Resources</strong>
                         </li>
                         <li>
-                            <a class="footer-li-a">
+                            <a href="/Home/Contact" class="footer-li-a">
                                 Contact
                             </a>
                         </li>
                         <li>
-                            <a class="footer-li-a">
+                            <a href="/Home/Help" class="footer-li-a">
                                 Help
                             </a>
                         </li>
                         <li>
-                            <a class="footer-li-a">
+                            <a href="/Home/Privacy" class="footer-li-a">
                                 Privacy
                             </a>
                         </li>
                         <li>
-                            <a class="footer-li-a">
+                            <a href="/Home/Security" class="footer-li-a">
                                 Security
                             </a>
                         </li>

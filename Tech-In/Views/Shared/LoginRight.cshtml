@@ -14,9 +14,9 @@
             <label aria-labelledby="Password" class="signup-label">Password</label>
             <input asp-for="Password" type="password" class="input" placeholder="Password" />
             <span asp-validation-for="Password"></span>
-            <input type="submit" value="Submit" class="main-btn btn-block blue-g-btn">
+            <input type="submit" value="Login" class="main-btn btn-block blue-g-btn">
             <br />
-            <a asp-action="Login">more options...</a>
+            <a asp-controller="Account" asp-action="Login">more options...</a>
         </form>
     </div>
 </div>

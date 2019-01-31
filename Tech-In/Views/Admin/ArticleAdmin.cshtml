@@ -1,0 +1,44 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model List<Tech_In.Models.ViewModels.ArticleViewModels.SingleArticleVM>
+@{
+    Layout = "_LayoutAdmin";
+}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h4 class="title">Articles</h4>
+                        <p class="category">List of Articles that are posted.</p>
+                    </div>
+                    <div class="content table-responsive table-full-width">
+                        <table class="table table-striped">
+                            <thead>
+                            <th>Aurthor Name</th>
+                            <th>Title</th>
+                            <th>Comments count</th>
+                            <th>Created on </th>
+                            <th>Delete</th>
+                            </th>
+                            <tbody>
+                                @foreach (var article in Model)
+                                {
+                                <tr>
+                                    <td>@article.AuthorName</td>
+                                    <td>@article.Title</td>
+                                    <td>@article.CommentsCount</td>
+                                    <td>@article.CreateTime</td>
+                                    <td>Delete </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

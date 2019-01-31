@@ -1,0 +1,1830 @@
+﻿@model ProfileViewModal
+@{
+    ViewData["Title"] = "Profile";
+}
+@*<script src="~/lib/jquery/dist/jquery.js"></script>*@
+<!-- Blog -->
+
+<div id="blog" class="section sm-padding">
+    
+    <!-- Container -->
+    <div class="container">
+
+        <!-- Row -->
+        <div class="row">
+            <div class="col-md-9">
+                <div>
+                    <img src="@Model.UserPersonalVM.CoverImage" class="img-responsive profile-cover" />
+                </div>
+                <!--Cover Div-->
+                <div class="profile-pic-align">
+                    
+                        <img src="@Model.UserPersonalVM.ProfileImage" class="img-responsive img-rounded profile-pic profile-pic-align" />
+
+                </div>
+                <!--/Profile Picture-->
+                @if (Model.IsCurrentUser)
+                {
+                    <!--Edit-->
+                    <div class="right-icon-div">
+                        <div onclick="editPCS()" class="round-icon-back">
+                            <i class="fa fa-pencil"></i>
+                        </div>
+                    </div>
+                    <!--/Edit-->
+                }
+                else
+                {
+                    @if (Model.AreFriends)
+                    {
+                        string can = Model.UserName + "c";
+                        string canl = can + "l";
+                        string cani = can + "i";
+                        string addl = Model.UserName + "al";
+                        string addi = Model.UserName + "ai";
+                        <div class="right-icon-div">
+                            <button title="UnFriend" id="@can" onclick="cancelFriend('@Model.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i id="@cani" class="fa fa-trash"></i><i id="@canl" style="display:none;" class="fa fa-spinner"></i></button>
+                        </div>
+                    }
+                    else if (Model.IsFriendReqRecieved)
+                    {
+                        <div class="right-icon-div">
+                            <button title="Accept Friend Request!" onclick="acceptFriend('@Model.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i class="fa fa-check"></i></button>
+                        </div>
+                    }
+                    else
+                    {
+                        string can = Model.UserName + "c";
+                        string canl = can + "l";
+                        string cani = can + "i";
+                        string addl = Model.UserName + "al";
+                        string addi = Model.UserName + "ai";
+                        @if (Model.IsFriendReqSent)
+                        {
+                            <div id="@can" class="right-icon-div">
+                                <button title="Cancel Friend Request!" onclick="cancelFriend('@Model.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i id="@cani" class="fa fa-trash"></i><i id="@canl" style="display:none;" class="fa fa-spinner"></i></button>
+                            </div>
+                            <div id="@Model.UserName" style="display:none;" class="right-icon-div">
+                                <button title="Add as Friend" onclick="addFriend('@Model.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i id="@addi" class="fa fa-user-plus"></i><i id="@addl" style="display:none;" class="fa fa-spinner"></i></button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div id="@can" style="display:none;" class="right-icon-div">
+                                <button title="Cancel Friend Request!" onclick="cancelFriend('@Model.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i id="@cani" class="fa fa-trash"></i><i id="@canl" style="display:none;" class="fa fa-spinner"></i></button>
+                            </div>
+                            <div id="@Model.UserName" class="right-icon-div">
+                                <button title="Add as Friend" onclick="addFriend('@Model.UserName')" style="padding:5px 15px;" class="main-btn blue-g-btn" type="button"><i id="@addi" class="fa fa-user-plus"></i><i id="@addl" style="display:none;" class="fa fa-spinner"></i></button>
+                            </div>
+                        }
+                    }
+                }
+                <div class="center">
+                    <h1 class="profile-name">@Model.UserPersonalVM.FullName</h1>
+                    @*<i class="fa fa-briefcase"></i>*@
+
+                    @*<h2 class="profile-name profile-less inline"> Student at Capital University of Science & Technology</h2>*@
+                    <hr class="col-xs-12">
+                    <br />
+                    <p>
+                        @Model.UserPersonalVM.Summary
+                    </p>
+                </div>
+                <!--/Name Education ends here-->
+
+                <div>
+
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#wall" aria-controls="home" role="tab" data-toggle="tab">Timeline</a>
+                        </li>
+                        <li id="#aboutbtn" role="presentation">
+                            <a href="#about" aria-controls="profile" role="tab" data-toggle="tab">About</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Questions</a>
+                        </li>
+                        @if (Model.IsCurrentUser)
+                        {
+                            <li><a id="opnfrnd" href="#friends">Friends</a></li>
+                        }
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="wall">
+                            <div class="row">
+
+                                @await Html.PartialAsync("_AddPostPartial", new Tech_In.Models.ViewModels.ProfileViewModels.AddPostVM { Id = 0 })
+
+                            </div>
+                            <div id="wallposts">
+                                @foreach (var singlePost in Model.UserPosts)
+                                {
+                                    @await Html.PartialAsync("_ViewPosts", singlePost)
+                                }
+                            </div>
+                        </div>
+                        <!--/Wall Div-->
+                        <div role="tabpanel" class="tab-pane" id="about">
+                            <div class="row">
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h6 class="inline small-h">Personal Information</h6>
+                                            <br />
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <!--Edit-->
+                                                <div class="right-post-icon-div" onclick="EditPersonalD('@Model.UserPersonalVM.UserPersonalDetailID')">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Edit-->
+                                            }
+
+                                            <hr />
+                                        </div>
+                                        <div class="row">
+                                            <div class="container">
+                                                <div class="col-xs-5 col-md-push-2 col-sm-push-1">
+                                                    <strong>First Name :</strong>
+                                                    <br />
+                                                    <strong>Last Name : </strong>
+                                                    <br />
+                                                    @if (@Model.UserPersonalVM.PhoneNo != null)
+                                                    {
+                                                        <strong>Phone no : </strong>
+                                                        <br />
+
+                                                    }
+                                                    <strong>Email : </strong>
+                                                    <br />
+                                                    <strong>Date of Birth : </strong>
+                                                    <br />
+                                                    <strong>Gender : </strong>
+                                                    <br />
+                                                    <strong>Country : </strong>
+                                                    <br />
+                                                    <strong>City : </strong>
+                                                    <br />
+                                                </div>
+                                                <div class="col-xs-7">
+                                                    <p class="black zero-margin">@Model.UserPersonalVM.FirstName</p>
+                                                    <p class="black zero-margin">@Model.UserPersonalVM.LastName</p>
+                                                    <p class="black zero-margin">@Model.UserPersonalVM.PhoneNo</p>
+                                                    <p class="black zero-margin">@Model.UserPersonalVM.Email</p>
+                                                    <p class="black zero-margin">@Model.UserPersonalVM.DOB.ToString("dd MMM yyyy")</p>
+                                                    <p class="black zero-margin">@Model.UserPersonalVM.Gender</p>
+                                                    <p class="black zero-margin">@Model.UserPersonalVM.CountryName</p>
+                                                    <p class="black zero-margin">@Model.UserPersonalVM.CityName</p>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!--Experience-->
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h6 class="inline small-h">
+                                                Experience
+                                                <small>(2 Months)</small>
+                                            </h6>
+                                            <br />
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <!--Add-->
+                                                <div class="right-post-icon-div" onclick="AddEditExp(0)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-plus"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Add-->
+                                            }
+                                            <hr />
+                                        </div>
+                                        <input type="hidden" id="hiddenExpId" />
+                                        @if (ViewBag.UserExperienceList != null && ViewBag.UserExperienceList.Count != 0)
+                                        {
+                                            foreach (var item in ViewBag.UserExperienceList)
+                                            {
+                                                <div class="row" id="row_exp_@item.UserExperienceId">
+                                                    <div class="col-xs-3 col-md-2">
+                                                        <img src="~/images/noimg.svg" alt="" class="img-thumbnail margin-left20" />
+                                                    </div>
+                                                    <div class="col-xs-9 col-md-10">
+                                                        <strong class="small-h">@item.Title</strong>
+                                                        @if (Model.IsCurrentUser)
+                                                        {
+                                                            <!--Delete-->
+                                                            <div onclick="confirmDelExp(@item.UserExperienceId)" class="delete-exp-round">
+                                                                <div class="round-icon-back-del" data-toggle="modal" data-target="#addExperienceModal">
+                                                                    <i class="fa fa-trash-o"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Delete-->
+                                                            <!--Edit-->
+                                                            <div onclick="AddEditExp(@item.UserExperienceId)" class="edit-exp-round">
+                                                                <div class="round-icon-back" data-toggle="modal" data-target="#addExperienceModal">
+                                                                    <i class="fa fa-pencil"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Edit-->
+                                                        }
+                                                        <p class="xsmall-h">
+                                                            @item.CompanyName, @item.CityName, @item.CountryName
+                                                            <i class="fa fa-map-marker" aria-hidden="true"></i>
+                                                        </p>
+                                                        <p class="black">@item.Description</p>
+                                                        <p>
+                                                            @item.StartDate.ToString("dd MMM yyyy") -
+                                                            @if (item.CurrentWorkCheck)
+                                                            {<span>Current</span> }
+                                                            else
+                                                            {
+
+                                                                @item.EndDate.ToString("dd MMM yyyy")
+                                                            }
+                                                            &bull;
+                                                            @*<small>1 Month</small>*@
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-xs-12">
+                                                        <hr class="margin-both-lr" />
+                                                    </div>
+                                                </div>
+
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="row">
+                                                <p class="xsmall-h"><center>No Experience</center></p>
+                                            </div>
+
+
+                                        }
+                                    </div>
+                                </div>
+                                <!--/Experience-->
+                                <!--Education-->
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h6 class="inline small-h">Education</h6>
+                                            <br />
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <!--Add-->
+                                                <div class="right-post-icon-div" onclick="viewEduModal(0)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-plus"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Add-->
+                                            }
+                                            <hr />
+                                        </div>
+                                        <input type="hidden" id="hiddenEduId" />
+                                        @if (ViewBag.UserEducationList != null && ViewBag.UserEducationList.Count != 0)
+                                        {
+                                            foreach (var item in ViewBag.UserEducationList)
+                                            {
+                                                <div class="row" id="row_exp_@item.UserEducationID">
+                                                    <div class="col-xs-12 margin-both-lr">
+                                                        <strong class="small-h">@item.Title</strong>
+                                                        @if (Model.IsCurrentUser)
+                                                        {
+                                                            <!--Delete-->
+                                                            <div onclick="confirmDelEdu(@item.UserEducationID)" class="delete-exp-round">
+                                                                <div class="round-icon-back-del" data-toggle="modal" data-target="#addExperienceModal">
+                                                                    <i class="fa fa-trash-o"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Delete-->
+                                                            <!--Edit-->
+                                                            <div class="edit-exp-round" onclick="viewEduModal(@item.UserEducationID)">
+                                                                <div class="round-icon-back">
+                                                                    <i class="fa fa-pencil"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Edit-->
+                                                        }
+                                                        <p class="xsmall-h">
+                                                            @item.SchoolName, @item.CityName, @item.CountryName
+                                                            <i class="fa fa-map-marker" aria-hidden="true"></i>
+                                                        </p>
+                                                        <p class="black">@item.Details</p>
+                                                        <p>
+                                                            @item.StartDate.ToString("dd MMM yyyy") -
+                                                            @if (item.CurrentStatusCheck)
+                                                            {<span>Current</span> }
+                                                            else
+                                                            {
+
+                                                                @item.EndDate.ToString("dd MMM yyyy")
+                                                            }
+                                                            @*<small>1 Month</small>*@
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-xs-12">
+                                                        <hr class="margin-both-lr" />
+                                                    </div>
+                                                </div>
+
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="row">
+                                                <p class="xsmall-h"><center>No Education</center></p>
+                                            </div>
+
+                                        }
+
+                                    </div>
+                                </div>
+                                <!--/Education-->
+                                <!--Skills-->
+                                @*<div class="post">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <h6 class="inline small-h">Skills</h6>
+                                        <br />
+                                        <!--Add-->
+                                        <div class="right-post-icon-div" data-toggle="modal" data-target="#skillModal">
+                                            <div class="round-icon-back">
+                                                <i class="fa fa-plus"></i>
+                                            </div>
+                                        </div>
+                                        <!--/Add-->
+                                        <hr />
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-12 margin-both-lr">
+                                            <div class="widget-tags">
+                                                <a href="#">Java</a>
+                                                <a href="#">Php</a>
+                                                <a href="#">Web Development</a>
+                                                <a href="#">Web Designing</a>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+                            </div>*@
+                                <!--/Skills-->
+                                <!--Certification-->
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h6 class="inline small-h">Certifications</h6>
+                                            <br />
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <!--Add-->
+                                                <div class="right-post-icon-div" onclick="viewCertModal(0)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-plus"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Add-->
+                                            }
+                                            <hr />
+                                        </div>
+                                        <input type="hidden" id="hiddenCertId" />
+                                        @if (ViewBag.UserCertificationList != null && ViewBag.UserCertificationList.Count != 0)
+                                        {
+                                            foreach (var item in ViewBag.UserCertificationList)
+                                            {
+                                                <div class="row" id="row_cert_@item.UserCertificationId">
+                                                    <div class="col-xs-12 margin-both-lr">
+                                                        <strong class="small-h">@item.Name</strong>
+                                                        @if (Model.IsCurrentUser)
+                                                        {
+                                                            <!--Delete-->
+                                                            <div onclick="confirmDelCert(@item.UserCertificationId)" class="delete-exp-round">
+                                                                <div class="round-icon-back-del">
+                                                                    <i class="fa fa-trash-o"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Delete-->
+                                                            <!--Edit-->
+                                                            <div class="edit-exp-round" onclick="viewCertModal(@item.UserCertificationId)">
+                                                                <div class="round-icon-back">
+                                                                    <i class="fa fa-pencil"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Edit-->
+                                                        }
+                                                        @if (@item.URL != null)
+                                                        {
+                                                            <p class="xsmall-h">
+                                                                Url : @item.URL
+
+                                                            </p>
+                                                        }
+
+                                                        @if (@item.LiscenceNo != null)
+                                                        {
+                                                            <p class="black">Liscence No : @item.LiscenceNo</p>
+                                                        }
+
+                                                        <p>
+                                                            Certification Date : @item.CertificationDate.ToString("dd MMM yyyy")  <br />Expiration Date : @item.ExpirationDate.ToString("dd MMM yyyy")
+                                                            @*<small>1 Month</small>*@
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-xs-12">
+                                                        <hr class="margin-both-lr" />
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="row">
+                                                <p class="xsmall-h"><center>No Certification</center></p>
+                                            </div>
+
+                                        }
+
+                                    </div>
+                                </div>
+                                <!--/Certification-->
+                                <!--Achievement-->
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h6 class="inline small-h">Achievements</h6>
+                                            <br />
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <!--Add-->
+                                                <div class="right-post-icon-div" onclick="viewAchievModel(0)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-plus"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Add-->
+                                            }
+                                            <hr />
+                                        </div>
+                                        <input type="hidden" id="hiddenAchievId" />
+                                        @if (Model.AchievVMList != null && Model.AchievVMList.Count() != 0)
+                                        {
+                                            <div class="row">
+                                                @foreach (var item in Model.AchievVMList)
+                                                {
+                                                    <div class="col-xs-12 margin-both-lr" id="row_Achiev_@item.UserAchievementId">
+                                                        <ul>
+                                                            <li>&bull; @item.Description</li>
+                                                        </ul>
+                                                        @if (Model.IsCurrentUser)
+                                                        {
+                                                            <!--Delete-->
+                                                            <div onclick="confirmDelAchiev(@item.UserAchievementId)" class="delete-exp-round">
+                                                                <div class="round-icon-back-del">
+                                                                    <i class="fa fa-trash-o"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Delete-->
+                                                            <!--Edit-->
+                                                            <div class="edit-exp-round" onclick="viewAchievModel(@item.UserAchievementId)">
+                                                                <div class="round-icon-back">
+                                                                    <i class="fa fa-pencil"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Edit-->
+                                                        }
+                                                        <div class="col-xs-12">
+                                                            <hr class="margin-both-lr" />
+                                                        </div>
+
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="row">
+                                                <p class="xsmall-h"><center>No Achievement</center></p>
+                                            </div>
+
+                                        }
+
+                                    </div>
+                                </div>
+                                <!--/Achievement-->
+                                <!--Hobbies-->
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h6 class="inline small-h">Hobbies</h6>
+                                            <br />
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <!--Add-->
+                                                <div class="right-post-icon-div" onclick="viewHobbyModel(0)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-plus"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Add-->
+                                            }
+                                            <hr />
+                                        </div>
+                                        <input type="hidden" id="hiddenHobbyId" />
+                                        @if (Model.HobbyVMList != null && Model.HobbyVMList.Count() != 0)
+                                        {
+                                            <div class="row">
+                                                @foreach (var item in Model.HobbyVMList)
+                                                {
+                                                    <div class="col-xs-12 margin-both-lr" id="row_Hobby_@item.UserHobbyId">
+                                                        <ul>
+                                                            <li>&bull; @item.HobbyOrIntrest</li>
+                                                        </ul>
+                                                        @if (Model.IsCurrentUser)
+                                                        {
+                                                            <!--Delete-->
+                                                            <div onclick="confirmDelHobby(@item.UserHobbyId)" class="delete-exp-round">
+                                                                <div class="round-icon-back-del">
+                                                                    <i class="fa fa-trash-o"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Delete-->
+                                                            <!--Edit-->
+                                                            <div class="edit-exp-round" onclick="viewHobbyModel(@item.UserHobbyId)">
+                                                                <div class="round-icon-back">
+                                                                    <i class="fa fa-pencil"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Edit-->
+                                                        }
+                                                        <div class="col-xs-12">
+                                                            <hr class="margin-both-lr" />
+                                                        </div>
+
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="row">
+                                                <p class="xsmall-h"><center>No Hobbies</center></p>
+                                            </div>
+
+                                        }
+
+                                    </div>
+                                </div>
+                                <!--/Hobbies-->
+                                <!--Language Skills-->
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h6 class="inline small-h">Language Skills</h6>
+                                            <br />
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <!--Add-->
+                                                <div class="right-post-icon-div" onclick="viewLSModel(0)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-plus"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Add-->
+                                            }
+                                            <hr />
+                                        </div>
+                                        <input type="hidden" id="hiddenLSId" />
+                                        @if (Model.LanguageSkillVMList != null && Model.LanguageSkillVMList.Count() != 0)
+                                        {
+                                            <div class="row">
+                                                @foreach (var item in Model.LanguageSkillVMList)
+                                                {
+                                                    <div class="col-xs-12 margin-both-lr" id="row_LS_@item.LanguageSkillId">
+                                                        <ul>
+                                                            <li>&bull; @item.SkillName</li>
+                                                        </ul>
+                                                        @if (Model.IsCurrentUser)
+                                                        {
+                                                            <!--Delete-->
+                                                            <div onclick="confirmDelLS(@item.LanguageSkillId)" class="delete-exp-round">
+                                                                <div class="round-icon-back-del">
+                                                                    <i class="fa fa-trash-o"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Delete-->
+                                                            <!--Edit-->
+                                                            <div class="edit-exp-round" onclick="viewLSModel(@item.LanguageSkillId)">
+                                                                <div class="round-icon-back">
+                                                                    <i class="fa fa-pencil"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Edit-->
+                                                        }
+                                                        <div class="col-xs-12">
+                                                            <hr class="margin-both-lr" />
+                                                        </div>
+
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="row">
+                                                <p class="xsmall-h"><center>No Language Skills Added</center></p>
+                                            </div>
+
+                                        }
+
+                                    </div>
+                                </div>
+                                <!--/Language Skills-->
+                                <!--Journal Publications-->
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h6 class="inline small-h">Journal Publications</h6>
+                                            <br />
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <!--Add-->
+                                                <div class="right-post-icon-div" onclick="viewJPCPModel(0)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-plus"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Add-->
+                                            }
+                                            <hr />
+                                        </div>
+                                        <input type="hidden" id="hiddenJPCPId" />
+                                        @if (Model.PublicationVMListJP != null && Model.PublicationVMListJP.Count() != 0)
+                                        {
+                                            foreach (var item in Model.PublicationVMListJP)
+                                            {
+                                                <div class="row" id="row_publication_@item.UserPublicationId">
+                                                    <div class="col-xs-12 margin-both-lr">
+                                                        <strong class="small-h">@item.Title</strong>
+                                                        @if (Model.IsCurrentUser)
+                                                        {
+                                                            <!--Delete-->
+                                                            <div onclick="confirmDelJPCP(@item.UserPublicationId)" class="delete-exp-round">
+                                                                <div class="round-icon-back-del">
+                                                                    <i class="fa fa-trash-o"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Delete-->
+                                                            <!--Edit-->
+                                                            <div class="edit-exp-round" onclick="viewJPCPModel(@item.UserPublicationId)">
+                                                                <div class="round-icon-back">
+                                                                    <i class="fa fa-pencil"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Edit-->
+                                                        }
+                                                        @if (@item.Description != null)
+                                                        {
+                                                            <p class="black">@item.Description</p>
+                                                        }
+
+                                                        <p>
+                                                            Publication Date : @item.PublishYear.ToString("dd MMM yyyy")
+                                                            @*<small>1 Month</small>*@
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-xs-12">
+                                                        <hr class="margin-both-lr" />
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="row">
+                                                <p class="xsmall-h"><center>No Journals Published</center></p>
+                                            </div>
+
+                                        }
+
+                                    </div>
+                                </div>
+                                <!--/Journal Publicationss-->
+                                <!--Conference Publications-->
+                                <div class="post">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h6 class="inline small-h">Conference Publications</h6>
+                                            <br />
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <!--Add-->
+                                                <div class="right-post-icon-div" onclick="viewCPModel(0)">
+                                                    <div class="round-icon-back">
+                                                        <i class="fa fa-plus"></i>
+                                                    </div>
+                                                </div>
+                                                <!--/Add-->
+                                            }
+                                            <hr />
+                                        </div>
+                                        @if (Model.PublicationVMListCP != null && Model.PublicationVMListCP.Count() != 0)
+                                        {
+                                            foreach (var item in Model.PublicationVMListCP)
+                                            {
+                                                <div class="row" id="row_publication_@item.UserPublicationId">
+                                                    <div class="col-xs-12 margin-both-lr">
+                                                        <strong class="small-h">@item.Title</strong>
+                                                        @if (Model.IsCurrentUser)
+                                                        {
+                                                            <!--Delete-->
+                                                            <div onclick="confirmDelJPCP(@item.UserPublicationId)" class="delete-exp-round">
+                                                                <div class="round-icon-back-del">
+                                                                    <i class="fa fa-trash-o"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Delete-->
+                                                            <!--Edit-->
+                                                            <div class="edit-exp-round" onclick="viewCPModel(@item.UserPublicationId)">
+                                                                <div class="round-icon-back">
+                                                                    <i class="fa fa-pencil"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!--/Edit-->
+                                                        }
+                                                        @if (@item.Description != null)
+                                                        {
+                                                            <p class="black">@item.Description</p>
+                                                        }
+
+                                                        <p>
+                                                            Publication Date : @item.PublishYear.ToString("dd MMM yyyy")
+                                                            @*<small>1 Month</small>*@
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-xs-12">
+                                                        <hr class="margin-both-lr" />
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="row">
+                                                <p class="xsmall-h"><center>No Conference Publication</center></p>
+                                            </div>
+
+                                        }
+
+                                    </div>
+                                </div>
+                                <!--/Conference Publicationss-->
+
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="messages">
+
+                            <div class="row">
+
+                                <div class="panel-group" id="accordion">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a data-toggle="collapse" data-parent="#accordion" class="btn-link" id="showQuestion" href="#collapse1">my questions</a>
+                                            </h4>
+                                        </div>
+                                        <div id="collapse1" class="panel-collapse collapse in">
+                                            @* Start of Question View *@
+                                            <div class="panel-body">
+
+                                                <div class="row">
+
+
+                                                    @foreach (var question in ViewBag.question)
+                                                    {
+                                                        <div class="well">
+                                                            <div id="rowQuestion_@question.UserQuestionId">
+                                                                <a class="btn btn-danger" onclick="ConfirmDeleteQuestion(@question.UserQuestionId)"><i class="fa fa-trash-o"></i></a>
+
+                                                                <button type="button" class="fa fa-pencil close" aria-label="Edit"> </button>
+
+                                                                <div class="row">
+                                                                    <div class="col-xs-1 grey-back">
+                                                                        <span>
+                                                                            <strong>@question.Voting</strong><br />Votes
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="col-xs-9">
+                                                                        <p class="font-size16 margin-bottom6"><a href="/Question/QuestionDetail/@question.UserQuestionId">@question.Title</a></p>
+                                                                        <input type="hidden" id="hiddenQuestionId" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+
+                                                </div>
+                                            </div>
+                                            @* End of Question View *@
+                                        </div>
+                                    </div>
+                                    @* Start of Question Confirm delete *@
+                                    <div class="modal fade" id="QuestionModal">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <a href="#" class="close" data-dismiss="modal">&times;</a>
+                                                    <h3 class="modal-title">Delete Question</h3>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <h4>Are you sure ? You want to delete this. </h4>
+
+                                                    <div style="text-align:center;display:none" id="loaderQuestionDiv">
+                                                        <img src="~/images/load.gif" width="150" />
+                                                    </div>
+
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                                                    <a href="#" class="btn btn-success" onclick="DeleteQuestion()">Confirm</a>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    @* End of Question Confirm Delete  *@
+
+
+                                    @* Start of Answer Confirm Delete *@
+                                    <div class="modal fade" id="AnswerModal">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <a href="#" class="close" data-dismiss="modal">&times;</a>
+                                                    <h3 class="modal-title">Delete Answer</h3>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <h4>Are you sure ? You want to delete this. </h4>
+
+                                                    <div style="text-align:center;display:none" id="loaderAnswerDiv">
+                                                        <img src="~/images/load.gif" width="150" />
+                                                    </div>
+
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                                                    <a href="#" class="btn btn-success" onclick="DeleteAnswer()">Confirm</a>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    @* End of Answer Confirm Delete *@
+
+                                    <br />
+                                    @* Start of Comment View *@
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">my comments</a>
+                                            </h4>
+                                        </div>
+                                        <div id="collapse2" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                @foreach (var comment in ViewBag.comment)
+                                                {
+                                                    <div class="row" id="rowComment_@comment.UserQACommentID">
+
+                                                        <a class="btn btn-danger" onclick="ConfirmDeleteComment(@comment.UserQACommentID)"><i class="fa fa-trash-o"></i></a>
+                                                        <button type="button" class="fa fa-pencil close" aria-label="Edit"> </button>
+                                                        <input type="hidden" id="hiddenCommentId" />
+                                                        <div class="row">
+                                                            <div class="col-xs-9">
+                                                                <p class="font-size16 margin-bottom6"><a href="/Question/QuestionDetail/@comment.UserQuestionId">@comment.Description</a></p>
+                                                                <hr />
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @* End of Comment View *@
+                                    <br />
+                                    @* Start of Comment Confirm Delete *@
+                                    <div class="modal fade" id="CommentModel">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <a href="#" class="close" data-dismiss="modal">&times;</a>
+                                                    <h3 class="modal-title">Delete Comment</h3>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <h4>Are you sure ? You want to delete this. </h4>
+
+                                                    <div style="text-align:center;display:none" id="loaderCommentDiv">
+                                                        <img src="~/images/load.gif" width="150" />
+                                                    </div>
+
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                                                    <a href="#" class="btn btn-success" onclick="DeleteComment()">Confirm</a>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    @* End of Comment Confirm Delete *@
+
+                                    @* Start of Answer View *@
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+
+                                                <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">my answers</a>
+                                            </h4>
+                                        </div>
+
+                                        <div id="collapse3" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                @foreach (var answer in ViewBag.answer)
+                                                {
+
+                                                    @foreach (var question in answer.UserQuestion)
+                                                    {
+                                                        <div id="rowAnswer_@answer.UserQAnswerId">
+                                                            <a class="btn btn-danger" onclick="ConfirmDeleteAnswer(@answer.UserQAnswerId)"><i class="fa fa-trash-o"></i></a>
+                                                            <button type="button" class="fa fa-pencil close" aria-label="Edit"> </button>
+                                                            <input type="hidden" id="hiddenAnswerId" />
+                                                            <div class="row">
+
+                                                                <div class="col-xs-9">
+                                                                    <p class="font-size16 margin-bottom6">
+
+                                                                        <a href="/Question/QuestionDetail/@question.UserQuestionId">
+                                                                            @question.Title
+                                                                        </a>
+                                                                    </p>
+                                                                    <hr />
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    }
+
+                                                }
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @* End of Answer View *@
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div id="friends" class="tab-pane fade">
+                            <div style="text-align:center;position:relative;left:50%;" id="loaderDivFrnd">
+                                <br /><br />
+                                <div style="position: relative; left: -50%;">
+                                    <img style=" height:150px;" src="~/images/load.gif" />
+                                </div>
+                                <br /><br />
+                            </div>
+                        </div>
+
+                        <script>
+                            $("#showAnswers").click(function () {
+                                document.getElementById('answerList').style.display = "block";
+                            });
+
+                            $("#showComments").click(function () {
+                                document.getElementById('commentList').style.display = "block";
+                            });
+
+                            $("#showQuestion").click(function () {
+                                document.getElementById('questionList').style.display = "block";
+                            });
+                        </script>
+
+                        <script>
+                            var ConfirmDeleteComment = function (commentId) {
+                                $("#hiddenCommentId").val(commentId);
+                                $("#CommentModel").modal('show');
+
+                            }
+                            var ConfirmDeleteAnswer = function (answerId) {
+                                $("#hiddenAnswerId").val(answerId);
+                                $("#AnswerModal").modal('show');
+
+                            }
+                            var ConfirmDeleteQuestion = function (questionId) {
+                                $("#hiddenQuestionId").val(questionId);
+                                $("#QuestionModal").modal('show');
+
+                            }
+
+                        </script>
+                        <script>
+
+                            var DeleteComment = function () {
+                                $("#loaderCommentDiv").show();
+                                var commentId = $("#hiddenCommentId").val();
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/User/DeleteComment",
+                                    data: { Id: commentId },
+                                    success: function (result) {
+                                        $("#loaderCommentDiv").hide();
+                                        debugger
+                                        $("#CommentModel").modal('hide');
+                                        $("#rowComment_" + commentId).remove();
+                                    }
+                                })
+                            }
+                            var DeleteQuestion = function () {
+                                $("#loaderQuestionDiv").show();
+                                var queId = $("#hiddenQuestionId").val();
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/User/DeleteQuestion",
+                                    data: { Id: queId },
+                                    success: function (result) {
+                                        $("#loaderQuestionDiv").hide();
+                                        debugger
+                                        $("#QuestionModal").modal('hide');
+                                        $("#rowQuestion_" + queId).remove();
+                                    }
+                                })
+                            }
+                            var DeleteAnswer = function () {
+                                $("#loaderAnswerDiv").show();
+                                var answerId = $("#hiddenAnswerId").val();
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/User/DeleteAnswer",
+                                    data: { Id: answerId },
+                                    success: function (result) {
+                                        $("#loaderAnswerDiv").hide();
+                                        debugger
+                                        $("#AnswerModal").modal('hide');
+                                        $("#rowAnswer_" + answerId).remove();
+                                    }
+                                })
+                            }
+                        </script>
+
+                    </div>
+
+                </div>
+
+            </div>
+            @* Edit Profile Pictures Modal Show *@
+            <div class="modal fade" id="myPCS">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Profile Summary</h3>
+                        </div>
+                        <div class="modal-body" id="viewPCSBody">
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* / Edit Profile Pictures Modal Show *@
+
+            @* Edit PersonalDetails Modal Show *@
+            <div class="modal fade" id="myPD">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Personal Details</h3>
+                        </div>
+                        <div class="modal-body" id="viewPDBody">
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* / Edit Personal Details Modal Show *@
+
+
+            @* Add/Edit Experience Modal Show *@
+            <div class="modal fade" id="myExp">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Experience</h3>
+                        </div>
+                        <div class="modal-body" id="viewExpBody">
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* /Add/Edit Experience Modal Show *@
+
+            @* Delete Experience Modal *@
+            <div class="modal fade" id="delExpModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Delete User Experience</h3>
+                        </div>
+                        <div class="modal-body">
+                            <h6>Are you sure ? You want to delete this. </h6>
+                            <div style="text-align:center;position:absolute;left:50%;display:none;" id="loaderDivExp">
+                                <div style="position: relative; left: -50%;">
+                                    <img src="~/images/load.gif" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button href="#" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <button class="btn btn-danger" onclick="DeleteExperience()">Confirm</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            @* /Delete Experience Modal *@
+
+            @* Education Add *@
+            <div class="modal fade" id="myEdu">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Education</h3>
+                        </div>
+                        <div class="modal-body" id="viewEduBody">
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* /Education Add *@
+            @* Education Delete *@
+            <div class="modal fade" id="delEduModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Delete User Education</h3>
+                        </div>
+                        <div class="modal-body">
+                            <h6>Are you sure ? You want to delete this. </h6>
+                            <div style="text-align:center;position:absolute;left:50%;display:none;" id="loaderDivEdu">
+                                <div style="position: relative; left: -50%;">
+                                    <img src="~/images/load.gif" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                            <button class="btn btn-danger" onclick="DeleteEducation()">Confirm</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            @* /Delete Education Modal *@
+            @* Skill Add *@
+            <div class="modal fade" id="skillModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">Skills</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <!--SKill-->
+                                <div class="form-group">
+                                    <label for="recipient-name" class="control-label">Skills:</label>
+                                    <textarea class="input" placeholder="Description"></textarea>
+                                </div>
+                                <!--/Skill-->
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="white-btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="main-btn">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* /Skill Add *@
+            @* Certification Add *@
+            <div class="modal fade" id="myCert">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Certification</h3>
+                        </div>
+                        <div class="modal-body" id="viewCertBody">
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* /Certification Add *@
+            @* Certification Delete *@
+            <div class="modal fade" id="delCertModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Delete User Certification</h3>
+                        </div>
+                        <div class="modal-body">
+                            <h6>Are you sure ? You want to delete this. </h6>
+                            <div style="text-align:center;position:absolute;left:50%;display:none;" id="loaderDivCert">
+                                <div style="position: relative; left: -50%;">
+                                    <img src="~/images/load.gif" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                            <button class="btn btn-danger" onclick="DeleteCertification()">Confirm</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            @* /Delete Certification Modal *@
+            @* Achievment Add *@
+            <div class="modal fade" id="myAchiev">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Achievments</h3>
+                        </div>
+                        <div class="modal-body" id="viewAchievBody">
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* /Achievments Add *@
+            @* Achievment Delete *@
+            <div class="modal fade" id="delAchievModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Delete Achievment</h3>
+                        </div>
+                        <div class="modal-body">
+                            <h6>Are you sure ? You want to delete this. </h6>
+                            <div style="text-align:center;position:absolute;left:50%;display:none;" id="loaderDivAchiev">
+                                <div style="position: relative; left: -50%;">
+                                    <img src="~/images/load.gif" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                            <button class="btn btn-danger" onclick="deleteAchievment()">Confirm</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            @* /Delete Achievment Modal *@
+
+            @* Hobbies Add *@
+            <div class="modal fade" id="myHobby">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Hobbies</h3>
+                        </div>
+                        <div class="modal-body" id="viewHobbyBody">
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* /Hobbies Add *@
+            @* Hobbies Delete *@
+            <div class="modal fade" id="delHobbyModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Delete Hobby</h3>
+                        </div>
+                        <div class="modal-body">
+                            <h6>Are you sure ? You want to delete this. </h6>
+                            <div style="text-align:center;position:absolute;left:50%;display:none;" id="loaderDivHobby">
+                                <div style="position: relative; left: -50%;">
+                                    <img src="~/images/load.gif" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                            <button class="btn btn-danger" onclick="deleteHobby()">Confirm</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            @* /Delete Hobby Model *@
+
+            @* Language Skills Add *@
+            <div class="modal fade" id="myLS">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Language Skills</h3>
+                        </div>
+                        <div class="modal-body" id="viewLSBody">
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* /Language Skills Add *@
+            @* Language Skills Delete *@
+            <div class="modal fade" id="delLSModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Delete Hobby</h3>
+                        </div>
+                        <div class="modal-body">
+                            <h6>Are you sure ? You want to delete this. </h6>
+                            <div style="text-align:center;position:absolute;left:50%;display:none;" id="loaderDivLS">
+                                <div style="position: relative; left: -50%;">
+                                    <img src="~/images/load.gif" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                            <button class="btn btn-danger" onclick="deleteLangSkill()">Confirm</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            @* /Delete Language Skills Model *@
+
+            @* Publication Add *@
+            <div class="modal fade" id="myJPCP">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 id="pubTitle" class="modal-title"></h3>
+                        </div>
+                        <div class="modal-body" id="viewJPCPBody">
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* /Publication Add *@
+            @* Publication Delete *@
+            <div class="modal fade" id="delJPCPModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" data-dismiss="modal">&times;</a>
+                            <h3 class="modal-title">Delete Publication</h3>
+                        </div>
+                        <div class="modal-body">
+                            <h6>Are you sure ? You want to delete this. </h6>
+                            <div style="text-align:center;position:absolute;left:50%;display:none;" id="loaderDivJPCP">
+                                <div style="position: relative; left: -50%;">
+                                    <img src="~/images/load.gif" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                            <button class="btn btn-danger" onclick="deleteJPCP()">Confirm</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            @* /Delete Publication Modal *@
+
+
+            <!--/Modals-->
+            @if (Model.IsCurrentUser)
+            {
+
+                <!-- Aside -->
+                <aside id="aside" class="col-md-3">
+
+                    <div class="center aside-profile">
+                        <h3 class="profile-less">Download CV as PDF</h3>
+                        <hr />
+                        <p>You can download your TechIn profile as CV!</p>
+                        <img src="~/images/pdf_ico.jpg" class="img-responsive" />
+                        <a asp-controller="User" asp-action="Resume" class="main-btn btn-block blue-g-btn margin-top10">
+                            <b class="white-text">Download</b>
+                        </a>
+
+                    </div>
+                    <!--PDF Div-->
+
+                </aside>
+                <!-- /Aside -->
+            }
+
+        </div>
+        <!-- /Row -->
+
+    </div>
+    <!-- /Container -->
+</div>
+<!-- /Blog -->
+<script>
+    $(document).ready(function () {
+        $(".nav-tabs #opnfrnd").click(function () {
+            $(this).tab('show');
+            //loaderDivFrnd
+            $("#friends").load("/User/MyFriendList");
+        });
+        
+        
+    });
+    
+    var addFriend = function (userName) {
+        $("#" + userName + " button").prop('disabled', true);
+        $("#" + userName + "al").show();
+        $("#" + userName + "ai").hide();
+        $.ajax({
+            type: "POST",
+            url: "/User/AddFriend",
+            data: { UserName: userName },
+            success: function (result) {
+                if (result.success) {
+                    toastr.options = {
+                        "positionClass": "toast-bottom-right"
+                    }
+                    toastr.success(result.msg, userName);
+                    $("#" + userName).hide();
+                    $("#" + userName + 'c').show();
+                    $("#" + userName + "al").hide();
+                    $("#" + userName + "ai").show();
+                    $("#" + userName + " button").prop('disabled', false);
+                } else {
+                    toastr.options = {
+                        "positionClass": "toast-bottom-right"
+                    }
+                    toastr.error(result.msg, userName);
+                    $("#" + userName + "al").hide();
+                    $("#" + userName + "ai").show();
+                    $("#" + userName + " button").prop('disabled', false);
+                }
+            }
+
+        })
+    };
+    var cancelFriend = function (userName) {
+        $("#" + userName + 'c' + " button").prop('disabled', true);
+        $("#" + userName + "cl").show();
+        $("#" + userName + "ci").hide();
+        $.ajax({
+            type: "POST",
+            url: "/User/CancelFriend",
+            data: { UserName: userName },
+            success: function (result) {
+                if (result.success) {
+                    toastr.options = {
+                        "positionClass": "toast-bottom-right"
+                    }
+                    toastr.info(result.msg, userName);
+                    $("#" + userName + 'c').hide();
+                    $("#" + userName).show();
+                    $("#" + userName + "cl").hide();
+                    $("#" + userName + "ci").show();
+                    $("#" + userName + 'c' + " button").prop('disabled', false);
+                } else {
+                    toastr.options = {
+                        "positionClass": "toast-bottom-right"
+                    }
+                    toastr.error(result.msg, userName);
+                    $("#" + userName + "cl").hide();
+                    $("#" + userName + "ci").show();
+                    $("#" + userName + 'c' + " button").prop('disabled', false);
+                }
+            }
+
+        })
+    };
+    var acceptFriend = function (userName) {
+        $.ajax({
+            type: "POST",
+            url: "/User/AcceptFriendR",
+            data: { UserName: userName },
+            success: function (result) {
+                if (result.success) {
+                    location.reload();
+                }
+            }
+        })
+    };
+
+    var EditPersonalD = function (id) {
+        
+        var url = "/User/UpdatePersonalDetail?Id=" + id;
+        $("#viewPDBody").load(url, function () {
+            $("#myPD").modal("show");
+
+        })
+    }
+
+    var editPCS = function () {
+
+        var url = "/User/UpdatePicturesSummary";
+        $("#viewPCSBody").load(url, function () {
+            $("#myPCS").modal("show");
+
+        })
+    }
+    //Add and Edit Experience Modal Show Function
+    var AddEditExp = function (id) {
+        var url = "/User/AddEditUserExperience?Id=" + id;
+
+        $("#viewExpBody").load(url, function () {
+            $("#myExp").modal("show");
+
+        })
+
+    }
+
+    //Delete Experiec=nce Model Popup
+    var confirmDelExp = function (id) {
+        $("#hiddenExpId").val(id);
+        $("#delExpModal").modal('show');
+    }
+    //Delete Experience
+    var DeleteExperience = function () {
+        $("#loaderDivExp").show();
+        var empId = $("#hiddenExpId").val();
+        $.ajax({
+            type: "POST",
+            url: "/User/DeleteUserExperience",
+            data: { Id: empId },
+            success: function (result) {
+                $("#loaderDivExp").hide();
+                $("#delExpModal").modal('hide');
+                $("#row_exp_" + empId).remove();
+            }
+        })
+    }
+
+    //Education
+    var viewEduModal = function (id) {
+        var url = "/User/AddEditUserEducation?Id=" + id;
+
+        $("#viewEduBody").load(url, function () {
+            $("#myEdu").modal("show");
+
+        })
+
+    }
+    var confirmDelEdu = function (id) {
+        $("#hiddenEduId").val(id);
+        $("#delEduModal").modal('show');
+
+    }
+    var DeleteEducation = function () {
+        $("#loaderDivEdu").show();
+        var eduId = $("#hiddenEduId").val();
+        $.ajax({
+            type: "POST",
+            url: "/User/DeleteUserEducation",
+            data: { Id: eduId },
+            success: function (result) {
+                $("#loaderDivEdu").hide();
+                $("#delEduModal").modal('hide');
+                $("#row_exp_" + eduId).remove();
+            }
+
+        })
+    }
+
+    //Certification
+    var viewCertModal = function (id) {
+        var url = "/User/AddEditUserCertification?Id=" + id;
+
+        $("#viewCertBody").load(url, function () {
+            $("#myCert").modal("show");
+
+        })
+    }
+
+    var confirmDelCert = function (id) {
+        $("#hiddenCertId").val(id);
+        $("#delCertModal").modal('show');
+
+    }
+
+    var DeleteCertification = function () {
+        $("#loaderDivCert").show();
+        var certId = $("#hiddenCertId").val();
+        $.ajax({
+            type: "POST",
+            url: "/User/DeleteUserCertification",
+            data: { Id: certId },
+            success: function (result) {
+                $("#loaderDivCert").hide();
+                debugger
+                $("#delCertModal").modal('hide');
+                $("#row_cert_" + certId).remove();
+            }
+        })
+    }
+
+    $("#element").on("mouseover", function () {
+        $("#popup").show();
+    }).on("mouseout", function () {
+        $("#popup").hide();
+    });
+
+
+    function checkTextAHeight() {
+        var val = document.getElementById("t1").scrollHeight;
+        var h = document.getElementById("t1").offsetHeight;
+        var cal = parseInt(h) - 2;
+        if (val > cal) {
+            h = h + 50
+            document.getElementById("t1").style.height = h;
+        }
+    }
+
+    //Achievements
+    var viewAchievModel = function (id) {
+        var url = "/User/AddEditUserAchievement?Id=" + id;
+
+        $("#viewAchievBody").load(url, function () {
+            $("#myAchiev").modal("show");
+
+        })
+    }
+    var confirmDelAchiev = function (id) {
+        $("#hiddenAchievId").val(id);
+        $("#delAchievModal").modal('show');
+    }
+    var deleteAchievment = function () {
+        $("#loaderDivAchiev").show();
+        var achievId = $("#hiddenAchievId").val();
+        $.ajax({
+            type: "POST",
+            url: "/User/DeleteUserAchievment",
+            data: { Id: achievId },
+            success: function (result) {
+                $("#loaderDivAchiev").hide();
+                debugger
+                $("#delAchievModal").modal('hide');
+                $("#row_Achiev_" + achievId).remove();
+            }
+        })
+
+    }
+
+
+    //Hobbies
+    var viewHobbyModel = function (id) {
+        var url = "/User/AddEditUserHobby?Id=" + id;
+
+        $("#viewHobbyBody").load(url, function () {
+            $("#myHobby").modal("show");
+
+        })
+    }
+    var confirmDelHobby = function (id) {
+        $("#hiddenHobbyId").val(id);
+        $("#delHobbyModal").modal('show');
+    }
+    var deleteHobby = function () {
+        $("#loaderDivHobby").show();
+        var hobbyId = $("#hiddenHobbyId").val();
+        $.ajax({
+            type: "POST",
+            url: "/User/DeleteUserHobby",
+            data: { Id: hobbyId },
+            success: function (result) {
+                $("#loaderDivHobby").hide();
+                $("#delHobbyModal").modal('hide');
+                $("#row_Hobby_" + hobbyId).remove();
+            }
+        })
+
+    }
+
+
+    //Language Skills
+    var viewLSModel = function (id) {
+        var url = "/User/AddEditLanguageSkill?Id=" + id;
+
+        $("#viewLSBody").load(url, function () {
+            $("#myLS").modal("show");
+
+        })
+    }
+    var confirmDelLS = function (id) {
+        $("#hiddenLSId").val(id);
+        $("#delLSModal").modal('show');
+    }
+    var deleteLangSkill = function () {
+        $("#loaderDivLS").show();
+        var lsID = $("#hiddenLSId").val();
+        $.ajax({
+            type: "POST",
+            url: "/User/DeleteLanguageSkill",
+            data: { Id: lsID },
+            success: function (result) {
+                $("#loaderDivLS").hide();
+                $("#delLSModal").modal('hide');
+                $("#row_LS_" + lsID).remove();
+            }
+        })
+    }
+
+
+    //Journal Publication
+    var viewJPCPModel = function (id) {
+        var url = "/User/AddEditPublication?Id=" + id + "&IsJournal=" + false;
+        $("#pubTitle").text("Journal Publication");
+        $("#viewJPCPBody").load(url, function () {
+            $("#myJPCP").modal("show");
+        })
+    }
+
+    var viewCPModel = function (id) {
+        var url = "/User/AddEditPublication?Id=" + id + "&IsJournal=" + true;
+        $("#pubTitle").text("Conference Publication");
+        $("#viewJPCPBody").load(url, function () {
+            $("#myJPCP").modal("show");
+        })
+    }
+
+    var confirmDelJPCP = function (id) {
+        $("#hiddenJPCPId").val(id);
+        $("#delJPCPModal").modal('show');
+    }
+    var deleteJPCP = function () {
+        $("#loaderDivJPCP").show();
+        var lsID = $("#hiddenJPCPId").val();
+        $.ajax({
+            type: "POST",
+            url: "/User/DeletePublication",
+            data: { Id: lsID },
+            success: function (result) {
+                $("#loaderDivJPCP").hide();
+                $("#delJPCPModal").modal('hide');
+                $("#row_publication_" + lsID).remove();
+            }
+        })
+    }
+</script>

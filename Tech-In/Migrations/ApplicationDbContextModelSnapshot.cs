@@ -19,7 +19,7 @@ namespace Tech_In.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.0.1-rtm-125")
+                .HasAnnotation("ProductVersion", "2.0.3-rtm-10026")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -395,6 +395,30 @@ namespace Tech_In.Migrations
                     b.ToTable("Category");
                 });
 
+            modelBuilder.Entity("Tech_In.Models.Database.Conversation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreatedAt");
+
+                    b.Property<string>("Message");
+
+                    b.Property<string>("RecieverId");
+
+                    b.Property<string>("SenderId");
+
+                    b.Property<int>("Status");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Conversation");
+                });
+
             modelBuilder.Entity("Tech_In.Models.Database.Company", b =>
                 {
                     b.Property<int>("Id")
@@ -516,6 +540,39 @@ namespace Tech_In.Migrations
                     b.HasIndex("TagId");
 
                     b.ToTable("JobSkill");
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.PostComments", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("CommentMsg");
+
+                    b.Property<int>("PostId");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PostComments");
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.PostLikes", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("PostId");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(300);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("PostLikes");
                 });
 
             modelBuilder.Entity("Tech_In.Models.Database.QuestionSkill", b =>
@@ -676,6 +733,55 @@ namespace Tech_In.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserLanguageSkill");
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.UserNetwork", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("AreFriend");
+
+                    b.Property<DateTime>("RecordTime");
+
+                    b.Property<string>("User1");
+
+                    b.Property<string>("User2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("User1");
+
+                    b.HasIndex("User2");
+
+                    b.ToTable("UserNetwork");
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.UserPost", b =>
+                {
+                    b.Property<int>("UserPostId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreateTime");
+
+                    b.Property<string>("Image");
+
+                    b.Property<int>("OriginalId");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(8);
+
+                    b.Property<string>("Summary")
+                        .HasMaxLength(1000);
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("UserPostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserPost");
                 });
 
             modelBuilder.Entity("Tech_In.Models.Database.UserPublication", b =>
@@ -1129,6 +1235,21 @@ namespace Tech_In.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("Tech_In.Models.Database.Conversation", b =>
+                {
+                    b.HasOne("Tech_In.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("Conversations")
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.PostLikes", b =>
+                {
+                    b.HasOne("Tech_In.Models.Database.UserPost", "PostRef")
+                        .WithMany()
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("Tech_In.Models.Database.QuestionSkill", b =>
                 {
                     b.HasOne("Tech_In.Models.Database.SkillTag", "SkillTag")
@@ -1194,6 +1315,24 @@ namespace Tech_In.Migrations
                 {
                     b.HasOne("Tech_In.Models.ApplicationUser", "ApplicationUser")
                         .WithMany("UserLanguageSkills")
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.UserNetwork", b =>
+                {
+                    b.HasOne("Tech_In.Models.ApplicationUser", "ApplicationUser1")
+                        .WithMany()
+                        .HasForeignKey("User1");
+
+                    b.HasOne("Tech_In.Models.ApplicationUser", "ApplicationUser2")
+                        .WithMany()
+                        .HasForeignKey("User2");
+                });
+
+            modelBuilder.Entity("Tech_In.Models.Database.UserPost", b =>
+                {
+                    b.HasOne("Tech_In.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany()
                         .HasForeignKey("UserId");
                 });
 

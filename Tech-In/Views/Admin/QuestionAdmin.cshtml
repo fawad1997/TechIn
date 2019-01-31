@@ -1,0 +1,45 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model List<NewQuestionVM>
+@{
+    Layout = "_LayoutAdmin";
+}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h4 class="title">Questions</h4>
+                        <p class="category">List of Questions that are posted.</p>
+                    </div>
+                    <div class="content table-responsive table-full-width">
+                        <table class="table table-striped">
+                            <thead>
+                            <th>Posted By</th>
+                            <th>Title</th>
+                            <th>Votes</th>
+                            <th>Answers</th>
+                            <th>Options</th>
+                            </thead>
+                            <tbody>
+                                @foreach (var question in Model)
+                                {
+                                    
+                                    <tr>
+                                        <td>@question.PostedBy</td>
+                                        <td>@question.Title </td>
+                                        <td>@question.Voting</td>
+                                        <td>@question.Answers</td>
+                                        <td>Delete </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

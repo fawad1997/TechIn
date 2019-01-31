@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using SixLabors.ImageSharp;
 using Tech_In.Data;
+using Tech_In.Extensions;
 using Tech_In.Models;
 using Tech_In.Models.Database;
 using Tech_In.Models.Model;
@@ -25,41 +29,111 @@ namespace Tech_In.Controllers
         private readonly ApplicationDbContext _context;
         private UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         //private IHttpContextAccessor _accessor;
-        public UserController(ApplicationDbContext context, UserManager<ApplicationUser> userManager,IMapper mapper)
+        public UserController(ApplicationDbContext context, UserManager<ApplicationUser> userManager,IMapper mapper, IHostingEnvironment hostingEnvironment)
         {
             _context = context;
             _userManager = userManager;
             _mapper = mapper;
+            _hostingEnvironment = hostingEnvironment;
             //_accessor = accessor;
         }
-        
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string currentFilter, string search, int? page)
         {
-            //string ip = _accessor.HttpContext.Connection.RemoteIpAddress.ToString();
-            //return Content(""+ip);
+            string userloggedId = await OnGetSesstion();
+            ViewData["CurrentFilter"] = search;
+            if (search != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                search = currentFilter;
+            }
+            var users = (from u in _context.UserPersonalDetail
+                         join us in _userManager.Users on u.UserId equals us.Id
+                         orderby u.FirstName
+                         select new SingleUserVM
+                         {
+                             FirstName = u.FirstName,
+                             LastName = u.LastName,
+                             ProfileImage = u.ProfileImage,
+                             UserName = us.UserName,
+                             IsFriend = _context.UserNetwork.Where(a => (a.User1 == us.Id || a.User1 == userloggedId) && (a.User2 == us.Id || a.User2 == userloggedId) && a.AreFriend==true).Any(),
+                             IsFriendReqSent = _context.UserNetwork.Where(a => a.User1 == userloggedId && a.User2 == us.Id).Any(),
+                             IsFriendReqRecieved = _context.UserNetwork.Where(a => a.User1 == us.Id && a.User2 == userloggedId).Any()
+                         }).Take(10);
+            if (!String.IsNullOrEmpty(search))
+            {
+                users = users.Where(s => s.FirstName.Contains(search) || s.LastName.Contains(search));
+            }
+            //var users = _context.UserPersonalDetail.Select(x=> new UserListVM { FirstName = x.FirstName,LastName=x.LastName,ProfileImage = x.ProfileImage, UserName = _userManager.Users.Where(y=>y.Id==x.UserId).Select(y=>y.UserName).FirstOrDefault() }).ToList();
+            return View(new UserListVM { User = await PaginatedList<SingleUserVM>.CreateAsync(users.AsQueryable(), page ?? 1, 10) });
+        }
+
+        [HttpGet("u/{username}", Name = "GetUser")]
+        public async Task<IActionResult> GetUser(string username)
+        {
+            string userloggedId = await OnGetSesstion();
             //Check User Profile is complete or not
-            var user = await _userManager.GetCurrentUser(HttpContext);
+            var user = _userManager.Users.Where(x => x.UserName.Equals(username)).FirstOrDefault();
+            if (user == null)
+            {
+                return NotFound();
+            }
             var userPersonalRow = _context.UserPersonalDetail.Where(a => a.UserId == user.Id).SingleOrDefault();
             if (userPersonalRow == null)
             {
                 return RedirectToAction("CompleteProfile", "Home");
             }
-
-
             ProfileViewModal PVM = new ProfileViewModal();
-
-            PVM.UserPersonalVM = _context.UserPersonalDetail.Where(m => m.UserId == user.Id).Select(x => new UserPersonalViewModel { FirstName = x.FirstName,LastName=x.LastName,Summary=x.Summary,ProfileImage = x.ProfileImage,DOB=x.DOB, UserPersonalDetailID = x.UserPersonalDetailId, Gender = x.Gender,CityName = x.City.CityName, CountryName = x.City.Country.CountryName }).SingleOrDefault();
-            
+            if (user.Id == userloggedId)
+                PVM.IsCurrentUser = true;
+            else
+            {
+                PVM.IsCurrentUser = false;
+                var AreFrndList = _context.UserNetwork.Where(a => (a.User1 == user.Id || a.User1 == userloggedId) && (a.User2 == user.Id || a.User2 == userloggedId)).ToList();
+                if (AreFrndList.Any())
+                {
+                    PVM.AreFriends = AreFrndList.Where(a => (a.User1 == user.Id || a.User1 == userloggedId) && (a.User2 == user.Id || a.User2 == userloggedId) && a.AreFriend == true).Any();
+                    PVM.IsFriendReqRecieved = AreFrndList.Where(a => (a.User1 == user.Id) && (a.User2 == userloggedId) && a.AreFriend == false).Any();
+                    PVM.IsFriendReqSent = AreFrndList.Where(a => (a.User1 == userloggedId) && (a.User2 == user.Id) && a.AreFriend == false).Any();
+                }
+            }
+            var wallPosts = (from pst in _context.UserPost
+                             join us in _userManager.Users on pst.UserId equals us.Id
+                             join u in  _context.UserPersonalDetail on pst.UserId equals u.UserId
+                             where pst.UserId == user.Id
+                             orderby pst.OriginalId descending
+                select new UserPostVM
+                {
+                    ProfilePic = u.ProfileImage,
+                    Name = u.FirstName+" "+u.LastName,
+                    UserName = us.UserName,
+                    UserPostId = pst.UserPostId,
+                    OriginalId = pst.OriginalId,
+                    Status = pst.Status,
+                    Summary = pst.Summary,
+                    Image = pst.Image,
+                    CreateTime = pst.CreateTime,
+                    IsLiked = _context.PostLikes.Where(y=>y.PostId == pst.UserPostId && y.UserId == userloggedId).Any(),
+                    TotalLikes = _context.PostLikes.Where(z=>z.PostId == pst.UserPostId).Count(),
+                    TotalComments = _context.PostComments.Where(aa=>aa.PostId == pst.UserPostId).Count()
+                }
+            ).Take(10);
+            PVM.UserPosts = wallPosts;
+            PVM.UserPersonalVM = _context.UserPersonalDetail.Where(m => m.UserId == user.Id).Select(x => new UserPersonalViewModel { FirstName = x.FirstName, LastName = x.LastName, Summary = x.Summary,CoverImage = x.CoverImage, ProfileImage = x.ProfileImage, DOB = x.DOB, UserPersonalDetailID = x.UserPersonalDetailId, Gender = x.Gender, CityName = x.City.CityName, CountryName = x.City.Country.CountryName }).SingleOrDefault();
+            PVM.UserName = username;
             PVM.UserPersonalVM.PhoneNo = user.PhoneNumber;
             PVM.UserPersonalVM.Email = user.Email;
 
 
 
-            List<ExperienceVM> userExperienceList = _context.UserExperience.Where(x => x.UserId == user.Id).Select(c => new ExperienceVM { Title = c.Title, UserExperienceId = c.UserExperienceId, CityId = c.CityID, CityName = c.City.CityName, CountryName=c.City.Country.CountryName,CompanyName = c.CompanyName, CurrentWorkCheck = c.CurrentWorkCheck, Description = c.Description, StartDate = c.StartDate, EndDate = c.EndDate }).ToList();
+            List<ExperienceVM> userExperienceList = _context.UserExperience.Where(x => x.UserId == user.Id).Select(c => new ExperienceVM { Title = c.Title, UserExperienceId = c.UserExperienceId, CityId = c.CityID, CityName = c.City.CityName, CountryName = c.City.Country.CountryName, CompanyName = c.CompanyName, CurrentWorkCheck = c.CurrentWorkCheck, Description = c.Description, StartDate = c.StartDate, EndDate = c.EndDate }).ToList();
             ViewBag.UserExperienceList = userExperienceList;
 
-            List<EducationVM> userEducationList = _context.UserEducation.Where(x => x.UserId == user.Id).Select(c => new EducationVM { Title = c.Title, Details = c.Details, SchoolName = c.SchoolName, StartDate = c.StartDate, EndDate = c.EndDate, CurrentStatusCheck = c.CurrentStatusCheck, CityId = c.CityId, CityName = c.City.CityName, CountryName = c.City.Country.CountryName, UserEducationID=c.UserEducationId }).ToList();
+            List<EducationVM> userEducationList = _context.UserEducation.Where(x => x.UserId == user.Id).Select(c => new EducationVM { Title = c.Title, Details = c.Details, SchoolName = c.SchoolName, StartDate = c.StartDate, EndDate = c.EndDate, CurrentStatusCheck = c.CurrentStatusCheck, CityId = c.CityId, CityName = c.City.CityName, CountryName = c.City.Country.CountryName, UserEducationID = c.UserEducationId }).ToList();
             ViewBag.UserEducationList = userEducationList;
 
             List<CertificationVM> userCertificationList = _context.UserCertification.Where(x => x.UserId == user.Id).Select(c => new CertificationVM { Name = c.Name, URL = c.URL, UserCertificationId = c.UserCertificationId, LiscenceNo = c.LiscenceNo, CertificationDate = c.CertificationDate, ExpirationDate = c.ExpirationDate }).ToList();
@@ -71,11 +145,12 @@ namespace Tech_In.Controllers
 
             PVM.LanguageSkillVMList = _context.UserLanguageSkill.Where(x => x.UserId == user.Id).Select(c => new LanguageSkillVM { LanguageSkillId = c.LanguageSkillId, SkillName = c.SkillName });
 
-            PVM.PublicationVMListJP = _context.UserPublication.Where(x => x.UserId == user.Id && x.ConferenceOrJournal==false).Select(c => new PublicationVM { Title = c.Title, PublishYear = c.PublishYear, Description = c.Description, ConferenceOrJournal = c.ConferenceOrJournal, UserPublicationId = c.UserPublicationId });
+            PVM.PublicationVMListJP = _context.UserPublication.Where(x => x.UserId == user.Id && x.ConferenceOrJournal == false).Select(c => new PublicationVM { Title = c.Title, PublishYear = c.PublishYear, Description = c.Description, ConferenceOrJournal = c.ConferenceOrJournal, UserPublicationId = c.UserPublicationId });
             PVM.PublicationVMListCP = _context.UserPublication.Where(x => x.UserId == user.Id && x.ConferenceOrJournal == true).Select(c => new PublicationVM { Title = c.Title, PublishYear = c.PublishYear, Description = c.Description, ConferenceOrJournal = c.ConferenceOrJournal, UserPublicationId = c.UserPublicationId });
 
             //Question
-            var questionList = _context.UserQuestion.Where(u => u.UserId == user.Id).Select(c => new NewQuestionVM{
+            var questionList = _context.UserQuestion.Where(u => u.UserId == user.Id).Select(c => new NewQuestionVM
+            {
                 UserQuestionId = c.UserQuestionId,
                 Title = c.Title,
                 PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == c.UserId).Select(z => z.FirstName).SingleOrDefault(),
@@ -83,7 +158,7 @@ namespace Tech_In.Controllers
                 PostTime = c.PostTime,
                 HasVerifiedAns = c.HasVerifiedAns,
                 Visitors = _context.QuestionVisitor.Where(f => f.QuestionId == c.UserQuestionId).Count(),
-                Tags = c.Tag.Select(t => new QuestionTagViewModel{SkillName = t.SkillTag.SkillName }).ToList(),
+                Tags = c.Tag.Select(t => new QuestionTagViewModel { SkillName = t.SkillTag.SkillName }).ToList(),
                 Voting = c.UserQAVoting.Sum(x => x.Value)
             }).ToList();
 
@@ -93,7 +168,7 @@ namespace Tech_In.Controllers
                 Description = s.Description,
                 UserQACommentID = s.UserQACommentID,
                 UserQuestionId = s.UserQuestionId,
-                IsAnswer= s.IsAnswer,
+                IsAnswer = s.IsAnswer,
                 PostedBy = _context.UserPersonalDetail.Where(aa => aa.UserId == s.UserId).Select(z => z.FirstName).SingleOrDefault(),
                 UserId = user.Id,
             }).ToList();
@@ -102,11 +177,11 @@ namespace Tech_In.Controllers
             var answers = _context.UserQAnswer.Where(f => f.UserId == user.Id).Select(k => new QAnswerViewModel
             {
                 Description = HttpUtility.HtmlDecode(k.Description),
-                Date =k.PostTime,
-                IsVerified =k.IsVerified,
+                Date = k.PostTime,
+                IsVerified = k.IsVerified,
                 User = user.Id,
-                UserQAnswerId =k.UserQAnswerId,
-                UserQuestion = _context.UserQuestion.Where(g=> g.UserQuestionId == k.UserQuestionId).Select(j=> new NewQuestionVM
+                UserQAnswerId = k.UserQAnswerId,
+                UserQuestion = _context.UserQuestion.Where(g => g.UserQuestionId == k.UserQuestionId).Select(j => new NewQuestionVM
                 {
                     UserQuestionId = j.UserQuestionId,
                     Title = j.Title,
@@ -122,16 +197,122 @@ namespace Tech_In.Controllers
             ViewBag.answer = answers;
             ViewBag.comment = comments;
             ViewBag.question = questionList;
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
             return View(PVM);
         }
+        
+        [HttpPost]
+        public async Task<IActionResult> AddPost(AddPostVM post)
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            if (post.PostImg == null && post.PostDescription.Length < 3)
+            {
+                ModelState.AddModelError("PostDescription", "Post length should be greater then 3 characters");
+                return null;
+            }
+            UserPost p = new UserPost
+            {
+                OriginalId = 0,
+                Status = "Active",
+                CreateTime = DateTime.Now,
+                Summary = post.PostDescription,
+                Image = null,
+                UserId = user.Id
+            };
+            if (post.PostImg != null)
+            {
+                if ((post.PostImg.Length / 1000) > 7000)
+                {
+                    ViewBag.ProfilePic = "Image can't exceed 7Mb size";
+                    return View();
+                }
+                string path = Path.Combine(_hostingEnvironment.WebRootPath, "images/posts");
+                string extension = Path.GetExtension(post.PostImg.FileName).Substring(1);
+                if (!(extension.ToLower() == "png" || extension.ToLower() == "jpg" || extension.ToLower() == "jpeg"))
+                {
+                    ViewBag.ProfilePic = "Only png, jpg & jpeg are allowed";
+                    return View();
+                }
+                string fileNam = user.Id.Substring(24) + "p." + extension;
+                using (var vs = new FileStream(Path.Combine(path, fileNam), FileMode.CreateNew))
+                {
+                    await post.PostImg.CopyToAsync(vs);
+                }
+                using (var img = SixLabors.ImageSharp.Image.Load(Path.Combine(path, fileNam)))
+                {
+                    p.Image = $"/images/posts/{fileNam}";
+                }
+            }
+            else
+            {
+                p.Image = null;
+            }
+            _context.UserPost.Add(p);
+            await _context.SaveChangesAsync();
+            p.OriginalId = p.UserPostId;
+            _context.SaveChanges();
+            return Redirect("/u/"+ user.UserName);
+        }
 
+        public async Task<IActionResult> DeletePost(int Id)
+        {
+            string userloggedId = await OnGetSesstion();
+            var likes = _context.PostLikes.Where(aa => aa.PostId == Id);
+            var comments = _context.PostComments.Where(aa => aa.PostId == Id);
+            foreach (var like in likes)
+            {
+                _context.PostLikes.Remove(like);
+            }
+            foreach (var comment in comments)
+            {
+                _context.PostComments.Remove(comment);
+            }
+            _context.SaveChanges();
+            var userpost = _context.UserPost.Where(x => x.UserPostId == Id).FirstOrDefault();
+            _context.Remove(userpost);
+            _context.SaveChanges();
+            return Redirect("/u/" + HttpContext.Session.GetString("_UserName"));
+        }
+
+        public async Task<IActionResult> AddPostComment(int Id,string Msg)
+        {
+            var userId = await OnGetSesstion();
+            PostComments pC = new PostComments
+            {
+                PostId = Id,
+                CommentMsg = Msg,
+                UserId = userId
+            };
+            _context.PostComments.Add(pC);
+            _context.SaveChanges();
+            return Json(new { success = true });
+        }
+
+        public IActionResult LoadUserComments(int Id)
+        {
+            var postComments = _context.PostComments.Where(x => x.PostId == Id).Select(y => new PostCommentsView { Name = _context.UserPersonalDetail.Where(z => z.UserId == y.UserId).Select(aa => aa.FirstName).FirstOrDefault(),Comment = y.CommentMsg, Image = _context.UserPersonalDetail.Where(z => z.UserId == y.UserId).Select(aa => aa.ProfileImage).FirstOrDefault(),UserName = _userManager.Users.Where(bb=>bb.Id==y.UserId).Select(cc=>cc.UserName).FirstOrDefault() }).ToList();
+            return PartialView("_PostCommentPartial",postComments);
+        }
+
+        public IActionResult ViewLikes(int Id)
+        {
+            var users = (from usr in _context.UserPersonalDetail
+                         join p in _context.PostLikes on usr.UserId equals p.UserId
+                         join us in _userManager.Users on usr.UserId equals us.Id
+                         where p.PostId == Id
+                         select new LikesViewVM
+                         {
+                             Name = usr.FirstName + " " + usr.LastName,
+                             Image = usr.ProfileImage,
+                             UserName = us.UserName
+                         }
+                  ).ToList();
+            return View("_ViewLikes",users);
+        }
         //Personal Details
         public async Task<IActionResult> UpdatePersonalDetail(int Id)
         {
             var user = await _userManager.GetCurrentUser(HttpContext);
             ViewBag.CountryList = new SelectList(GetCountryList(), "CountryId", "CountryName");
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
             UserPersonalViewModel vm = new UserPersonalViewModel();
             if (Id > 0)
             {
@@ -165,6 +346,7 @@ namespace Tech_In.Controllers
         {
             if (ModelState.IsValid)
             {
+                await OnGetSesstion();
                 var user = await _userManager.GetCurrentUser(HttpContext);
                 var pd = _context.UserPersonalDetail.Where(p => p.UserId == user.Id).FirstOrDefault();
                 pd.FirstName = vm.FirstName;
@@ -188,7 +370,7 @@ namespace Tech_In.Controllers
                 ViewBag.CountryList = new SelectList(GetCountryList(), "CountryId", "CountryName");
                 return PartialView("UpdatePersonalDetail", vm);
             }
-            return Json(new { success = true });
+            return Redirect("/u/" + HttpContext.Session.GetString("_UserName"));
         }
 
         public async Task<string> SetUserId()
@@ -196,6 +378,267 @@ namespace Tech_In.Controllers
             var user = await _userManager.GetCurrentUser(HttpContext);
             HttpContext.Session.SetString("UserId", user.Id);
             return user.Id;
+        }
+
+        public async Task<IActionResult> AddFriend(string UserName)
+        {
+            string currentUserId = await OnGetSesstion();
+            var userToAdd = _context.Users.Where(x => x.UserName == UserName).FirstOrDefault();
+            if (userToAdd == null || userToAdd.Id == currentUserId)
+                return Json(new { success = false, msg = "Sorry, Unable to send Friend Request :(" });
+            int countrecieverfrnds = _context.UserNetwork.Where(y => y.User1 == userToAdd.Id || y.User2 == userToAdd.Id && y.AreFriend == true).Count();
+            int countsenderfrnds = _context.UserNetwork.Where(y => y.User1 == currentUserId || y.User2 == currentUserId && y.AreFriend == true).Count();
+            if (countrecieverfrnds >= 5000)
+            {
+                return Json(new { success = false, msg = "Sorry, Reciever has too many friends :(" });
+            }
+            else
+            {
+                DateTime lastOneDayReq = DateTime.Now.AddDays(-1);
+                int lastDayReqCount = _context.UserNetwork.Where(z => z.User1 == currentUserId && z.RecordTime > lastOneDayReq).Count();
+                if(lastDayReqCount>=20)
+                    return Json(new { success = false, msg = "Sorry, you can only send 20 requests per day :(" });
+                if (countsenderfrnds >= 5000)
+                    return Json(new { success = false, msg = "Sorry, you have reached your 5000 friends limit :(" });
+            }
+            UserNetwork uN = new UserNetwork
+            {
+                User1 = currentUserId,
+                User2 = userToAdd.Id,
+                RecordTime = DateTime.Now,
+                AreFriend = false
+            };
+            _context.UserNetwork.Add(uN);
+            _context.SaveChanges();
+            return Json(new { success = true, msg = "Friend Request Sent!" });
+        }
+        public async Task<IActionResult> AcceptFriend(string UserName)
+        {
+            string currentUserId = await OnGetSesstion();
+            var userToAdd = _context.Users.Where(x => x.UserName == UserName).FirstOrDefault();
+            if (userToAdd == null || userToAdd.Id == currentUserId)
+                return Json(new { success = false, msg = "Unable to accept :(" });
+            int countrecieverfrnds = _context.UserNetwork.Where(y => y.User1 == currentUserId || y.User2 == currentUserId && y.AreFriend == true).Count();
+            if (countrecieverfrnds >= 5000)
+            {
+                return Json(new { success = false, msg = "Sorry, You already have 5000 friends :(" });
+            }
+            UserNetwork frnd = _context.UserNetwork.Where(a => a.User1 == userToAdd.Id && a.User2 == currentUserId && a.AreFriend == false).FirstOrDefault();
+            frnd.AreFriend = true;
+            _context.SaveChanges();
+            return Json(new { success = true, msg = "You and "+UserName+" are now Friends!" });
+        }
+        public async Task<IActionResult> AcceptFriendR(string UserName)
+        {
+            string currentUserId = await OnGetSesstion();
+            var userToAdd = _context.Users.Where(x => x.UserName == UserName).FirstOrDefault();
+            if (userToAdd == null || userToAdd.Id == currentUserId)
+                return Json(new { success = false, msg = "Unable to accept :(" });
+            UserNetwork frnd = _context.UserNetwork.Where(a => a.User1 == userToAdd.Id && a.User2 == currentUserId && a.AreFriend == false).FirstOrDefault();
+            frnd.AreFriend = true;
+            _context.SaveChanges();
+            return Json(new { success = true });
+        }
+        public async Task<IActionResult> RejectFriend(string UserName)
+        {
+            string currentUserId = await OnGetSesstion();
+            var userToAdd = _context.Users.Where(x => x.UserName == UserName).FirstOrDefault();
+            if (userToAdd == null || userToAdd.Id == currentUserId)
+                return Json(new { success = false, msg = "Unable to accept :(" });
+            UserNetwork frnd = _context.UserNetwork.Where(a => a.User1 == userToAdd.Id && a.User2 == currentUserId && a.AreFriend == false).FirstOrDefault();
+            _context.UserNetwork.Remove(frnd);
+            _context.SaveChanges();
+            return Json(new { success = true, msg = "Friend Request Rejected!" });
+        }
+
+        public async Task<IActionResult> CancelFriend(string UserName)
+        {
+            string currentUserId = await OnGetSesstion();
+            var userToCancel = _context.Users.Where(x => x.UserName == UserName).FirstOrDefault();
+            var alreadyEsists = _context.UserNetwork.Where(a => (a.User1 == currentUserId || a.User1 == userToCancel.Id) && (a.User2 == currentUserId || a.User2 == userToCancel.Id)).FirstOrDefault();
+            if (alreadyEsists == null)
+                return Json(new { success = false, msg = "Unable to cancel request!" });
+            _context.UserNetwork.Remove(alreadyEsists);
+            _context.SaveChanges();
+            return Json(new { success = true, msg = "Friend Request Canceled!" });
+        }
+        public async Task<IActionResult> CountFriendReq(string UserName)
+        {
+            string currentUserId = await OnGetSesstion();
+            int countFriendReq = _context.UserNetwork.Where(x => x.User2 == currentUserId && x.AreFriend == false).Count();
+            return Json(new { count = countFriendReq });
+        }
+
+        public async Task<IActionResult> FriendRequests()
+        {
+            string currentUserId = await OnGetSesstion();
+            var friendR = (from un in _context.UserNetwork
+                           join up in _context.UserPersonalDetail on un.User1 equals up.UserId
+                           where un.User2 == currentUserId && un.AreFriend == false
+                           select new FriendsVM
+                           {
+                               Name = up.FirstName + " " + up.LastName,
+                               UserName = un.ApplicationUser1.UserName,
+                               ProfilePic = up.ProfileImage,
+                               ReqTime = un.RecordTime
+                           }).ToList();
+            return View("_FriendReq", friendR);
+        }
+        public async Task<IActionResult> MyFriendList()
+        {
+
+            string currentUserId = await OnGetSesstion();
+            var friendsR = (from un in _context.UserNetwork
+                           join up in _context.UserPersonalDetail on un.User1 equals up.UserId
+                           where un.User2 == currentUserId && un.AreFriend == true
+                           select new FriendsVM
+                           {
+                               Name = up.FirstName + " " + up.LastName,
+                               UserName = un.ApplicationUser1.UserName,
+                               ProfilePic = up.ProfileImage,
+                               ReqTime = un.RecordTime
+                           }).ToList();
+            var friendsR2 = (from un in _context.UserNetwork
+                            join up in _context.UserPersonalDetail on un.User2 equals up.UserId
+                            where un.User1 == currentUserId && un.AreFriend == true
+                            select new FriendsVM
+                            {
+                                Name = up.FirstName + " " + up.LastName,
+                                UserName = un.ApplicationUser2.UserName,
+                                ProfilePic = up.ProfileImage,
+                                ReqTime = un.RecordTime
+                            }).ToList();
+            friendsR.AddRange(friendsR2);
+            return View("_FriendsList",friendsR);
+        }
+        
+        public async Task<IActionResult> ToggleLike(int Id)
+        {
+            string userloggedId = await OnGetSesstion();
+            PostLikes ifLiked = _context.PostLikes.Where(x => x.PostId == Id && x.UserId == userloggedId).FirstOrDefault();
+            if (ifLiked == null)
+            {
+                PostLikes pLike = new PostLikes
+                {
+                    PostId = Id,
+                    UserId = userloggedId
+                };
+                _context.PostLikes.Add(pLike);
+                _context.SaveChanges();
+                return Json(new { like = true, unlike = false });
+            }
+            else
+            {
+                _context.PostLikes.Remove(ifLiked);
+                _context.SaveChanges();
+                return Json(new { like = false, unlike = true });
+            }
+        }
+
+        public async Task<IActionResult> UpdatePicturesSummary()
+        {
+            var currentUser = await OnGetSesstion();
+            var userPersonalDetails = _context.UserPersonalDetail.Where(x => x.UserId == currentUser).SingleOrDefault();
+            UserPicsVM userPics = new UserPicsVM
+            {
+                Id = userPersonalDetails.UserPersonalDetailId,
+                PPic = userPersonalDetails.ProfileImage,
+                Cpic = userPersonalDetails.CoverImage,
+                Summary = userPersonalDetails.Summary
+            };
+            return PartialView(userPics);
+        }
+        [HttpPost]
+        public async Task<IActionResult> UpdatePicturesSummaryP(UserPicsVM vm)
+        {
+            if (ModelState.IsValid)
+            {
+                var currentUser = await OnGetSesstion();
+                var userPersonalDetails = _context.UserPersonalDetail.Where(x => x.UserId == currentUser).FirstOrDefault();
+                if (vm.ProfileImage != null)
+                {
+                    var pfile = vm.ProfileImage;
+                    if ((pfile.Length / 1000) > 5000)
+                    {
+                        ModelState.AddModelError("ProfileImage", "Image can't exceed 5Mb size");
+                        return PartialView("UpdatePicturesSummaryP",vm);
+                    }
+                    string path = Path.Combine(_hostingEnvironment.WebRootPath, "images/users");
+                    string extension = Path.GetExtension(pfile.FileName).Substring(1);
+                    if (!(extension.ToLower() == "png" || extension.ToLower() == "jpg" || extension.ToLower() == "jpeg"))
+                    {
+                        ModelState.AddModelError("ProfileImage", "Only png, jpg & jpeg are allowed");
+                        return PartialView("UpdatePicturesSummaryP", vm);
+                    }
+                    string fileNam = currentUser.Substring(24) + DateTime.Now.ToString("ddMMyyhhmmsstt") + "p." + extension;
+                    using (var vs = new FileStream(Path.Combine(path, fileNam), FileMode.CreateNew))
+                    {
+                        await pfile.CopyToAsync(vs);
+                    }
+                    using (var img = SixLabors.ImageSharp.Image.Load(Path.Combine(path, fileNam)))
+                    {
+                        userPersonalDetails.ProfileImage = $"/images/users/{fileNam}";
+                    }
+                }
+                if(vm.CoverImage != null)
+                {
+                    var file = vm.CoverImage;
+                    string errorMsg = null;
+
+                    String[] orgfileName = file.FileName.Split('.');
+                    if (orgfileName[1].ToLower() != "jpg" && orgfileName[1].ToLower() != "jpeg" && orgfileName[1].ToLower() != "png")
+                    {
+                        errorMsg = "Only .jpg, .jpeg & .png are allowed";
+                        ModelState.AddModelError("CoverImage", errorMsg);
+                        return PartialView("UpdatePicturesSummaryP", vm);
+                    }
+
+                    string path = Path.Combine(_hostingEnvironment.WebRootPath, "images/users");
+                    var filename = orgfileName[0] + DateTime.Now.ToString("ddMMyyhhmmsstt") + "c." + orgfileName[1];
+                    using (var fs = new FileStream(Path.Combine(path, filename), FileMode.Create))
+                    {
+                        await file.CopyToAsync(fs);
+                    }
+                    using (var img = Image.Load(Path.Combine(path, filename)))
+                    {
+                        var srce = $"/images/users/{filename}";
+                        var exten = Path.GetExtension(filename).Substring(1);
+                        var siz = file.Length / 1000;
+                        if (img.Height > 400)
+                        {
+                            if (img.Width > 700)
+                            {
+                                if (siz < 5000)
+                                {
+                                    userPersonalDetails.CoverImage = srce;
+                                    //add to db
+                                    //return Json(new { success = true, response = vm });
+                                }
+                                else
+                                    errorMsg = "Image should be less than 10 MB";
+                            }
+                            else
+                                errorMsg = "Image Width should be greater than 700px";
+                        }
+                        else
+                            errorMsg = "Image height should be greater than 400px";
+
+                        if (errorMsg != null)
+                        {
+                            string fullPath = path + "/" + filename;
+                            if (System.IO.File.Exists(fullPath))
+                            {
+                                System.IO.File.Delete(fullPath);
+                            }
+                            ModelState.AddModelError("CoverImage", errorMsg);
+                            return PartialView("UpdatePicturesSummaryP", vm);
+                        }
+                    }
+                }
+                userPersonalDetails.Summary = vm.Summary;
+                _context.SaveChanges();
+            }
+            return Redirect("/u/" + HttpContext.Session.GetString("_UserName"));
         }
 
         //User Experience
@@ -265,10 +708,7 @@ namespace Tech_In.Controllers
                 ViewBag.CountryList = new SelectList(GetCountryList(), "CountryId", "CountryName");
                 return PartialView("AddEditUserExperience", vm);
             }
-            return Json(new { success = true });
-            //@ViewBag.UName = HttpContext.Session.GetString("Name");
-            //return RedirectToAction("Index");
-            //return View("Index");
+            return Json(new { success = true, username = HttpContext.Session.GetString("_UserName") });
         }
 
         public async Task<JsonResult> DeleteUserExperience(int Id)
@@ -318,7 +758,7 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateEducation(EducationVM vm)
         {
-            string userId = HttpContext.Session.GetString("UserId");
+            string userId = await OnGetSesstion();
             if (userId == null)
             {
                 userId = await SetUserId();
@@ -344,8 +784,7 @@ namespace Tech_In.Controllers
                 _context.UserEducation.Add(edu);
             }
             _context.SaveChanges();
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
-            return RedirectToAction("Index");
+            return Redirect("/u/" + HttpContext.Session.GetString("_UserName"));
         }
 
         public async Task<JsonResult> DeleteUserEducation(int Id)
@@ -392,7 +831,7 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateCertification(CertificationVM vm)
         {
-            string userId = HttpContext.Session.GetString("UserId");
+            string userId = await OnGetSesstion();
             if (userId == null)
             {
                 userId = await SetUserId();
@@ -418,9 +857,7 @@ namespace Tech_In.Controllers
                 _context.UserCertification.Add(cert);
             }
             _context.SaveChanges();
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
-            return RedirectToAction("Index");
-            //return View("Index");
+            return Redirect("/u/" + HttpContext.Session.GetString("_UserName"));
         }
 
         public async Task<JsonResult> DeleteUserCertification(int Id)
@@ -463,7 +900,7 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateAchievment(AchievmentVM vm)
         {
-            string userId = HttpContext.Session.GetString("UserId");
+            string userId = await OnGetSesstion();
             if (userId == null)
             {
                 userId = await SetUserId();
@@ -484,9 +921,7 @@ namespace Tech_In.Controllers
                 _context.UserAcheivement.Add(achiev);
             }
             _context.SaveChanges();
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
-            return RedirectToAction("Index");
-            //return View("Index");
+            return Redirect("/u/" + HttpContext.Session.GetString("_UserName"));
         }
 
         public async Task<JsonResult> DeleteUserAchievment(int Id)
@@ -529,7 +964,7 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateHobby(HobbyVM vm)
         {
-            string userId = HttpContext.Session.GetString("UserId");
+            string userId = await OnGetSesstion();
             if (userId == null)
             {
                 userId = await SetUserId();
@@ -551,10 +986,7 @@ namespace Tech_In.Controllers
             }
             _context.SaveChanges();
             var hobbiess = _context.UserHobby.ToList();
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
-            //return Json(new { hobbies = hobbiess });
-            return RedirectToAction("Index");
-            //return View("Index");
+            return Redirect("/u/" + HttpContext.Session.GetString("_UserName"));
         }
 
         public async Task<JsonResult> DeleteUserHobby(int Id)
@@ -597,7 +1029,7 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateLS(LanguageSkillVM vm)
         {
-            string userId = HttpContext.Session.GetString("UserId");
+            string userId = await OnGetSesstion();
             if (userId == null)
             {
                 userId = await SetUserId();
@@ -618,9 +1050,7 @@ namespace Tech_In.Controllers
                 _context.UserLanguageSkill.Add(ls);
             }
             _context.SaveChanges();
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
-            return RedirectToAction("Index");
-            //return View("Index");
+            return Redirect("/u/" + HttpContext.Session.GetString("_UserName"));
         }
 
         public async Task<JsonResult> DeleteLanguageSkill(int Id)
@@ -667,7 +1097,7 @@ namespace Tech_In.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdatePublication(PublicationVM vm)
         {
-            string userId = HttpContext.Session.GetString("UserId");
+            string userId = await OnGetSesstion();
             if (userId == null)
             {
                 userId = await SetUserId();
@@ -694,9 +1124,7 @@ namespace Tech_In.Controllers
                 _context.UserPublication.Add(publication);
             }
             _context.SaveChanges();
-            @ViewBag.UName = HttpContext.Session.GetString("Name");
-            return RedirectToAction("Index");
-            //return View("Index");
+            return Redirect("/u/" + HttpContext.Session.GetString("_UserName"));
         }
 
         public async Task<JsonResult> DeletePublication(int Id)
@@ -832,7 +1260,36 @@ namespace Tech_In.Controllers
 
             return Json(result);
         }
+        public async Task<JsonResult> CheckUserName(string userName)
+        {
+            var user = await _userManager.GetCurrentUser(HttpContext);
+            var exists = _userManager.Users.ToList().Find(aa => aa.UserName.Equals(userName.ToLower()));
+            if(exists!=null)
+                return Json(new { success = false });
+            return Json(new { success = true });
+        }
 
+        public async Task<string> OnGetSesstion()
+        {
+            const string SessionKeyName = "_Name";
+            const string SessionKeyPic = "_PPic";
+            const string SessionKeyId = "_Id";
+            const string SessionUserName = "_UserName";
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString(SessionKeyName)))
+            {
+                var user = await _userManager.GetCurrentUser(HttpContext);
+                if (user == null)
+                    return null;
+                HttpContext.Session.SetString(SessionKeyName, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.FirstName).FirstOrDefault());
+                HttpContext.Session.SetString(SessionKeyPic, _context.UserPersonalDetail.Where(x => x.UserId == user.Id).Select(c => c.ProfileImage).FirstOrDefault());
+                HttpContext.Session.SetString(SessionKeyId, user.Id);
+                HttpContext.Session.SetString(SessionUserName, user.UserName);
+            }
+            @ViewBag.UName = HttpContext.Session.GetString(SessionKeyName);
+            @ViewBag.UserName = HttpContext.Session.GetString(SessionUserName);
+            @ViewBag.UserPic = HttpContext.Session.GetString(SessionKeyPic);
+            return HttpContext.Session.GetString(SessionKeyId);
+        }
 
     }
 }

@@ -1,0 +1,108 @@
+﻿@{
+
+    ViewData["Title"] = "Chat";
+}
+
+<head>
+    <title>pChat &mdash; Private Chatroom</title>
+</head>
+
+<!-- / Navigation Bar -->
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-md-3">
+            <aside class="main visible-md visible-lg">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="panel panel-default users__bar">
+                            <div class="panel-heading users__heading">
+                                Contacts (@ViewBag.allUsers.Count)
+                            </div>
+                            <div class="__no__chat__">
+                                <p>Select a contact to chat with</p>
+                            </div>
+                            <div class="panel-body users__body">
+                                <ul id="contacts" class="list-group">
+                                    @foreach (var user in @ViewBag.allUsers)
+                                    {
+                                        <li>
+                                            <button class="user__item" data-contact-id="@user.UserID" data-contact-name="@user.FirstName">
+                                                <div class="avatar">
+                                                </div>
+                                                <span>@user.FirstName @user.LastName</span>
+                                                <div class="status-bar"></div>
+                                            </button>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+        <div class="col-xs-12 col-md-9 chat__body">
+
+            <div class="col-xs-12 col-md-9 chat__body">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <ul class="list-group" id="chat"></ul>
+                    </div>
+
+                    <div class="chat__type__body">
+                        <div class="chat__type">
+                            <textarea id="msg_box" placeholder="Type your message"></textarea>
+                            <button class="btn btn-primary" id="sendMessage">Send</button>
+                        </div>
+                    </div>
+                    <div class="chat__typing">
+                        <span id="typerDisplay"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        var recieverId = "";
+        var timerVar;
+
+        $(document).ready(function () {
+            $('.user__item').click(function () {
+                recieverId = $(this).data('contact-id');
+
+                if (timerVar)
+                    clearInterval(timerVar);
+                timerVar = setInterval(function () {
+                    debugger;
+                    $.post('/Chat/Conversation', { "contact": recieverId }, function (data) {
+                        SetChat(data.data);
+                    });
+                }, 5000);
+            });
+
+            $('#sendMessage').click(function () {
+                var message = $('#msg_box').val();
+                        $.ajax({
+                            type: "GET",
+                            url: "/chat/SendMessage",
+                            data: { recieverId: recieverId, message: message },
+                            success: function (data) {
+                                SetChat(data);
+                            }
+                });
+                $('#msg_box').val("");
+                    });
+        });
+
+        function SetChat(data) {
+            var _html = "";
+            var _this = $('#chat');
+            $.each(data, function (index, chat) {
+                _html += "<li class='list-group-item'>" + (chat.senderId == recieverId ? "<div class='pull-left'>" : "<div class='pull-right'>") + chat.message + "</div><div class='clearfix'></li>";
+            });
+            _this.append(_html);
+        }
+    </script>
