@@ -1,4 +1,4 @@
-﻿
+﻿@model Job
 @{
     ViewData["Title"] = "PostJob";
 }
@@ -7,7 +7,7 @@
     <div class="form-row">
         <div class="form-group col-md-6">
             <h6 for="JobTitle">Job Title<sup>*</sup></h6>
-            <input type="text" class="form-control" id="inputEmail4" required>
+            <input asp-for="Title" type="text" class="form-control" id="inputEmail4" required>
         </div>
     </div>
     <div class="form-row">
@@ -18,46 +18,49 @@
     </div>
     <div class="form-row">
         <div class="form-group col-md-6">
-            <h6>Experience<sup>*</sup></h6>
-            <select id="inputState" class="form-control">
-                <option selected>Choose...</option>
-                <option>...</option>
-            </select>
+            <h6>Minimum Experience<sup>*</sup></h6>
+            <input asp-for="MinExpereince" class="form-control" required />
         </div>
     </div>
     <div class="form-row">
         <div class="form-group col-md-6">
-            <h6>Salary<sup>*</sup></h6>
-            <select id="inputState" class="form-control">
-                <option selected>Choose...</option>
-                <option>...</option>
-            </select>
+            <h6>Maximum Experience<sup>*</sup></h6>
+            <input asp-for="MaxExpereince" class="form-control" required />
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <h6>Minimum Salary<sup>*</sup></h6>
+            <input asp-for="MinSalary" class="form-control" required />
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <h6>Maximum Salary<sup>*</sup></h6>
+            <input asp-for="MaxSalary" class="form-control" required />
         </div>
     </div>
     <div class="form-row">
         <div class="form-group col-md-6">
             <h6>Job Type<sup>*</sup></h6>
-            <select id="inputState" class="form-control">
-                <option selected>Choose...</option>
-                <option>...</option>
-            </select>
+            @Html.DropDownList("Job Type",
+           Html.GetEnumSelectList<JobType>(),"Select Job Type",
+           new { @class="form-control"})
         </div>
     </div>
     <div class="form-row">
         <div class="form-group col-md-6">
             <h6>Job Shift<sup>*</sup></h6>
-            <select id="inputState" class="form-control">
-                <option selected>Choose...</option>
-                <option>...</option>
+            <select asp-items="Html.GetEnumSelectList<JobShift>()" id="inputState" class="form-control">
+                <option selected="selected" value="">Select Job Shift</option>
             </select>
         </div>
     </div>
     <div class="form-row">
         <div class="form-group col-md-6">
             <h6>Qualification<sup>*</sup></h6>
-            <select id="inputState" class="form-control">
-                <option selected>Choose...</option>
-                <option>...</option>
+            <select asp-items="Html.GetEnumSelectList<Qualification>()" id="inputState" class="form-control">
+                <option selected="selected" value="">Select Job Qualification</option>
             </select>
         </div>
     </div>
@@ -65,34 +68,40 @@
     <div class="form-row">
         <div class="form-group col-md-6">
             <h6 for="JobCategory">Total Vacancies<sup>*</sup></h6>
-            <input type="text" class="form-control" id="inputEmail4" required>
+            <input asp-for="vacancies" class="form-control" id="inputEmail4" required>
         </div>
     </div>
 
-    <div class="form-group">
+    <div class="form-row">
         <div class="form-group">
             <h4>Job Description</h4>
-            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+            @*<textarea name="content" id="editor" asp-for="Description" class="form-control"></textarea>*@
+            <textarea asp-for="Description" class="fr-form"></textarea>
         </div>
     </div>
-    <div class="form-group">
-        <div class="form-group">
-            <h5>Job Specifications</h5>
-            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="form-group">
-            <h6>Position Requirments</h6>
-            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <div class="control-label">Closing Date</div>
+               <input asp-for="EndDate" class="form-control" />
         </div>
     </div>
     <br>
     <button type="button" class="btn btn-primary">Post Job</button>
-
-
-
-
-
 </div>
-
+<script src="https://cloud.tinymce.com/stable/tinymce.min.js"></script>
+<script>
+    tinymce.init({
+        selector: 'textarea',
+        height: 300,
+        menubar: false,
+        plugins: [
+            'advlist autolink lists link image charmap print preview anchor textcolor',
+            'searchreplace visualblocks code fullscreen',
+            'insertdatetime media table contextmenu paste code help wordcount'
+        ],
+        toolbar: 'insert | undo redo |  formatselect | bold italic backcolor  | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+        content_css: [
+            '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+            '//www.tinymce.com/css/codepen.min.css']
+    });
+</script>

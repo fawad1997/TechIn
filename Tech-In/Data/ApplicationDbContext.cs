@@ -32,6 +32,7 @@ namespace Tech_In.Data
         public DbSet<UserAcheivement> UserAcheivement { get; set; }
         public DbSet<SkillTag> SkillTag { get; set; }
 
+        //Questions Module
         public DbSet<UserQAComment> UserQAComment { get; set; }
         public DbSet<UserQAnswer> UserQAnswer { get; set; }
         public DbSet<UserQAVoting> UserQAVoting { get; set; }
@@ -39,6 +40,7 @@ namespace Tech_In.Data
         public DbSet<UserSkill> UserSkill { get; set; }
         public DbSet<QuestionSkill> QuestionSkill { get; set; }
         public DbSet<QuestionVisitor> QuestionVisitor { get; set; }
+
         //Article Module
         public DbSet<Article> Article { get; set; }
         public DbSet<ArticleComment> ArticleComment { get; set; }
@@ -47,6 +49,15 @@ namespace Tech_In.Data
         public DbSet<Category> Category { get; set; }
         public DbSet<ArticleCategory> ArticleCategory { get; set; }
         public DbSet<AIUserInterest> AIUserInterest { get; set; }
+
+        //Job Module
+        public DbSet<Tech_In.Models.Database.Company> Company { get; set; }
+        public DbSet<Tech_In.Models.Database.Job> Job { get; set; }
+        public DbSet<Tech_In.Models.Database.JobCatagory> JobCatagory { get; set; }
+        public DbSet<Tech_In.Models.Database.Applicant> Applicant { get; set; }
+        public DbSet<Tech_In.Models.Database.JobSkill> JobSkill { get; set; }
+        public DbSet<Tech_In.Models.Database.SavedJob> SavedJob { get; set; }
+               
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -71,5 +82,6 @@ namespace Tech_In.Data
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
         }
+
     }
 }

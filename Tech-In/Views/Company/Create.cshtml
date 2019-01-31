@@ -1,0 +1,134 @@
+﻿@model Tech_In.Models.Database.Company
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Create</h2>
+
+<h4>Company</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="About" class="control-label"></label>
+                <textarea asp-for="About" class="fr-form"></textarea>
+                <span asp-validation-for="About" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WebSite" class="control-label"></label>
+                <input asp-for="WebSite" class="form-control" />
+                <span asp-validation-for="WebSite" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FoundedDate" class="control-label"></label>
+                <input asp-for="FoundedDate" class="form-control" />
+                <span asp-validation-for="FoundedDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Industry" class="control-label"></label>
+                <input asp-for="Industry" class="form-control" />
+                <span asp-validation-for="Industry" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Type" class="control-label"></label>
+                <input asp-for="Type" class="form-control" />
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Size" class="control-label"></label>
+                <input asp-for="Size" class="form-control" />
+                <span asp-validation-for="Size" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Location" class="control-label"></label>
+                <select asp-for="Location" class="form-control" asp-items="ViewBag.Location"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Logo" class="control-label"></label>
+                <input type="file" class="form-control" />
+                <input asp-for="Logo" type="hidden" class="form-control" />
+                <span asp-validation-for="Logo" class="text-danger"></span>
+                <span id="imgError" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <span class="text-danger">Image height and width should be 400x400 and should not exceed 2Mb.</span>
+            </div>
+            <div id="imgDisp" class="form-group" style="display:none;">
+                <img id="dispImg" style="height:400px; width:400px;" />
+            </div>
+            @*<div class="form-group">
+            <label asp-for="UserId" class="control-label"></label>
+            <select asp-for="UserId" class ="form-control" asp-items="ViewBag.UserId"></select>
+        </div>*@
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+<script src="https://cloud.tinymce.com/stable/tinymce.min.js"></script>
+<script>
+    $(document).ready(function () {
+        let onchange = function () {
+            let _this = $(this)[0];
+            let f = new FormData();
+            f.append('File', _this.files[0]);
+            let onSuccess = function (model) {
+                if (model.success) {
+                    $('#Logo').val(model.response.source);
+                    $("#dispImg").prop('src', model.response.source);
+                    $("#imgDisp").css('display', 'block');
+                    //console.log(model);
+                } else {
+                    $('#imgError').text(model.response);
+                }
+            };
+
+            $.ajax({
+                method: 'post',
+                url: '/company/checkimg',
+                data: f,
+                processData: false,
+                contentType: false,
+                error: function (response) {
+                    console.log(response);
+                    alert("error");
+                }
+            }).done(onSuccess);
+            //alert('1');
+        };
+        $(document).on('change', 'input[type=file]', onchange);
+
+        tinymce.init({
+            selector: 'textarea',
+            height: 500,
+            menubar: false,
+            plugins: [
+                'advlist autolink lists link image charmap print preview anchor textcolor',
+                'searchreplace visualblocks code fullscreen',
+                'insertdatetime media table contextmenu paste code help wordcount'
+            ],
+            toolbar: 'insert | undo redo |  formatselect | bold italic backcolor  | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+            content_css: [
+                '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+                '//www.tinymce.com/css/codepen.min.css']
+        });
+    });
+</script>
