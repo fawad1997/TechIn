@@ -5,116 +5,73 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Index</h2>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Title)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.vacancies)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Description)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.MinSalary)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.MaxSalary)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Status)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.MinExpereince)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.MaxExpereince)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Qualification)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.PostDate)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.JobType)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.JobShift)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.EndDate)
-                </th>
-            <th>
-                @Html.DisplayNameFor(model => model.City)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Company)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.vacancies)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MinSalary)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MaxSalary)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MinExpereince)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MaxExpereince)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Qualification)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PostDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.JobType)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.JobShift)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.City.CityId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Company.About)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div id="job" class="section md-padding">
+    <!-- Container -->
+    <div class="container">
+        <!-- Row -->
+
+        <div class="row">
+
+            <div class="col-md-9">
+                @foreach (var item in Model)
+                {
+                    <div style="margin-bottom:2%;" class="row">
+                        <div class="blog">
+                            <img style="align-content:flex-start;float:left;height:75px;width:75px;" src="@item.Company.Logo" />
+                            <div class="col-sm-8" style="cursor: pointer;">
+
+                                <h3 style="margin-bottom:0px;">@Html.DisplayFor(modelItem => item.Title)</h3>
+                                <h4 style="margin-bottom:0px;">@Html.DisplayFor(modelItem => item.Company.Title)</h4>
+                                <ul style="margin-bottom:4px;" class="blog-meta">
+                                    <li>
+                                        <i class="fa fa-envelope"></i>
+                                        @Html.DisplayFor(modelItem => item.MinExpereince) - @Html.DisplayFor(modelItem => item.MaxExpereince) Years
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-clock-o"></i>
+                                        @Html.DisplayFor(modelItem => item.PostDate)
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-dollar"></i>
+                                        @Html.DisplayFor(modelItem => item.MinSalary) - @Html.DisplayFor(modelItem => item.MaxSalary)
+                                    </li>
+                                </ul>
+
+                                <div style="word-wrap:break-word;overflow:hidden;text-overflow:ellipsis;max-height:150px;">
+                                    @Html.Raw(item.Description) ...
+                                </div>
+                                <a asp-action="Details" asp-route-id="@item.Id">Read more</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <!-- Aside -->
+            <aside id="aside" class="col-md-3">
+
+                <button onclick="location.href='@Url.Action("Create", "Job")'" style="margin-bottom:2em; padding:1em;" class="main-btn btn-block">
+                    Post a Job
+                </button>
+                <!-- Search -->
+                <div class="widget">
+                    <div class="widget-search">
+                        <input class="search-input" type="text" placeholder="search jobs">
+                        <button class="search-btn" type="button">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- /Search -->
+
+            </aside>
+            <!-- /Aside -->
+
+        </div>
+        <!-- /Row -->
+
+    </div>
+    <!-- /Container -->
+
+</div>
+<!-- /job -->

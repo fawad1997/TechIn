@@ -395,6 +395,50 @@ namespace Tech_In.Migrations
                     b.ToTable("Category");
                 });
 
+            modelBuilder.Entity("Tech_In.Models.Database.Company", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("About")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(MAX)");
+
+                    b.Property<DateTime>("FoundedDate");
+
+                    b.Property<string>("Industry")
+                        .IsRequired();
+
+                    b.Property<int>("Location");
+
+                    b.Property<string>("Logo");
+
+                    b.Property<int>("Size");
+
+                    b.Property<string>("Speciality")
+                        .IsRequired();
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<string>("Type")
+                        .IsRequired();
+
+                    b.Property<string>("UserId");
+
+                    b.Property<string>("WebSite")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Location");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Company");
+                });
+
             modelBuilder.Entity("Tech_In.Models.Database.Conversation", b =>
                 {
                     b.Property<int>("Id")
@@ -417,42 +461,6 @@ namespace Tech_In.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Conversation");
-                });
-
-            modelBuilder.Entity("Tech_In.Models.Database.Company", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("About")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(MAX)");
-
-                    b.Property<DateTime>("FoundedDate");
-
-                    b.Property<int>("Location");
-
-                    b.Property<string>("Logo");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(50);
-
-                    b.Property<string>("Type")
-                        .IsRequired();
-
-                    b.Property<string>("UserId");
-
-                    b.Property<string>("WebSite")
-                        .IsRequired();
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Location");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Company");
                 });
 
             modelBuilder.Entity("Tech_In.Models.Database.Job", b =>
@@ -1197,6 +1205,13 @@ namespace Tech_In.Migrations
                         .HasForeignKey("UserId");
                 });
 
+            modelBuilder.Entity("Tech_In.Models.Database.Conversation", b =>
+                {
+                    b.HasOne("Tech_In.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("Conversations")
+                        .HasForeignKey("UserId");
+                });
+
             modelBuilder.Entity("Tech_In.Models.Database.Job", b =>
                 {
                     b.HasOne("Tech_In.Models.City", "City")
@@ -1233,13 +1248,6 @@ namespace Tech_In.Migrations
                         .WithMany()
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("Tech_In.Models.Database.Conversation", b =>
-                {
-                    b.HasOne("Tech_In.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany("Conversations")
-                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("Tech_In.Models.Database.PostLikes", b =>

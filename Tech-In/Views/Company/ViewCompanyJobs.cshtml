@@ -1,0 +1,17 @@
+﻿@model Company
+@{
+    ViewData["Title"] = "ViewCompanyJobs";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>ViewCompanyJobs</h2>
+<dt>
+    @Html.DisplayNameFor(model=>model.Title)
+</dt>
+<dd>
+    @foreach(var item in ViewBag.jobs)
+    {
+        @Html.DisplayFor(item.Title)
+    }
+</dd>
+

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +35,7 @@ namespace Tech_In.Controllers
         // GET: Company
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Company.Include(c => c.City).Include(c => c.User);
+            var applicationDbContext = _context.Company.Include(c => c.City);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -61,8 +62,7 @@ namespace Tech_In.Controllers
         // GET: Company/Create
         public IActionResult Create()
         {
-            ViewData["Location"] = new SelectList(_context.City, "CityId", "CityId");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
+            ViewData["Location"] = new SelectList(_context.City, "CityId", "CityName");
             return View();
         }
 
@@ -71,9 +71,30 @@ namespace Tech_In.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,About,WebSite,FoundedDate,Type,Location,Logo")] Company company)
+        [Authorize]
+        public async Task<IActionResult> Create(Company co)
         {
+            if (co == null)
+            {
+                throw new ArgumentNullException(nameof(co));
+            }
+
             var user = await _userManager.GetCurrentUser(HttpContext);
+            Company company = new Company
+            {
+                UserId = user.Id,
+                Title = co.Title,
+                About = co.About,
+                WebSite = co.WebSite,
+                FoundedDate = co.FoundedDate,
+                Industry = co.Industry,
+                Type = co.Type,
+                Size = co.Size,
+                Location = co.Location,
+                Logo = co.Logo,
+                Speciality = co.Speciality
+            };
+
             if (ModelState.IsValid)
             {
                 company.UserId = user.Id;
@@ -81,8 +102,7 @@ namespace Tech_In.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["Location"] = new SelectList(_context.City, "CityId", "CityId", company.Location);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", company.UserId);
+            ViewData["Location"] = new SelectList(_context.City, "CityId", "CityName", company.Location);
             return View(company);
         }
 
@@ -100,7 +120,7 @@ namespace Tech_In.Controllers
                     return Json(new { success = false, response = errorMsg });
                 }
 
-                string path = Path.Combine(_environment.WebRootPath, "images/company");
+                string path = Path.Combine(_environment.WebRootPath, "images/article");
                 var filename = orgfileName[0] + DateTime.Now.ToString("ddMMyyhhmmsstt") + "." + orgfileName[1];
                 using (var fs = new FileStream(Path.Combine(path, filename), FileMode.Create))
                 {
@@ -108,7 +128,7 @@ namespace Tech_In.Controllers
                 }
                 using (var img = Image.Load(Path.Combine(path, filename)))
                 {
-                    vm.Source = $"/images/company/{filename}";
+                    vm.Source = $"/images/article/{filename}";
                     vm.Extension = Path.GetExtension(filename).Substring(1);
                     vm.Width = img.Width;
                     vm.Height = img.Height;

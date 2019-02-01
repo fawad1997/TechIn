@@ -10,7 +10,7 @@
 <h4>Job</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
@@ -25,7 +25,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
+                <textarea asp-for="Description" class="fr-form"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -38,11 +38,11 @@
                 <input asp-for="MaxSalary" class="form-control" />
                 <span asp-validation-for="MaxSalary" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <select asp-for="Status" class="form-control"></select>
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
+            @*<div class="form-group">
+                    <label asp-for="Status" class="control-label"></label>
+                    <select asp-for="Status" asp-items="@Html.GetEnumSelectList<JobStatus> ()" class="form-control"></select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+                </div>*@
             <div class="form-group">
                 <label asp-for="MinExpereince" class="control-label"></label>
                 <input asp-for="MinExpereince" class="form-control" />
@@ -55,22 +55,22 @@
             </div>
             <div class="form-group">
                 <label asp-for="Qualification" class="control-label"></label>
-                <select asp-for="Qualification" class="form-control"></select>
+                <select asp-for="Qualification" asp-items="@Html.GetEnumSelectList<Qualification> ()" class="form-control"></select>
                 <span asp-validation-for="Qualification" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="PostDate" class="control-label"></label>
-                <input asp-for="PostDate" class="form-control" />
-                <span asp-validation-for="PostDate" class="text-danger"></span>
-            </div>
+            @*<div class="form-group">
+                    <label asp-for="PostDate" class="control-label"></label>
+                    <input asp-for="PostDate" class="form-control" />
+                    <span asp-validation-for="PostDate" class="text-danger"></span>
+                </div>*@
             <div class="form-group">
                 <label asp-for="JobType" class="control-label"></label>
-                <select asp-for="JobType" class="form-control"></select>
+                <select asp-for="JobType" asp-items="@Html.GetEnumSelectList<JobType> ()" class="form-control"></select>
                 <span asp-validation-for="JobType" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="JobShift" class="control-label"></label>
-                <select asp-for="JobShift" class="form-control"></select>
+                <select asp-for="JobShift" asp-items="@Html.GetEnumSelectList<JobShift> ()" class="form-control"></select>
                 <span asp-validation-for="JobShift" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -80,11 +80,11 @@
             </div>
             <div class="form-group">
                 <label asp-for="Location" class="control-label"></label>
-                <select asp-for="Location" class ="form-control" asp-items="ViewBag.Location"></select>
+                <select asp-for="Location" class="form-control" asp-items="ViewBag.Location"></select>
             </div>
             <div class="form-group">
                 <label asp-for="PostedBy" class="control-label"></label>
-                <select asp-for="PostedBy" class ="form-control" asp-items="ViewBag.PostedBy"></select>
+                <select asp-for="PostedBy" class="form-control" asp-items="ViewBag.PostedBy"></select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-default" />
@@ -99,4 +99,24 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
 }
+<script src="https://cloud.tinymce.com/stable/tinymce.min.js"></script>
+<script>
+    $(document).ready(function () {
+        tinymce.init({
+            selector: 'textarea',
+            height: 500,
+            menubar: false,
+            plugins: [
+                'advlist autolink lists link image charmap print preview anchor textcolor',
+                'searchreplace visualblocks code fullscreen',
+                'insertdatetime media table contextmenu paste code help wordcount'
+            ],
+            toolbar: 'insert | undo redo |  formatselect | bold italic backcolor  | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+            content_css: [
+                '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+                '//www.tinymce.com/css/codepen.min.css']
+        });
+    });
+</script>

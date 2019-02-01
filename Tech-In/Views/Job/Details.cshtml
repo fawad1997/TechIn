@@ -5,105 +5,94 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Details</h2>
+<div id="blog" class="section md-padding">
 
-<div>
-    <h4>Job</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.vacancies)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.vacancies)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.MinSalary)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.MinSalary)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.MaxSalary)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.MaxSalary)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.MinExpereince)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.MinExpereince)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.MaxExpereince)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.MaxExpereince)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Qualification)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Qualification)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.PostDate)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.PostDate)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.JobType)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.JobType)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.JobShift)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.JobShift)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.EndDate)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.EndDate)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.City)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.City.CityId)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Company)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Company.About)
-        </dd>
-    </dl>
+    <!-- Container -->
+    <div class="container">
+
+        <!-- Row -->
+        <div class="row">
+            <!-- Main -->
+            <main id="main" class="col-md-9">
+                <div class="job">
+                    <div class="blog-content">
+                        <h3>@Html.DisplayFor(model => model.Title)</h3>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><h6>Experience</h6></td>
+                                    <td>@Html.DisplayFor(model => model.MinExpereince) - @Html.DisplayFor(model => model.MaxExpereince)</td>
+                                    <td><h6>Qualification</h6></td>
+                                    <td> @Html.DisplayFor(model => model.Qualification)</td>
+                                </tr>
+                                <tr>
+                                    <td><h6>Job Shift</h6></td>
+                                    <td>@Html.DisplayFor(model => model.JobShift)</td>
+                                    <td><h6>Job Type</h6></td>
+                                    <td>@Html.DisplayFor(model => model.JobType)</td>
+                                </tr>
+                                <tr>
+
+                                    <td><h6>Post Date</h6></td>
+                                    <td>@Html.DisplayFor(model => model.PostDate)</td>
+                                    <td><h6>End Date</h6></td>
+                                    <td>@Html.DisplayFor(model => model.EndDate)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+
+                        <p>
+                            @Html.Raw(Model.Description)
+                        </p>
+                    </div>
+
+                    <div class="blog-tags">
+                        <ul style="margin-bottom:4px;" class="blog-meta">
+                            <li>
+                                <i class="fa fa-envelope"></i> @Html.DisplayFor(modelItem => modelItem.MinExpereince) - @Html.DisplayFor(modelItem => modelItem.MaxExpereince) Years
+                            </li>
+                            <li>
+                                <i class="fa fa-clock-o"></i> @Html.DisplayFor(modelItem => modelItem.PostDate)
+                            </li>
+                            <li>
+                                <i class="fa fa-dollar"></i>@Html.DisplayFor(modelItem => modelItem.MinSalary) - @Html.DisplayFor(modelItem => modelItem.MaxSalary)
+                            </li>
+                        </ul>
+                    </div>
+            </main>
+            <!-- /Main -->
+            <!-- Aside -->
+            <aside id="aside" class="col-md-3">
+                <!-- Posts sidebar -->
+                <div class-"col-md-3">
+                    <a asp-route-id="@Model.Id" asp-action="ApplyForJob" class="main-btn btn-block" style="margin-bottom:2em; padding:1em;text-align:center;"> Apply </a>
+                    @if (ViewBag.IsSaved)
+                    {
+                        <a asp-action="UnSaveJob" asp-route-id="@Model.Id" class="main-btn btn-block" style="margin-bottom:2em; padding:1em;text-align:center;"> Un Save </a>
+                    }
+                    else
+                    {
+                        <a asp-action="SaveJob" asp-route-id="@Model.Id" class="main-btn btn-block" style="margin-bottom:2em; padding:1em;text-align:center;"> Save </a>
+                    }
+                    </div>
+
+</aside>
+            <!-- /Aside -->
+
+        </div>
+        <!-- /Row -->
+
+    </div>
+    <!-- /Container -->
+
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+<!-- /Blog -->
