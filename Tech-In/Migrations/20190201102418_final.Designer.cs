@@ -13,7 +13,7 @@ using Tech_In.Models.Model;
 namespace Tech_In.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190201095711_final")]
+    [Migration("20190201102418_final")]
     partial class final
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
