@@ -383,7 +383,7 @@ namespace Tech_In.Controllers
 
         public async Task<IActionResult> AddFriend(string UserName)
         {
-            string currentUserId = await OnGetSesstion();
+            string currentUserId = await OnGetSesstion();//commit
             var userToAdd = _context.Users.Where(x => x.UserName == UserName).FirstOrDefault();
             if (userToAdd == null || userToAdd.Id == currentUserId)
                 return Json(new { success = false, msg = "Sorry, Unable to send Friend Request :(" });
