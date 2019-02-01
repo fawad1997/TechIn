@@ -13,6 +13,7 @@
         <div class="col-xs-10 col-md-11">
             <h6 class="inline small-h"><a style="color:black;" href="/u/@Model.UserName"> @Model.Name</a></h6>
             <br />
+            @if (Model.UserId == ViewBag.UserID) { 
             <!--Edit--> 
             <div class="right-post-icon-div">
                 <a href="/User/DeletePost/@Model.UserPostId">
@@ -21,7 +22,7 @@
                     </div>
                 </a>
             </div>
-
+            }
             <!--/Edit-->
             <p class="inline twelve-font">@Model.GetPastTime()</p>
         </div>

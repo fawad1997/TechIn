@@ -7,6 +7,7 @@ namespace Tech_In.Models.ViewModels.ProfileViewModels
 {
     public class FriendsVM
     {
+        public string Id { get; set; }
         public string UserName { get; set; }
         public string Name { get; set; }
         public string ProfilePic { get; set; }

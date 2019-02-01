@@ -48,12 +48,29 @@ namespace Tech_In.Controllers
                 {
                     return RedirectToAction("CompleteProfile", "Home");
                 }
+                //var friendsR = (from un in _context.UserNetwork
+                //                join up in _context.UserPersonalDetail on un.User1 equals up.UserId
+                //                where un.User2 == currentUserId && un.AreFriend == true
+                //                select new FriendsVM
+                //                {
+                //                    Id = up.UserId,
+                //                }).ToList();
+                //var friendsR2 = (from un in _context.UserNetwork
+                //                 join up in _context.UserPersonalDetail on un.User2 equals up.UserId
+                //                 where un.User1 == currentUserId && un.AreFriend == true
+                //                 select new FriendsVM
+                //                 {
+                //                     Id = up.UserId,
+                //                 }).ToList();
+                //friendsR.AddRange(friendsR2);
+
                 wallPosts = (from pst in _context.UserPost
                     join us in _userManager.Users on pst.UserId equals us.Id
                              join u in _context.UserPersonalDetail on pst.UserId equals u.UserId
                              orderby pst.OriginalId descending
                     select new UserPostVM
                     {
+                        UserId = pst.UserId,
                         ProfilePic = u.ProfileImage,
                         Name = u.FirstName + " " + u.LastName,
                         UserName = us.UserName,
@@ -67,7 +84,7 @@ namespace Tech_In.Controllers
                         TotalLikes = _context.PostLikes.Where(z => z.PostId == pst.UserPostId).Count(),
                         TotalComments = _context.PostComments.Where(z => z.PostId == pst.UserPostId).Count()
                     }
-                ).Take(10);
+                ).Take(50);
             }
             return View("Welcome",wallPosts);
         }
@@ -238,6 +255,7 @@ namespace Tech_In.Controllers
             @ViewBag.UName = HttpContext.Session.GetString(SessionKeyName);
             @ViewBag.UserName = HttpContext.Session.GetString(SessionUserName);
             @ViewBag.UserPic = HttpContext.Session.GetString(SessionKeyPic);
+            @ViewBag.UserID = HttpContext.Session.GetString(SessionKeyId);
             return HttpContext.Session.GetString(SessionKeyId);
         }
     }

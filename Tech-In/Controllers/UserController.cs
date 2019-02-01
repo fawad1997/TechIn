@@ -108,6 +108,7 @@ namespace Tech_In.Controllers
                              orderby pst.OriginalId descending
                 select new UserPostVM
                 {
+                    UserId = pst.UserId,
                     ProfilePic = u.ProfileImage,
                     Name = u.FirstName+" "+u.LastName,
                     UserName = us.UserName,
@@ -382,7 +383,7 @@ namespace Tech_In.Controllers
 
         public async Task<IActionResult> AddFriend(string UserName)
         {
-            string currentUserId = await OnGetSesstion();
+            string currentUserId = await OnGetSesstion();//commit
             var userToAdd = _context.Users.Where(x => x.UserName == UserName).FirstOrDefault();
             if (userToAdd == null || userToAdd.Id == currentUserId)
                 return Json(new { success = false, msg = "Sorry, Unable to send Friend Request :(" });
@@ -1288,6 +1289,7 @@ namespace Tech_In.Controllers
             @ViewBag.UName = HttpContext.Session.GetString(SessionKeyName);
             @ViewBag.UserName = HttpContext.Session.GetString(SessionUserName);
             @ViewBag.UserPic = HttpContext.Session.GetString(SessionKeyPic);
+            @ViewBag.UserID = HttpContext.Session.GetString(SessionKeyId);
             return HttpContext.Session.GetString(SessionKeyId);
         }
 
